@@ -2469,7 +2469,7 @@ body {
         <div class="delivery-info" id="friend-delivery-date" aria-live="polite"></div>
         <div class="card-letter card-letter--night">
           <div class="card-letter__label" id="friend-letter-label">ともだちの朝に、とどける手紙。</div>
-          <textarea class="textarea-letter" id="friend-letter-input" aria-label="手紙の内容"></textarea>
+          <textarea class="textarea-letter" id="friend-letter-input" aria-label="手紙の内容" maxlength="5000"></textarea>
         </div>
         <div class="write-actions">
           <button class="btn btn-night-primary btn--lg btn--block" id="friend-send-btn" onclick="sendFriendLetter()" aria-label="あしたのともだちにとどける">あしたのともだちにとどける</button>
@@ -3518,7 +3518,7 @@ function toggleSheetFriendPicker() {
     if (typeof friendsList !== 'undefined' && friendsList.length > 0) {
       friendsList.forEach(f => {
         const sel = sheetRecipientUid === f.uid ? ' selected' : '';
-        html += `<button class="sheet__friend-option${sel}" data-uid="${f.uid}" onclick="selectSheetRecipient('${f.uid}', '${escapeHtml(f.displayName)}')">${escapeHtml(f.displayName)}</button>`;
+        html += `<button class="sheet__friend-option${sel}" data-uid="${escapeHtml(f.uid)}" onclick="selectSheetRecipient('${escapeJsStr(f.uid)}', '${escapeJsStr(f.displayName)}')">${escapeHtml(f.displayName)}</button>`;
       });
     } else {
       html += '<div class="sheet__friend-empty">ともだちがまだいません。<br>設定画面からフレンドコードを<br>送って招待してね。</div>';
@@ -4384,6 +4384,9 @@ function escapeHtml(text) {
   d.textContent = text;
   return d.innerHTML;
 }
+function escapeJsStr(s) {
+  return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
 
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -4556,15 +4559,17 @@ async function loadUserProfile() {
 
 // ===== フレンドコード生成（重複チェック付き） =====
 async function generateFriendCode() {
-  let code = '';
-  let exists = true;
-  while (exists) {
-    code = Math.random().toString(36).substring(2, 8).toUpperCase();
-    const q = db.collection('users').where('friendCode', '==', code);
-    const snap = await q.get();
-    exists = !snap.empty;
+  for (let i = 0; i < 10; i++) {
+    try {
+      const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+      const q = db.collection('users').where('friendCode', '==', code);
+      const snap = await q.get();
+      if (snap.empty) return code;
+    } catch (e) {
+      console.warn('generateFriendCode attempt failed:', e);
+    }
   }
-  return code;
+  throw new Error('フレンドコードの生成に失敗しました');
 }
 
 // ===== 認証画面のモード切り替え =====
@@ -4670,13 +4675,18 @@ async function handleAuth() {
 // ===== ログアウト =====
 async function handleLogout() {
   if (!confirm('ログアウトしますか？')) return;
-  console.log('[Auth] handleLogout: signing out...');
-  await auth.signOut();
-  console.log('[Auth] handleLogout: signed out');
-  showToast('ログアウトしたよ');
-  writeTarget = 'self';
-  selectedFriendUid = null;
-  selectedFriendName = null;
+  try {
+    console.log('[Auth] handleLogout: signing out...');
+    await auth.signOut();
+    console.log('[Auth] handleLogout: signed out');
+    showToast('ログアウトしたよ');
+    writeTarget = 'self';
+    selectedFriendUid = null;
+    selectedFriendName = null;
+  } catch (e) {
+    console.error('handleLogout error:', e);
+    showToast('ログアウトに失敗したよ。もう一度試してね');
+  }
 }
 
 // ===== 認証UIの更新 =====
@@ -4827,13 +4837,14 @@ async function loadFriends() {
     snap1.forEach(doc => { const d = doc.data(); friendUids.add(d.user2); });
     snap2.forEach(doc => { const d = doc.data(); friendUids.add(d.user1); });
 
-    // フレンドのプロフィールを取得
-    for (const uid of friendUids) {
-      const uDoc = await db.collection('users').doc(uid).get();
-      if (uDoc.exists) {
-        friendsList.push({ uid, ...uDoc.data() });
-      }
-    }
+    // フレンドのプロフィールを並列取得
+    const profilePromises = [...friendUids].map(uid =>
+      db.collection('users').doc(uid).get().then(uDoc =>
+        uDoc.exists ? { uid, ...uDoc.data() } : null
+      )
+    );
+    const profiles = await Promise.all(profilePromises);
+    friendsList = profiles.filter(p => p !== null);
   } catch (e) {
     console.warn('loadFriends error:', e);
   }
@@ -4918,12 +4929,13 @@ async function sendFriendRequest(friendCode) {
 async function acceptFriendRequest(requestId, fromUid) {
   try {
     const uids = [currentUser.uid, fromUid].sort();
-    await db.collection('friends').add({
+    const friendDocId = `${uids[0]}_${uids[1]}`;
+    await db.collection('friends').doc(friendDocId).set({
       users: uids,
       user1: uids[0],
       user2: uids[1],
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    }, { merge: true });
     await db.collection('friendRequests').doc(requestId).update({
       status: 'accepted',
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -5006,8 +5018,8 @@ function renderFriendsScreen() {
         <div class="friend-request-card">
           <div class="friend-card__name">${escapeHtml(req.fromName)}</div>
           <div class="friend-request-card__actions">
-            <button class="btn btn-primary btn--sm" onclick="acceptFriendRequest('${req.id}', '${req.fromUid}')">ともだちになる</button>
-            <button class="btn btn-secondary btn--sm" onclick="rejectFriendRequest('${req.id}')">やめとく</button>
+            <button class="btn btn-primary btn--sm" onclick="acceptFriendRequest('${escapeJsStr(req.id)}', '${escapeJsStr(req.fromUid)}')">ともだちになる</button>
+            <button class="btn btn-secondary btn--sm" onclick="rejectFriendRequest('${escapeJsStr(req.id)}')">やめとく</button>
           </div>
         </div>
       `;
@@ -5078,7 +5090,7 @@ function renderFriendSelectList() {
     return;
   }
   list.innerHTML = friendsList.map(f => `
-    <button class="friend-select-item" data-uid="${f.uid}" data-name="${escapeHtml(f.displayName)}" onclick="selectFriendForLetter(this, '${f.uid}', '${escapeHtml(f.displayName)}')">
+    <button class="friend-select-item" data-uid="${escapeHtml(f.uid)}" data-name="${escapeHtml(f.displayName)}" onclick="selectFriendForLetter(this, '${escapeJsStr(f.uid)}', '${escapeJsStr(f.displayName)}')">
       ${escapeHtml(f.displayName)}
     </button>
   `).join('');
@@ -5225,9 +5237,10 @@ async function loadIncomingLetters() {
       .where('deliverAt', '<', firebase.firestore.Timestamp.fromDate(tomorrow));
 
     const snap = await q.get();
+    const now = new Date();
     snap.forEach(doc => {
       const d = doc.data();
-      if (!d.read) {
+      if (!d.read && d.deliverAt.toDate() <= now) {
         incomingLetters.push({ id: doc.id, ...d });
       }
     });
@@ -5266,12 +5279,16 @@ function renderFriendLettersInAlarm() {
 async function markFriendLettersRead() {
   if (!currentUser || incomingLetters.length === 0) return;
 
+  // DOM要素の値を同期的に先に取得（画面遷移でDOMが消える前に）
+  const letterUpdates = incomingLetters.map(letter => {
+    const replyEl = document.getElementById(`friend-reply-${letter.id}`);
+    return { id: letter.id, reply: replyEl ? replyEl.value.trim() : '' };
+  });
+
   try {
     const batch = db.batch();
-    incomingLetters.forEach(letter => {
-      const replyEl = document.getElementById(`friend-reply-${letter.id}`);
-      const reply = replyEl ? replyEl.value.trim() : '';
-      const ref = db.collection('letters').doc(letter.id);
+    letterUpdates.forEach(({ id, reply }) => {
+      const ref = db.collection('letters').doc(id);
       const updateData = { read: true };
       if (reply) {
         updateData.reply = reply;
@@ -5302,20 +5319,22 @@ async function updateHomeFriendLetters() {
 
     const snap = await q.get();
     let friendHtml = '';
+    const now = new Date();
     snap.forEach(doc => {
       const d = doc.data();
-      if (!d.read) {
+      if (!d.read && d.deliverAt.toDate() <= now) {
         const deliverTime = d.deliverAt.toDate();
         const h = String(deliverTime.getHours()).padStart(2, '0');
         const m = String(deliverTime.getMinutes()).padStart(2, '0');
-        const preview = d.letter ? d.letter.substring(0, 30) + (d.letter.length > 30 ? '…' : '') : '';
-        const initial = (d.fromName || '?')[0];
+        const preview = d.letter ? escapeHtml(d.letter.substring(0, 30)) + (d.letter.length > 30 ? '…' : '') : '';
+        const initial = escapeHtml((d.fromName || '?')[0]);
+        const fromName = escapeHtml(d.fromName || 'ともだち');
 
         friendHtml += `
-          <div class="inbox-item" onclick="navigateTo('alarm')">
+          <div class="inbox-item inbox-item--friend">
             <div class="inbox-item__icon inbox-item__icon--friend">${initial}</div>
             <div class="inbox-item__body">
-              <div class="inbox-item__title">${d.fromName || 'ともだち'}からの手紙</div>
+              <div class="inbox-item__title">${fromName}からの手紙</div>
               <div class="inbox-item__sub">${preview || '手紙が届いています'}</div>
             </div>
             <span class="inbox-item__status">未読</span>
@@ -5324,15 +5343,15 @@ async function updateHomeFriendLetters() {
       }
     });
 
-    // 既存の inbox 末尾に追加
+    // 既存のフレンド手紙アイテムを削除してから追加（重複防止）
+    inbox.querySelectorAll('.inbox-item--friend').forEach(el => el.remove());
     if (friendHtml) {
       inbox.insertAdjacentHTML('beforeend', friendHtml);
-      // 空状態を非表示
       const emptyEl = document.getElementById('home-empty-state');
       if (emptyEl) { emptyEl.classList.remove('active'); emptyEl.innerHTML = ''; }
     }
   } catch (e) {
-    // エラー時は何もしない
+    console.warn('updateHomeFriendLetters error:', e);
   }
 }
 
