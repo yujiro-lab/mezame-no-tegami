@@ -2461,18 +2461,13 @@ body {
       </div><!-- /write-self-area -->
       <!-- フレンドへの手紙エリア -->
       <div id="write-friend-area" style="display:none;">
-        <div class="time-picker" aria-label="配達時刻設定">
-          <input type="text" inputmode="numeric" class="time-picker__input" id="friend-alarm-hour" maxlength="2" value="07" placeholder="07" aria-label="時">
-          <span class="time-picker__separator">:</span>
-          <input type="text" inputmode="numeric" class="time-picker__input" id="friend-alarm-minute" maxlength="2" value="00" placeholder="00" aria-label="分">
-        </div>
         <div class="delivery-info" id="friend-delivery-date" aria-live="polite"></div>
         <div class="card-letter card-letter--night">
-          <div class="card-letter__label" id="friend-letter-label">ともだちの朝に、とどける手紙。</div>
+          <div class="card-letter__label" id="friend-letter-label">ともだちに、とどける手紙。</div>
           <textarea class="textarea-letter" id="friend-letter-input" aria-label="手紙の内容" maxlength="5000"></textarea>
         </div>
         <div class="write-actions">
-          <button class="btn btn-night-primary btn--lg btn--block" id="friend-send-btn" onclick="sendFriendLetter()" aria-label="あしたのともだちにとどける">あしたのともだちにとどける</button>
+          <button class="btn btn-night-primary btn--lg btn--block" id="friend-send-btn" onclick="sendFriendLetter()" aria-label="ともだちにとどける">ともだちにとどける</button>
         </div>
       </div>
     </div>
@@ -2688,13 +2683,16 @@ body {
                 <span class="sheet__field-sep">日</span>
               </div>
             </div>
-            <div class="sheet__field">
+            <div class="sheet__field" id="sheet-time-field">
               <span class="sheet__field-label">時刻</span>
               <div class="sheet__field-value">
                 <input type="text" inputmode="numeric" class="sheet__field-input" id="sheet-alarm-hour" maxlength="2" value="07" placeholder="07" aria-label="時">
                 <span class="sheet__field-sep">:</span>
                 <input type="text" inputmode="numeric" class="sheet__field-input" id="sheet-alarm-minute" maxlength="2" value="00" placeholder="00" aria-label="分">
               </div>
+            </div>
+            <div class="sheet__field" id="sheet-friend-date-note" style="display:none;">
+              <span class="sheet__field-label" style="color:var(--color-text-tertiary);font-size:0.85rem;">届く時間は相手が決めるよ</span>
             </div>
           </div>
         </div>
@@ -2730,6 +2728,42 @@ body {
       <div class="sheet__goodnight-icon">📮</div>
       <div class="sheet__goodnight-main">手紙がセットされました</div>
       <div class="sheet__goodnight-sub" id="sheet-goodnight-sub">設定日時にお届けします</div>
+    </div>
+  </div>
+
+  <!-- ===== フレンド手紙アラーム設定シート ===== -->
+  <div class="sheet-overlay" id="friend-alarm-overlay" onclick="closeFriendAlarmSetup()"></div>
+  <div class="sheet" id="friend-alarm-sheet">
+    <div class="sheet__handle-area"><div class="sheet__handle"></div></div>
+    <div class="sheet__content">
+      <div class="sheet__form">
+        <div class="sheet__section">
+          <div class="sheet__section-title" id="friend-alarm-title" style="font-size:1.1rem;">手紙が届いてるよ</div>
+          <p style="color:var(--color-text-tertiary);font-size:0.85rem;margin:0 0 var(--space-4);">届く時間を決めてね。その時間にアラームで届くよ。</p>
+          <div class="sheet__field-group">
+            <div class="sheet__field">
+              <span class="sheet__field-label">日付</span>
+              <div class="sheet__field-value">
+                <input type="text" inputmode="numeric" class="sheet__field-input" id="friend-setup-month" maxlength="2" aria-label="月">
+                <span class="sheet__field-sep">月</span>
+                <input type="text" inputmode="numeric" class="sheet__field-input" id="friend-setup-day" maxlength="2" aria-label="日">
+                <span class="sheet__field-sep">日</span>
+              </div>
+            </div>
+            <div class="sheet__field">
+              <span class="sheet__field-label">時刻</span>
+              <div class="sheet__field-value">
+                <input type="text" inputmode="numeric" class="sheet__field-input" id="friend-setup-hour" maxlength="2" value="07" placeholder="07" aria-label="時">
+                <span class="sheet__field-sep">:</span>
+                <input type="text" inputmode="numeric" class="sheet__field-input" id="friend-setup-minute" maxlength="2" value="00" placeholder="00" aria-label="分">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sheet__cta-area">
+        <button class="sheet__cta sheet__cta--ready" onclick="confirmFriendAlarmSetup()">この時間にとどける</button>
+      </div>
     </div>
   </div>
 
@@ -2842,10 +2876,6 @@ function init() {
   // アラーム時刻入力監視
   document.getElementById('alarm-hour').addEventListener('input', updateDeliveryDate);
   document.getElementById('alarm-minute').addEventListener('input', updateDeliveryDate);
-
-  // フレンド手紙時刻入力監視
-  document.getElementById('friend-alarm-hour').addEventListener('input', updateFriendDeliveryDate);
-  document.getElementById('friend-alarm-minute').addEventListener('input', updateFriendDeliveryDate);
 
   // 音量スライダー
   document.getElementById('volume-slider').addEventListener('input', function() {
@@ -3537,6 +3567,11 @@ function selectSheetRecipient(uid, name) {
   if (textarea) {
     textarea.placeholder = uid ? `${name}の朝に届く手紙。` : 'あしたの朝の自分に、ひとこと。';
   }
+  // フレンド宛なら時刻フィールドを隠す（送り手は日付のみ）
+  const timeField = document.getElementById('sheet-time-field');
+  const dateNote = document.getElementById('sheet-friend-date-note');
+  if (timeField) timeField.style.display = uid ? 'none' : '';
+  if (dateNote) dateNote.style.display = uid ? '' : 'none';
   // Close picker
   const picker = document.getElementById('sheet-friend-picker');
   if (picker) picker.classList.remove('open');
@@ -3707,21 +3742,42 @@ function updateHomeLetterArea() {
     const dateStr = `${t.getMonth()+1}/${t.getDate()}（${days[t.getDay()]}）`;
     const h = String(alarm.hour).padStart(2, '0');
     const m = String(alarm.minute).padStart(2, '0');
-    const preview = alarm.letter ? alarm.letter.substring(0, 40) + (alarm.letter.length > 40 ? '…' : '') : '';
+    const isFriend = !!alarm.friendLetterId;
+    const fromName = isFriend ? escapeHtml(alarm.friendFromName || 'ともだち') : null;
+    const initial = isFriend ? escapeHtml((alarm.friendFromName || '?')[0]) : null;
+    const preview = isFriend
+      ? `${fromName}からの手紙`
+      : (alarm.letter ? alarm.letter.substring(0, 40) + (alarm.letter.length > 40 ? '…' : '') : '');
 
-    html += `
-      <div class="inbox-item">
-        <div class="inbox-item__icon inbox-item__icon--self" onclick="openWriteSheet(${alarm.id})">${getUserIcon()}</div>
-        <div class="inbox-item__body" onclick="openWriteSheet(${alarm.id})">
-          <div class="inbox-item__title">${dateStr} ${h}:${m} にとどく</div>
-          <div class="inbox-item__sub">${preview || '手紙をあずかり中'}</div>
+    if (isFriend) {
+      html += `
+        <div class="inbox-item">
+          <div class="inbox-item__icon inbox-item__icon--friend">${initial}</div>
+          <div class="inbox-item__body">
+            <div class="inbox-item__title">${dateStr} ${h}:${m} にとどく</div>
+            <div class="inbox-item__sub">${preview}</div>
+          </div>
+          <span class="inbox-item__status">セット済み</span>
+          <button class="inbox-item__delete" onclick="deleteAlarm(${alarm.id})" aria-label="削除">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
         </div>
-        <span class="inbox-item__status">あずかり中</span>
-        <button class="inbox-item__delete" onclick="deleteAlarm(${alarm.id})" aria-label="削除">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-        </button>
-      </div>
-    `;
+      `;
+    } else {
+      html += `
+        <div class="inbox-item">
+          <div class="inbox-item__icon inbox-item__icon--self" onclick="openWriteSheet(${alarm.id})">${getUserIcon()}</div>
+          <div class="inbox-item__body" onclick="openWriteSheet(${alarm.id})">
+            <div class="inbox-item__title">${dateStr} ${h}:${m} にとどく</div>
+            <div class="inbox-item__sub">${preview || '手紙をあずかり中'}</div>
+          </div>
+          <span class="inbox-item__status">あずかり中</span>
+          <button class="inbox-item__delete" onclick="deleteAlarm(${alarm.id})" aria-label="削除">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+        </div>
+      `;
+    }
   });
 
   el.innerHTML = html;
@@ -3921,12 +3977,6 @@ function triggerAlarm() {
   document.getElementById('alarm-current-time').textContent =
     String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
 
-  const setDate = new Date(alarmData.setDate);
-  const days = ['日', '月', '火', '水', '木', '金', '土'];
-  document.getElementById('letter-sent-date').textContent =
-    `${setDate.getMonth()+1}月${setDate.getDate()}日（${days[setDate.getDay()]}）の夜に書きました`;
-
-  document.getElementById('letter-content').textContent = alarmData.letter;
   document.getElementById('reply-input').value = '';
   const ctaBtn = document.getElementById('dismiss-btn');
   ctaBtn.disabled = true;
@@ -3937,11 +3987,18 @@ function triggerAlarm() {
   document.getElementById('alarm-phase-reply').style.display = 'none';
   document.getElementById('alarm-phase-complete').style.display = 'none';
 
-  renderTimeCapsule();
+  if (alarmData.friendLetterId) {
+    // フレンド手紙のアラーム → Firestoreから取得して表示
+    triggerFriendLetterAlarm();
+  } else {
+    // 自分への手紙のアラーム
+    const setDate = new Date(alarmData.setDate);
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
+    document.getElementById('letter-sent-date').textContent =
+      `${setDate.getMonth()+1}月${setDate.getDate()}日（${days[setDate.getDay()]}）の夜に書きました`;
+    document.getElementById('letter-content').textContent = alarmData.letter;
 
-  // フレンドからの手紙を読み込み・表示
-  if (currentUser) {
-    loadIncomingLetters().then(() => renderFriendLettersInAlarm());
+    renderTimeCapsule();
   }
 
   navigateTo('alarm-screen');
@@ -3960,11 +4017,50 @@ function triggerAlarm() {
   const ttsEnabled = localStorage.getItem('mezame_tts') !== 'off';
   if (ttsEnabled) {
     ttsLooping = true;
-    setTimeout(() => readLetterAloud(alarmData.letter), 5000);
+    const ttsText = alarmData.friendLetterId ? null : alarmData.letter;
+    if (ttsText) setTimeout(() => readLetterAloud(ttsText), 5000);
   }
 
   if ('Notification' in window && Notification.permission === 'granted') {
-    new Notification('めざめの手紙', { body: 'ゆうべの自分から、手紙が届いてるよ。' });
+    const body = alarmData.friendLetterId
+      ? `${alarmData.friendFromName}から手紙が届いてるよ。`
+      : 'ゆうべの自分から、手紙が届いてるよ。';
+    new Notification('めざめの手紙', { body });
+  }
+}
+
+// フレンド手紙アラームの内容をFirestoreから取得して表示
+async function triggerFriendLetterAlarm() {
+  try {
+    const doc = await db.collection('letters').doc(alarmData.friendLetterId).get();
+    if (!doc.exists) {
+      document.getElementById('letter-sent-date').textContent = 'ともだちからの手紙';
+      document.getElementById('letter-content').textContent = '（手紙が見つかりませんでした）';
+      return;
+    }
+    const data = doc.data();
+    const fromName = data.fromName || alarmData.friendFromName || 'ともだち';
+
+    document.getElementById('letter-sent-date').textContent = `${fromName}が書いてくれた手紙`;
+    document.getElementById('letter-content').textContent = data.letter;
+
+    // タイムカプセル領域を非表示（フレンド手紙には不要）
+    const tcArea = document.getElementById('time-capsule-area');
+    if (tcArea) tcArea.innerHTML = '';
+
+    // フレンド手紙用の返事プレースホルダー
+    const replyInput = document.getElementById('reply-input');
+    if (replyInput) replyInput.placeholder = `${fromName}に、ひとこと`;
+
+    // TTS読み上げ
+    const ttsEnabled = localStorage.getItem('mezame_tts') !== 'off';
+    if (ttsEnabled && data.letter) {
+      setTimeout(() => readLetterAloud(data.letter), 5000);
+    }
+  } catch (e) {
+    console.warn('triggerFriendLetterAlarm error:', e);
+    document.getElementById('letter-sent-date').textContent = 'ともだちからの手紙';
+    document.getElementById('letter-content').textContent = '（読み込み中にエラーが起きました）';
   }
 }
 
@@ -4156,27 +4252,30 @@ function dismissAlarm() {
   const reply = document.getElementById('reply-input').value.trim();
   if (!reply) return;
 
-  const history = JSON.parse(localStorage.getItem('mezame_history') || '[]');
-  history.unshift({
-    letter: alarmData.letter,
-    letterDate: alarmData.setDate,
-    reply,
-    replyDate: new Date().toISOString(),
-    fromName: alarmData.recipientName || 'じぶん'
-  });
-  if (history.length > 100) history.length = 100;
-  localStorage.setItem('mezame_history', JSON.stringify(history));
-
   stopAlarmSound();
-  const savedLetter = alarmData.letter;
+
+  if (alarmData.friendLetterId) {
+    // フレンド手紙 → Firestoreに返事を保存 + 既読に
+    const letterContent = document.getElementById('letter-content').textContent;
+    saveFriendLetterReply(alarmData.friendLetterId, reply, letterContent, alarmData.friendFromName);
+  } else {
+    // 自分への手紙 → localStorageに保存
+    const history = JSON.parse(localStorage.getItem('mezame_history') || '[]');
+    history.unshift({
+      letter: alarmData.letter,
+      letterDate: alarmData.setDate,
+      reply,
+      replyDate: new Date().toISOString(),
+      fromName: alarmData.recipientName || 'じぶん'
+    });
+    if (history.length > 100) history.length = 100;
+    localStorage.setItem('mezame_history', JSON.stringify(history));
+  }
 
   // 配列からこのアラームを削除
   let alarms = loadAlarms();
   alarms = alarms.filter(a => a.id !== alarmData.id);
   saveAlarms(alarms);
-
-  // フレンド手紙も既読に
-  markFriendLettersRead();
 
   // 完了フェーズを表示 → 2.5秒後にホームへ
   showAlarmComplete();
@@ -4185,36 +4284,43 @@ function dismissAlarm() {
   setTimeout(() => {
     navigateTo('home');
     updateHomeLetterArea();
+    if (currentUser) updateHomeFriendLetters();
   }, 2500);
 }
 
 // ===== アラーム解除（読んだよ） =====
 function dismissAlarmReadOnly() {
-  const history = JSON.parse(localStorage.getItem('mezame_history') || '[]');
-  history.unshift({
-    letter: alarmData.letter,
-    letterDate: alarmData.setDate,
-    reply: '(読んだよ)',
-    replyDate: new Date().toISOString(),
-    fromName: alarmData.recipientName || 'じぶん'
-  });
-  if (history.length > 100) history.length = 100;
-  localStorage.setItem('mezame_history', JSON.stringify(history));
-
   stopAlarmSound();
+
+  if (alarmData.friendLetterId) {
+    // フレンド手紙 → Firestoreで既読に（返事なし）
+    const letterContent = document.getElementById('letter-content').textContent;
+    saveFriendLetterReply(alarmData.friendLetterId, null, letterContent, alarmData.friendFromName);
+  } else {
+    // 自分への手紙 → localStorageに保存
+    const history = JSON.parse(localStorage.getItem('mezame_history') || '[]');
+    history.unshift({
+      letter: alarmData.letter,
+      letterDate: alarmData.setDate,
+      reply: '(読んだよ)',
+      replyDate: new Date().toISOString(),
+      fromName: alarmData.recipientName || 'じぶん'
+    });
+    if (history.length > 100) history.length = 100;
+    localStorage.setItem('mezame_history', JSON.stringify(history));
+  }
 
   // 配列からこのアラームを削除
   let alarms = loadAlarms();
   alarms = alarms.filter(a => a.id !== alarmData.id);
   saveAlarms(alarms);
 
-  // フレンド手紙も既読に
-  markFriendLettersRead();
-
   navigateTo('home');
   showToast('おはよう。いい一日を。');
   updateStreak();
   updateTodayQuote();
+  updateHomeLetterArea();
+  if (currentUser) updateHomeFriendLetters();
 }
 
 // ===== いってらっしゃい画面 =====
@@ -5109,8 +5215,8 @@ function selectFriendForLetter(el, uid, name) {
   friendWriteArea.style.display = 'block';
 
   // ラベル更新
-  document.getElementById('friend-letter-label').textContent = `${name}の朝に、とどける手紙。`;
-  document.getElementById('friend-send-btn').textContent = `あしたの${name}にとどける`;
+  document.getElementById('friend-letter-label').textContent = `${name}に、とどける手紙。`;
+  document.getElementById('friend-send-btn').textContent = `${name}にとどける`;
   document.getElementById('friend-letter-input').value = '';
   document.getElementById('friend-letter-input').placeholder = `${name}へ`;
   updateFriendDeliveryDate();
@@ -5118,16 +5224,12 @@ function selectFriendForLetter(el, uid, name) {
 
 function updateFriendDeliveryDate() {
   const el = document.getElementById('friend-delivery-date');
-  const hour = parseInt(document.getElementById('friend-alarm-hour').value);
-  const minute = parseInt(document.getElementById('friend-alarm-minute').value);
-  if (isNaN(hour) || isNaN(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
-    el.innerHTML = '';
-    return;
-  }
-  const target = getDeliveryDate(hour, minute);
+  // あした届く（日付のみ、時間は相手が決める）
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
   const days = ['日', '月', '火', '水', '木', '金', '土'];
-  const dateStr = `${target.getMonth()+1}月${target.getDate()}日（${days[target.getDay()]}）`;
-  el.innerHTML = `<span class="hl">${dateStr}</span> の朝にとどきます`;
+  const dateStr = `${tomorrow.getMonth()+1}月${tomorrow.getDate()}日（${days[tomorrow.getDay()]}）`;
+  el.innerHTML = `<span class="hl">${dateStr}</span> に届きます（届く時間は相手が決めるよ）`;
 }
 
 // ===== フレンドに手紙を送信 =====
@@ -5138,14 +5240,10 @@ async function sendFriendLetter() {
   const letter = document.getElementById('friend-letter-input').value.trim();
   if (!letter) { showToast('ひとこと、なんでもいいよ。'); return; }
 
-  const hour = parseInt(document.getElementById('friend-alarm-hour').value);
-  const minute = parseInt(document.getElementById('friend-alarm-minute').value);
-  if (isNaN(hour) || isNaN(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
-    showToast('時刻を正しく入れてね');
-    return;
-  }
-
-  const deliverAt = getDeliveryDate(hour, minute);
+  // 届く日=あした（日付のみ、時間は受け手が決める）
+  const deliverDate = new Date();
+  deliverDate.setDate(deliverDate.getDate() + 1);
+  deliverDate.setHours(0, 0, 0, 0);
 
   try {
     await db.collection('letters').add({
@@ -5153,11 +5251,12 @@ async function sendFriendLetter() {
       fromName: userProfile.displayName,
       toUid: selectedFriendUid,
       letter: letter,
-      deliverAt: firebase.firestore.Timestamp.fromDate(deliverAt),
+      deliverDate: firebase.firestore.Timestamp.fromDate(deliverDate),
       setDate: firebase.firestore.Timestamp.now(),
       reply: null,
       replyDate: null,
       read: false,
+      alarmSet: false,
       createdAt: firebase.firestore.Timestamp.now()
     });
 
@@ -5185,20 +5284,17 @@ async function sendSheetFriendLetter() {
 
   const monthVal = parseInt(document.getElementById('sheet-alarm-month').value);
   const dayVal = parseInt(document.getElementById('sheet-alarm-day').value);
-  const hour = parseInt(document.getElementById('sheet-alarm-hour').value);
-  const minute = parseInt(document.getElementById('sheet-alarm-minute').value);
 
   if (isNaN(monthVal) || isNaN(dayVal) || monthVal < 1 || monthVal > 12 || dayVal < 1 || dayVal > 31) {
     showToast('日付を正しく入れてね'); return;
   }
-  if (isNaN(hour) || isNaN(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
-    showToast('時刻を正しく入れてね'); return;
-  }
 
   const now = new Date();
   let year = now.getFullYear();
-  const deliverAt = new Date(year, monthVal - 1, dayVal, hour, minute, 0, 0);
-  if (deliverAt <= now) deliverAt.setFullYear(year + 1);
+  const deliverDate = new Date(year, monthVal - 1, dayVal, 0, 0, 0, 0);
+  if (deliverDate < new Date(now.getFullYear(), now.getMonth(), now.getDate())) {
+    deliverDate.setFullYear(year + 1);
+  }
 
   try {
     await db.collection('letters').add({
@@ -5206,20 +5302,121 @@ async function sendSheetFriendLetter() {
       fromName: userProfile.displayName,
       toUid: sheetRecipientUid,
       letter: letter,
-      deliverAt: firebase.firestore.Timestamp.fromDate(deliverAt),
+      deliverDate: firebase.firestore.Timestamp.fromDate(deliverDate),
       setDate: firebase.firestore.Timestamp.now(),
       reply: null,
       replyDate: null,
       read: false,
+      alarmSet: false,
       createdAt: firebase.firestore.Timestamp.now()
     });
 
-    showToast(`${sheetRecipientName}に手紙をセットしました`);
+    showToast(`${sheetRecipientName}に手紙をあずけたよ`);
     startSheetGoodnight();
   } catch (e) {
     console.error('sendSheetFriendLetter error:', e);
     showToast('送信に失敗しました。もう一度お試しください');
   }
+}
+
+// ===== フレンド手紙アラーム設定 =====
+let pendingFriendAlarmLetter = null; // { id, fromName, minDate }
+
+function setupFriendLetterAlarm(letterId, fromName, deliverDateMs) {
+  pendingFriendAlarmLetter = { id: letterId, fromName: fromName, minDate: new Date(deliverDateMs) };
+
+  const now = new Date();
+  const defaultDate = pendingFriendAlarmLetter.minDate <= now ? now : pendingFriendAlarmLetter.minDate;
+
+  document.getElementById('friend-alarm-title').textContent = `${fromName}からの手紙が届いてるよ`;
+  document.getElementById('friend-setup-month').value = String(defaultDate.getMonth() + 1);
+  document.getElementById('friend-setup-day').value = String(defaultDate.getDate());
+  document.getElementById('friend-setup-hour').value = '07';
+  document.getElementById('friend-setup-minute').value = '00';
+
+  document.getElementById('friend-alarm-overlay').classList.add('active');
+  document.getElementById('friend-alarm-sheet').classList.add('open');
+}
+
+function closeFriendAlarmSetup() {
+  document.getElementById('friend-alarm-overlay').classList.remove('active');
+  document.getElementById('friend-alarm-sheet').classList.remove('open');
+  pendingFriendAlarmLetter = null;
+}
+
+async function confirmFriendAlarmSetup() {
+  if (!pendingFriendAlarmLetter) return;
+
+  const monthVal = parseInt(document.getElementById('friend-setup-month').value);
+  const dayVal = parseInt(document.getElementById('friend-setup-day').value);
+  const hour = parseInt(document.getElementById('friend-setup-hour').value);
+  const minute = parseInt(document.getElementById('friend-setup-minute').value);
+
+  if (isNaN(monthVal) || isNaN(dayVal) || isNaN(hour) || isNaN(minute) ||
+      monthVal < 1 || monthVal > 12 || dayVal < 1 || dayVal > 31 ||
+      hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+    showToast('日時を正しく入れてね');
+    return;
+  }
+
+  const now = new Date();
+  const year = now.getFullYear();
+  let targetDate = new Date(year, monthVal - 1, dayVal, hour, minute, 0, 0);
+
+  // 過去の場合は来年にする
+  if (targetDate <= now) {
+    // 今日の日付で未来の時刻なら有効
+    const todayCheck = new Date(year, monthVal - 1, dayVal, 0, 0, 0, 0);
+    const nowDate = new Date(year, now.getMonth(), now.getDate(), 0, 0, 0, 0);
+    if (todayCheck.getTime() === nowDate.getTime() && (hour > now.getHours() || (hour === now.getHours() && minute > now.getMinutes()))) {
+      // OK: 今日のまだ来てない時間
+    } else if (targetDate <= now) {
+      showToast('未来の時刻を設定してね');
+      return;
+    }
+  }
+
+  // 送り主が指定した日付より前にはできない
+  const minDate = pendingFriendAlarmLetter.minDate;
+  const minDateOnly = new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate());
+  const targetDateOnly = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
+
+  if (targetDateOnly < minDateOnly) {
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
+    const ds = `${minDate.getMonth()+1}月${minDate.getDate()}日（${days[minDate.getDay()]}）`;
+    showToast(`${ds}より前にはできないよ`);
+    return;
+  }
+
+  // ローカルアラームを作成（friendLetterIdつき）
+  const alarmObj = {
+    id: Date.now(),
+    hour,
+    minute,
+    letter: `${pendingFriendAlarmLetter.fromName}からの手紙`,
+    setDate: now.toISOString(),
+    targetDate: targetDate.toISOString(),
+    friendLetterId: pendingFriendAlarmLetter.id,
+    friendFromName: pendingFriendAlarmLetter.fromName
+  };
+
+  let alarms = loadAlarms();
+  alarms.push(alarmObj);
+  saveAlarms(alarms);
+
+  // Firestore: alarmSet = true に更新
+  try {
+    await db.collection('letters').doc(pendingFriendAlarmLetter.id).update({ alarmSet: true });
+  } catch (e) {
+    console.warn('Failed to update alarmSet:', e);
+  }
+
+  showToast(`${pendingFriendAlarmLetter.fromName}の手紙、セットしたよ`);
+  closeFriendAlarmSetup();
+
+  // ホーム画面を更新
+  updateHomeLetterArea();
+  updateHomeFriendLetters();
 }
 
 // ===== フレンドからの手紙を取得（アラーム画面用） =====
@@ -5228,19 +5425,23 @@ async function loadIncomingLetters() {
   if (!currentUser) return;
 
   try {
-    const today = new Date(); today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
+    // 未読かつアラーム未設定のフレンド手紙を取得（ホーム通知用）
+    const now = new Date();
+    const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
 
     const q = db.collection('letters')
       .where('toUid', '==', currentUser.uid)
-      .where('deliverAt', '>=', firebase.firestore.Timestamp.fromDate(today))
-      .where('deliverAt', '<', firebase.firestore.Timestamp.fromDate(tomorrow));
+      .where('read', '==', false);
 
     const snap = await q.get();
-    const now = new Date();
     snap.forEach(doc => {
       const d = doc.data();
-      if (!d.read && d.deliverAt.toDate() <= now) {
+      // deliverDate フィールドがあり、今日以前の日付
+      if (d.deliverDate && d.deliverDate.toDate() <= todayEnd) {
+        incomingLetters.push({ id: doc.id, ...d });
+      }
+      // 旧形式 deliverAt フィールド（後方互換）
+      else if (d.deliverAt && d.deliverAt.toDate() <= now) {
         incomingLetters.push({ id: doc.id, ...d });
       }
     });
@@ -5275,7 +5476,34 @@ function renderFriendLettersInAlarm() {
   area.innerHTML = html;
 }
 
-// ===== フレンド手紙を既読にして返事を保存 =====
+// ===== フレンド手紙の返事をFirestoreに保存（個別アラーム用） =====
+async function saveFriendLetterReply(letterId, reply, letterContent, fromName) {
+  if (!currentUser) return;
+  try {
+    const updateData = { read: true };
+    if (reply) {
+      updateData.reply = reply;
+      updateData.replyDate = firebase.firestore.Timestamp.now();
+    }
+    await db.collection('letters').doc(letterId).update(updateData);
+
+    // 記録にも残す
+    const history = JSON.parse(localStorage.getItem('mezame_history') || '[]');
+    history.unshift({
+      letter: letterContent || '',
+      letterDate: new Date().toISOString(),
+      reply: reply || '(読んだよ)',
+      replyDate: new Date().toISOString(),
+      fromName: fromName || 'ともだち'
+    });
+    if (history.length > 100) history.length = 100;
+    localStorage.setItem('mezame_history', JSON.stringify(history));
+  } catch (e) {
+    console.warn('saveFriendLetterReply error:', e);
+  }
+}
+
+// ===== フレンド手紙を既読にして返事を保存（一括・旧形式用） =====
 async function markFriendLettersRead() {
   if (!currentUser || incomingLetters.length === 0) return;
 
@@ -5309,27 +5537,53 @@ async function updateHomeFriendLetters() {
   if (!inbox || !currentUser) return;
 
   try {
-    const today = new Date(); today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
+    const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
 
     const q = db.collection('letters')
       .where('toUid', '==', currentUser.uid)
-      .where('deliverAt', '>=', firebase.firestore.Timestamp.fromDate(today))
-      .where('deliverAt', '<', firebase.firestore.Timestamp.fromDate(tomorrow));
+      .where('read', '==', false);
 
     const snap = await q.get();
     let friendHtml = '';
-    const now = new Date();
     snap.forEach(doc => {
       const d = doc.data();
-      if (!d.read && d.deliverAt.toDate() <= now) {
-        const deliverTime = d.deliverAt.toDate();
-        const h = String(deliverTime.getHours()).padStart(2, '0');
-        const m = String(deliverTime.getMinutes()).padStart(2, '0');
-        const preview = d.letter ? escapeHtml(d.letter.substring(0, 30)) + (d.letter.length > 30 ? '…' : '') : '';
-        const initial = escapeHtml((d.fromName || '?')[0]);
-        const fromName = escapeHtml(d.fromName || 'ともだち');
+      // deliverDate（新形式）またはdeliverAt（旧形式）で判定
+      const deliverDate = d.deliverDate ? d.deliverDate.toDate() : (d.deliverAt ? d.deliverAt.toDate() : null);
+      if (!deliverDate || deliverDate > todayEnd) return;
 
+      const initial = escapeHtml((d.fromName || '?')[0]);
+      const fromName = escapeHtml(d.fromName || 'ともだち');
+      const docId = escapeJsStr(doc.id);
+      const escapedName = escapeJsStr(d.fromName || 'ともだち');
+      const deliverMs = deliverDate.getTime();
+
+      if (d.alarmSet === false) {
+        // アラーム未設定 → タップでアラーム設定を開く（内容は見えない）
+        friendHtml += `
+          <div class="inbox-item inbox-item--friend" onclick="setupFriendLetterAlarm('${docId}', '${escapedName}', ${deliverMs})">
+            <div class="inbox-item__icon inbox-item__icon--friend">${initial}</div>
+            <div class="inbox-item__body">
+              <div class="inbox-item__title">${fromName}からの手紙</div>
+              <div class="inbox-item__sub">届く時間をセットしよう</div>
+            </div>
+            <span class="inbox-item__status" style="color:var(--color-primary);">時間をセット</span>
+          </div>
+        `;
+      } else if (d.alarmSet === true) {
+        // アラーム設定済み → 待機中表示（内容は見えない）
+        friendHtml += `
+          <div class="inbox-item inbox-item--friend">
+            <div class="inbox-item__icon inbox-item__icon--friend">${initial}</div>
+            <div class="inbox-item__body">
+              <div class="inbox-item__title">${fromName}からの手紙</div>
+              <div class="inbox-item__sub">セットした時間にとどくよ</div>
+            </div>
+            <span class="inbox-item__status">セット済み</span>
+          </div>
+        `;
+      } else {
+        // 旧形式（alarmSetフィールドなし）→ 従来通り表示
+        const preview = d.letter ? escapeHtml(d.letter.substring(0, 30)) + (d.letter.length > 30 ? '…' : '') : '';
         friendHtml += `
           <div class="inbox-item inbox-item--friend">
             <div class="inbox-item__icon inbox-item__icon--friend">${initial}</div>
