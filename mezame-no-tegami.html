@@ -1,0 +1,5342 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="めざめの手紙">
+<meta name="theme-color" content="#0F0F1E" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F7F7FA" media="(prefers-color-scheme: light)">
+<meta name="description" content="夜、自分に手紙を書く。朝、届く。自分との文通アプリ。">
+<title>めざめの手紙</title>
+<!-- 手紙フォント (非同期読み込み) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kurenaido&display=swap" media="print" onload="this.media='all'">
+<!-- Firebase SDK (compat版) -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<style>
+/* ============================================================
+   めざめの手紙 - Design System (inline)
+   ============================================================ */
+/* --- Design Tokens --- */
+:root {
+  /* 色彩: 余白のある静かな色相 — 原研哉 × 谷尻誠 */
+  --color-primary:          #5B6ABF;
+  --color-primary-light:    #7B88D3;
+  --color-primary-dark:     #424F9A;
+  --color-secondary:        #D4A574;
+  --color-secondary-light:  #E8C8A8;
+  --color-secondary-dark:   #B8886A;
+  --color-accent:           #C96B6B;
+  --color-accent-light:     #DDA0A0;
+  --color-success:          #5CB888;
+  --color-warning:          #D4A574;
+  --color-error:            #C95B68;
+
+  --color-text-primary:     #1A1A2E;
+  --color-text-secondary:   #5C5C72;
+  --color-text-tertiary:    #8E8E9F;
+  --color-text-inverse:     #FFFFFF;
+  --color-text-link:        #5B6ABF;
+
+  --color-bg-primary:       #FAFAF9;
+  --color-bg-secondary:     #F5F4F2;
+  --color-bg-tertiary:      #EEEDEA;
+  --color-bg-elevated:      #FFFFFF;
+
+  --color-border-primary:   #E5E4E0;
+  --color-border-secondary: #F0EFED;
+  --color-border-focus:     #5B6ABF;
+
+  --color-paper:            #FAF6EE;
+  --color-paper-line:       #E5DDD0;
+  --color-paper-shadow:     rgba(139, 120, 90, 0.06);
+
+  --night-bg-deep:          #0D0D1A;
+  --night-bg-mid:           #161630;
+  --night-bg-surface:       #1E1E3A;
+  --night-bg-elevated:      #28284A;
+  --night-text-primary:     #EAEAF5;
+  --night-text-secondary:   rgba(234, 234, 245, 0.72);
+  --night-text-tertiary:    rgba(234, 234, 245, 0.52);
+  --night-border:           rgba(255, 255, 255, 0.08);
+  --night-accent:           #E8B84D;
+  --night-accent-glow:      rgba(232, 184, 77, 0.15);
+  --night-gradient:         linear-gradient(175deg, #0D0D1A 0%, #161630 40%, #221838 70%, #2D1E40 100%);
+
+  /* グラデーション背景上の3段階テキスト階層 (カーネマン) */
+  --gradient-text-primary:   rgba(255, 255, 255, 0.93);
+  --gradient-text-secondary: rgba(255, 255, 255, 0.72);
+  --gradient-text-tertiary:  rgba(255, 255, 255, 0.50);
+
+  --morning-sky-top:        #B8C4D4;
+  --morning-sky-mid:        #D4CCBE;
+  --morning-horizon:        #E2D8CC;
+  --morning-glow:           #EDE6DC;
+  --morning-text-primary:   #2E2A26;
+  --morning-text-secondary: rgba(46, 42, 38, 0.60);
+  --morning-gradient:       linear-gradient(180deg, #B8C4D4 0%, #D4CCBE 45%, #E2D8CC 75%, #EDE6DC 100%);
+  --morning-success:        #5CB888;
+
+  /* UIはOSネイティブフォントで軽量化、手紙だけ書体 */
+  --font-sans:              -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+  --font-letter:            'Zen Kurenaido', 'Hiragino Mincho ProN', 'Noto Serif JP', serif;
+
+  /* Typography: Perfect Fourth (1.333) — 明確なメリハリ */
+  --text-hero:              3.5rem;    /* 56px  感情的ヒーロー */
+  --text-display:           2.75rem;   /* 44px  時計、大数字 */
+  --text-h1:                2rem;      /* 32px  画面タイトル */
+  --text-h2:                1.5rem;    /* 24px  セクション見出し */
+  --text-h3:                1.125rem;  /* 18px  カード見出し */
+  --text-body:              1rem;      /* 16px  本文 */
+  --text-body-sm:           0.875rem;  /* 14px  補助テキスト */
+  --text-caption:           0.75rem;   /* 12px  キャプション */
+  --text-overline:          0.6875rem; /* 11px  オーバーライン */
+
+  --weight-light:           300;
+  --weight-regular:         400;
+  --weight-medium:          500;
+  --weight-bold:            700;
+
+  --leading-tight:          1.3;
+  --leading-normal:         1.6;
+  --leading-relaxed:        1.8;
+  --leading-loose:          2.0;
+
+  --tracking-tight:         -0.01em;
+  --tracking-normal:        0.02em;
+  --tracking-wide:          0.08em;
+  --tracking-wider:         0.12em;
+
+  --space-0:    0;
+  --space-1:    4px;
+  --space-2:    8px;
+  --space-3:    12px;
+  --space-4:    16px;
+  --space-5:    20px;
+  --space-6:    24px;
+  --space-8:    32px;
+  --space-10:   40px;
+  --space-12:   48px;
+  --space-16:   64px;
+  --space-20:   80px;
+
+  --radius-sm:    8px;
+  --radius-md:    12px;
+  --radius-lg:    16px;
+  --radius-xl:    20px;
+  --radius-full:  9999px;
+
+  /* 影: 静かな浮遊感 — 原研哉のミニマリズム */
+  --shadow-xs:    0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-sm:    0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-md:    0 4px 12px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02);
+  --shadow-lg:    0 8px 28px rgba(0, 0, 0, 0.05), 0 2px 6px rgba(0, 0, 0, 0.02);
+  --shadow-xl:    0 16px 48px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.03);
+  --shadow-night: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --shadow-paper: 0 2px 12px rgba(139, 120, 90, 0.06), 0 0 1px rgba(139, 120, 90, 0.08);
+
+  --duration-fast:      120ms;
+  --duration-normal:    200ms;
+  --duration-slow:      350ms;
+  --duration-page:      500ms;
+
+  --ease-out:           cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-in-out:        cubic-bezier(0.42, 0, 0.58, 1);
+  --ease-spring:        cubic-bezier(0.34, 1.08, 0.64, 1);
+  --ease-spring-bouncy: cubic-bezier(0.34, 1.20, 0.64, 1);
+  --ease-page:          cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-emotional:     cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-gentle:        cubic-bezier(0.4, 0, 0.2, 1);
+
+  --z-base:       0;
+  --z-elevated:   10;
+  --z-header:     100;
+  --z-overlay:    200;
+  --z-modal:      300;
+  --z-toast:      400;
+
+  --content-max-width:   420px;
+  --header-height:       48px;
+  --tab-bar-height:      56px;
+  --safe-area-top:       env(safe-area-inset-top, 0px);
+  --safe-area-bottom:    env(safe-area-inset-bottom, 0px);
+}
+
+/* --- Reset --- */
+*, *::before, *::after {
+  margin: 0; padding: 0; box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-size-adjust: 100%;
+}
+body {
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-normal);
+  letter-spacing: var(--tracking-normal);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-secondary);
+  overflow-x: hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* --- Layout --- */
+.app-shell {
+  position: relative;
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.screen {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  will-change: transform, opacity;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+.screen.active { visibility: visible; opacity: 1; pointer-events: auto; }
+.screen.screen-entering { visibility: visible; pointer-events: none; z-index: 2; }
+.screen.screen-leaving  { visibility: visible; pointer-events: none; z-index: 1; }
+
+/* 入場: 新画面が上に乗って現れる（下の旧画面を覆う） */
+.screen.screen-entering.tr-push { animation: screenIn 300ms var(--ease-out) forwards; }
+.screen.screen-entering.tr-pop  { animation: screenIn 300ms var(--ease-out) forwards; }
+.screen.screen-entering.tr-rise { animation: screenRiseIn 400ms var(--ease-page) forwards; }
+.screen.screen-entering.tr-fade { animation: screenFadeIn 500ms var(--ease-emotional) forwards; }
+.screen.screen-entering.tr-dawn { animation: screenDawnIn 800ms var(--ease-emotional) forwards; }
+
+/* 退場: 旧画面は即座に消す（入場画面の下にいるので見えない） */
+.screen.screen-leaving { animation: screenOut 250ms var(--ease-out) forwards; }
+
+@keyframes screenIn     { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes screenRiseIn { from { opacity: 0; transform: translateY(40px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes screenFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes screenDawnIn { 0% { opacity: 0; filter: brightness(0.4); } 60% { opacity: 0.8; filter: brightness(0.9); } 100% { opacity: 1; filter: brightness(1); } }
+@keyframes screenOut    { from { opacity: 1; } to { opacity: 0; } }
+
+.screen-content {
+  flex: 1;
+  padding: var(--space-4);
+  padding-top: calc(var(--header-height) + var(--safe-area-top) + var(--space-4));
+  padding-bottom: calc(var(--tab-bar-height) + var(--safe-area-bottom) + var(--space-4));
+}
+.screen-content--full {
+  padding-top: calc(var(--safe-area-top) + var(--space-6));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.screen-content--no-header {
+  padding-top: calc(var(--safe-area-top) + var(--space-4));
+}
+.screen-content--no-tab {
+  padding-bottom: calc(var(--safe-area-bottom) + var(--space-4));
+}
+
+/* --- Header --- */
+.header {
+  position: sticky;
+  top: 0;
+  left: 0; right: 0;
+  z-index: var(--z-header);
+  height: calc(var(--header-height) + var(--safe-area-top));
+  padding-top: var(--safe-area-top);
+  background-color: rgba(250, 250, 249, 0.85);
+  -webkit-backdrop-filter: blur(0px);
+  backdrop-filter: blur(0px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: none;
+  flex-shrink: 0;
+  transition: backdrop-filter 200ms ease, background-color 200ms ease;
+}
+.header.scrolled {
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+.header__title {
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-primary);
+  text-align: center;
+}
+.header__action {
+  position: absolute;
+  top: var(--safe-area-top);
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-4);
+  background: none; border: none;
+  font-family: var(--font-sans);
+  font-size: var(--text-body-sm);
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+.header__action:active { opacity: 0.5; }
+.header__action--left { left: 0; }
+.header__action--right { right: 0; }
+
+.header--night {
+  background-color: rgba(15, 15, 30, 0.85);
+  border-bottom: none;
+}
+.header--night .header__title { color: var(--night-text-primary); }
+.header--night .header__action { color: var(--night-accent); }
+.header--transparent {
+  background-color: transparent;
+  border-bottom: none;
+}
+
+/* --- Tab Bar --- */
+.tab-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: var(--z-header);
+  height: calc(var(--tab-bar-height) + var(--safe-area-bottom));
+  padding-bottom: var(--safe-area-bottom);
+  background-color: rgba(250, 250, 249, 0.85);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border-top: none;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+}
+.tab-bar__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  background: none; border: none;
+  cursor: pointer;
+  color: var(--color-text-tertiary);
+  font-family: var(--font-sans);
+  transition: color 200ms var(--ease-out), transform 300ms var(--ease-spring-bouncy);
+  touch-action: manipulation;
+}
+.tab-bar__item:active { transform: scale(0.88); transition-duration: 50ms; }
+.tab-bar__icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+.tab-bar__icon svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tab-bar__label {
+  font-size: var(--text-overline);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-normal);
+}
+.tab-bar__item.active { color: var(--color-primary); }
+
+/* --- Buttons --- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  border: none;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 400ms var(--ease-spring-bouncy),
+    box-shadow var(--duration-normal) var(--ease-out),
+    background-color var(--duration-normal) var(--ease-out),
+    opacity var(--duration-fast) var(--ease-out);
+  -webkit-user-select: none;
+  user-select: none;
+  white-space: nowrap;
+  touch-action: manipulation;
+}
+.btn:active { transform: scale(0.94); transition-duration: 60ms; transition-timing-function: var(--ease-out); }
+.btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  box-shadow: 0 2px 8px rgba(91, 106, 191, 0.3);
+}
+.btn-primary:active:not(:disabled) {
+  background-color: var(--color-primary-dark);
+}
+.btn-accent {
+  background-color: var(--color-accent);
+  color: var(--color-text-inverse);
+  box-shadow: 0 2px 8px rgba(224, 107, 120, 0.3);
+}
+.btn-secondary {
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+}
+.btn-ghost {
+  background-color: transparent;
+  color: var(--color-primary);
+  padding: var(--space-2) var(--space-4);
+}
+.btn-night-primary {
+  background: var(--night-accent);
+  color: var(--night-bg-deep);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-normal);
+  box-shadow: none;
+  border-radius: var(--radius-full);
+}
+.btn-night-primary:active {
+  background: #D4A040;
+  transform: scale(0.98);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+.btn-night-secondary {
+  background-color: var(--night-bg-elevated);
+  color: var(--night-text-primary);
+  border: 1px solid var(--night-border);
+}
+.btn-morning-primary {
+  background-color: var(--morning-success);
+  color: var(--color-text-inverse);
+  box-shadow: 0 2px 8px rgba(92, 184, 136, 0.3);
+}
+.btn-morning-secondary {
+  background-color: rgba(255, 255, 255, 0.75);
+  color: var(--morning-text-primary);
+  backdrop-filter: blur(8px);
+}
+.btn--sm { padding: var(--space-2) var(--space-4); font-size: var(--text-body-sm); }
+.btn--lg { padding: var(--space-5) var(--space-8); font-size: var(--text-body); border-radius: var(--radius-full); }
+.btn--block { width: 100%; }
+
+/* --- Cards --- */
+.card {
+  background-color: var(--color-bg-elevated);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+}
+.card-letter {
+  background-color: var(--color-paper);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-paper);
+  position: relative;
+  overflow: hidden;
+}
+/* 手紙の上端の飾り線 — 控えめなアクセント */
+.card-letter::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: var(--space-8); right: var(--space-8);
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--color-secondary-light) 30%, var(--color-secondary) 50%, var(--color-secondary-light) 70%, transparent 100%);
+  opacity: 0.7;
+  border-radius: 0 0 2px 2px;
+}
+/* 和紙のような微細なテクスチャ */
+.card-letter::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.015'/%3E%3C/svg%3E");
+  pointer-events: none;
+  border-radius: var(--radius-lg);
+}
+.card-letter__label {
+  font-family: var(--font-letter);
+  font-size: var(--text-body);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-3);
+  letter-spacing: var(--tracking-wide);
+}
+.card-letter__date {
+  font-size: var(--text-caption);
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-4);
+}
+.card-letter__body {
+  font-family: var(--font-letter);
+  font-size: var(--text-h3);
+  color: var(--color-text-primary);
+  line-height: var(--leading-loose);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.card-history {
+  background-color: var(--color-bg-elevated);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 500ms var(--ease-out), transform 500ms var(--ease-page);
+}
+.card-history.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.card-history__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+.card-history__avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--color-bg-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-body-sm);
+  flex-shrink: 0;
+}
+.card-history__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.card-history__from {
+  font-size: var(--text-body-sm);
+  color: var(--color-text-primary);
+  font-weight: var(--weight-medium);
+}
+.card-history__date {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-caption);
+  color: var(--color-text-tertiary);
+}
+.card-history__section {
+  font-family: var(--font-letter);
+  margin-bottom: var(--space-3);
+}
+.card-history__section:last-child { margin-bottom: 0; }
+.card-history__section + .card-history__section {
+  padding-top: var(--space-3);
+  border-top: 1px dashed var(--color-border-primary);
+}
+.card-history__section-label {
+  font-size: var(--text-caption);
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-1);
+}
+.card-history__section-text {
+  font-size: var(--text-body);
+  color: var(--color-text-primary);
+  line-height: var(--leading-relaxed);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* タイムカプセルカード */
+.card-timecapsule {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  border: 1px solid var(--night-border);
+}
+.card-timecapsule__label {
+  font-size: var(--text-caption);
+  color: rgba(255, 255, 255, 0.65);
+  text-align: center;
+  letter-spacing: var(--tracking-wide);
+  margin-bottom: var(--space-3);
+}
+.card-timecapsule__inner {
+  background-color: var(--color-paper);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* --- Textarea --- */
+.textarea-letter {
+  width: 100%;
+  min-height: 120px;
+  border: none;
+  background: transparent;
+  font-family: var(--font-letter);
+  font-size: var(--text-h3);
+  color: var(--color-text-primary);
+  resize: none;
+  outline: none;
+  line-height: var(--leading-loose);
+}
+.textarea-letter::placeholder { color: var(--color-text-tertiary); }
+/* 手紙を書いている時の集中感 */
+.card-letter:focus-within {
+  box-shadow: var(--shadow-paper), 0 0 0 1px var(--color-paper-line);
+  transform: translateY(-1px);
+  transition: transform var(--duration-slow) var(--ease-spring), box-shadow var(--duration-slow) var(--ease-out);
+}
+
+.textarea-reply {
+  width: 100%;
+  min-height: 80px;
+  border: none;
+  background: transparent;
+  font-family: var(--font-letter);
+  font-size: var(--text-body);
+  color: var(--color-text-primary);
+  resize: none;
+  outline: none;
+  line-height: var(--leading-loose);
+}
+.textarea-reply::placeholder { color: var(--color-text-tertiary); }
+
+/* --- Time Picker — unified pill --- */
+.time-picker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: var(--space-3) var(--space-5);
+  margin-bottom: var(--space-2);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-full);
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  transition: border-color var(--duration-normal) var(--ease-out), background var(--duration-normal) var(--ease-out);
+}
+.time-picker:focus-within {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+.time-picker__input {
+  width: 52px;
+  padding: var(--space-2) 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-h1);
+  font-weight: var(--weight-light);
+  text-align: center;
+  border: none;
+  border-radius: 0;
+  outline: none;
+  background: transparent;
+  color: var(--night-text-primary);
+  letter-spacing: 0.05em;
+  caret-color: var(--night-accent);
+}
+.time-picker__input:focus {
+  box-shadow: none;
+}
+.time-picker__separator {
+  font-size: var(--text-h1);
+  font-weight: var(--weight-light);
+  color: var(--night-text-tertiary);
+  padding: 0 var(--space-1);
+}
+
+/* --- Toast --- */
+.toast {
+  position: fixed;
+  top: calc(var(--safe-area-top) + var(--space-4));
+  left: 50%;
+  transform: translateX(-50%) translateY(-120%);
+  z-index: var(--z-toast);
+  background-color: var(--color-text-primary);
+  color: var(--color-text-inverse);
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-full);
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+  max-width: calc(100% - var(--space-8));
+  box-shadow: var(--shadow-lg);
+  transition: transform var(--duration-slow) var(--ease-spring);
+  visibility: hidden;
+  pointer-events: none;
+}
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* --- Animations --- */
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideInUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes softRise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+/* 夢から覚めるような有機的な色の混ざり合い */
+.morning-blobs {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+  filter: blur(60px);
+  opacity: 0;
+  animation: blobsFadeIn 8s ease forwards;
+}
+@keyframes blobsFadeIn {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+.morning-blob {
+  position: absolute;
+  border-radius: 50%;
+  mix-blend-mode: soft-light;
+}
+.morning-blob--1 {
+  width: 120%;
+  height: 60%;
+  top: -15%;
+  left: -20%;
+  background: radial-gradient(ellipse, rgba(200, 210, 235, 0.8) 0%, transparent 70%);
+  animation: blobDrift1 18s ease-in-out infinite alternate;
+}
+.morning-blob--2 {
+  width: 90%;
+  height: 70%;
+  bottom: -10%;
+  right: -15%;
+  background: radial-gradient(ellipse, rgba(230, 215, 190, 0.7) 0%, transparent 70%);
+  animation: blobDrift2 22s ease-in-out infinite alternate;
+}
+.morning-blob--3 {
+  width: 80%;
+  height: 50%;
+  top: 30%;
+  left: 10%;
+  background: radial-gradient(ellipse, rgba(215, 200, 225, 0.6) 0%, transparent 65%);
+  animation: blobDrift3 15s ease-in-out infinite alternate;
+}
+.morning-blob--4 {
+  width: 70%;
+  height: 45%;
+  top: 10%;
+  right: -5%;
+  background: radial-gradient(ellipse, rgba(240, 230, 210, 0.5) 0%, transparent 60%);
+  animation: blobDrift4 20s ease-in-out infinite alternate;
+}
+@keyframes blobDrift1 {
+  0%   { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(8%, 12%) scale(1.1); }
+  100% { transform: translate(-5%, 8%) scale(0.95); }
+}
+@keyframes blobDrift2 {
+  0%   { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(-10%, -8%) scale(1.15); }
+  100% { transform: translate(5%, -12%) scale(0.9); }
+}
+@keyframes blobDrift3 {
+  0%   { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(12%, -6%) scale(1.08); }
+  100% { transform: translate(-8%, 10%) scale(1.05); }
+}
+@keyframes blobDrift4 {
+  0%   { transform: translate(0, 0) scale(0.9); }
+  50%  { transform: translate(-6%, 10%) scale(1.1); }
+  100% { transform: translate(8%, -5%) scale(1); }
+}
+@keyframes gentleFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.15; }
+  50%      { opacity: 0.9; }
+}
+@keyframes envelopeOpen {
+  0%   { transform: scale(0.85) rotateX(30deg); opacity: 0; }
+  60%  { transform: scale(1.02) rotateX(-2deg); opacity: 1; }
+  100% { transform: scale(1) rotateX(0deg); opacity: 1; }
+}
+
+.animate-fade-in { animation: fadeIn var(--duration-page) var(--ease-page) both; }
+.animate-slide-up { animation: slideInUp var(--duration-page) var(--ease-page) both; }
+.animate-slide-right { animation: slideInRight var(--duration-page) var(--ease-page) both; }
+.animate-soft-rise { animation: softRise var(--duration-slow) var(--ease-out) both; }
+.animate-envelope { animation: envelopeOpen 800ms var(--ease-spring) both; }
+.animate-float { animation: gentleFloat 3s ease-in-out infinite; }
+
+.stagger-children > * {
+  animation: softRise var(--duration-slow) var(--ease-out) both;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 80ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 160ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 240ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 320ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 400ms; }
+.stagger-children > *:nth-child(7) { animation-delay: 480ms; }
+
+/* --- Screen Themes --- */
+.screen--night { background: var(--night-gradient); color: var(--night-text-primary); }
+.screen--morning {
+  background: #A0A8B8;
+  color: var(--morning-text-primary);
+  overflow: hidden;
+  animation: dawnBase 20s var(--ease-emotional) forwards;
+}
+@keyframes dawnBase {
+  0%   { background: #A0A8B8; }
+  50%  { background: #C4BEB4; }
+  100% { background: #DDD8D0; }
+}
+.screen--day { background-color: var(--color-bg-secondary); color: var(--color-text-primary); }
+
+/* --- Home Background --- */
+.home-bg {
+  position: absolute; inset: 0;
+  transition: background 2s var(--ease-in-out);
+  z-index: 0;
+}
+.home-bg--night { background: linear-gradient(175deg, #0D0D1A 0%, #161630 30%, #221838 60%, #2D1E40 85%, #352248 100%); }
+.home-bg--dawn  { background: linear-gradient(175deg, #161630 0%, #352050 20%, #7A5A70 45%, #C08A68 70%, #E8BF90 100%); }
+.home-bg--morning { background: linear-gradient(175deg, #8BA4C8 0%, #B0C0D8 30%, #E0D0C0 60%, #F0E8E0 100%); }
+.home-bg--daytime { background: linear-gradient(175deg, #78A8D8 0%, #98BDE0 30%, #C0D8E8 60%, #E0ECF2 100%); }
+.home-bg--evening { background: linear-gradient(175deg, #2D1E40 0%, #784858 25%, #C08060 50%, #E8BF90 75%, #F0D8C0 100%); }
+
+/* --- Stars --- */
+.stars {
+  position: absolute; inset: 0;
+  overflow: hidden; pointer-events: none;
+  transition: opacity 2s var(--ease-in-out);
+  z-index: 1;
+}
+.star {
+  position: absolute; width: 2px; height: 2px;
+  background: white; border-radius: 50%;
+  animation: twinkle 3s ease-in-out infinite;
+}
+/* 流れ星 */
+.shooting-star {
+  position: absolute;
+  width: 2px; height: 2px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 6px 1px rgba(255,255,255,0.6);
+  animation: shootingStar 1s ease-in forwards;
+}
+@keyframes shootingStar {
+  0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+  70%  { opacity: 0.8; }
+  100% { transform: translate(120px, 80px) scale(0.2); opacity: 0; }
+}
+.shooting-star::after {
+  content: '';
+  position: absolute;
+  width: 40px; height: 1px;
+  background: linear-gradient(270deg, rgba(255,255,255,0.5), transparent);
+  top: 0; right: 2px;
+  transform-origin: right center;
+  transform: rotate(-33deg);
+}
+
+/* --- Clock --- */
+.clock {
+  font-size: 2rem;
+  font-weight: var(--weight-light);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: var(--space-1);
+  font-variant-numeric: tabular-nums;
+}
+.clock--dark {
+  color: var(--color-text-secondary);
+}
+.date-display {
+  font-size: var(--text-caption);
+  font-weight: var(--weight-light);
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.06em;
+  margin-bottom: var(--space-8);
+}
+.date-display--dark { color: var(--color-text-tertiary); }
+
+/* --- Utility --- */
+.text-center { text-align: center; }
+.text-muted { color: var(--color-text-secondary); }
+.mt-2 { margin-top: var(--space-2); }
+.mt-3 { margin-top: var(--space-3); }
+.mt-4 { margin-top: var(--space-4); }
+.mt-6 { margin-top: var(--space-6); }
+.mb-2 { margin-bottom: var(--space-2); }
+.mb-3 { margin-bottom: var(--space-3); }
+.mb-4 { margin-bottom: var(--space-4); }
+.mb-6 { margin-bottom: var(--space-6); }
+.gap-3 { gap: var(--space-3); }
+.gap-4 { gap: var(--space-4); }
+
+/* ============================================================
+   App-Specific Styles
+   ============================================================ */
+
+/* ホーム画面コンテンツ — 受信ボックススタイル */
+.home-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding-top: calc(var(--safe-area-top) + var(--space-4));
+  padding-bottom: calc(var(--tab-bar-height) + var(--safe-area-bottom));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* --- ホームヘッダー: 日付＋時刻 --- */
+.home-header {
+  padding: var(--space-6) var(--space-5) var(--space-4);
+  text-align: left;
+}
+.home-header__date {
+  font-family: var(--font-sans);
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-regular);
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.04em;
+  margin-bottom: var(--space-1);
+}
+.home-header__date--light {
+  color: var(--color-text-secondary);
+}
+.home-header__clock {
+  font-family: var(--font-sans);
+  font-size: var(--text-hero);
+  font-weight: var(--weight-light);
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.home-header__clock--light {
+  color: var(--color-text-primary);
+}
+
+/* --- 受信ボックスリスト --- */
+.inbox {
+  display: flex;
+  flex-direction: column;
+}
+.inbox-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-out);
+  text-align: left;
+}
+.inbox-item:active {
+  background: rgba(255, 255, 255, 0.04);
+}
+.inbox-item--light {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+.inbox-item--light:active {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+/* アイコン（左側の丸） */
+.inbox-item__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: var(--text-h3);
+}
+.inbox-item__icon--self {
+  background: rgba(255, 255, 255, 0.08);
+}
+.inbox-item__icon--friend {
+  background: rgba(91, 106, 191, 0.15);
+}
+.inbox-item__icon--self.inbox-item__icon--light {
+  background: rgba(0, 0, 0, 0.06);
+}
+.inbox-item__icon--friend.inbox-item__icon--light {
+  background: rgba(91, 106, 191, 0.1);
+}
+
+/* テキストエリア（中央） */
+.inbox-item__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.inbox-item__title {
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  color: var(--night-text-primary);
+  letter-spacing: var(--tracking-normal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.inbox-item__title--light {
+  color: var(--color-text-primary);
+}
+.inbox-item__sub {
+  font-family: var(--font-sans);
+  font-size: var(--text-body-sm);
+  color: var(--night-text-tertiary);
+  letter-spacing: var(--tracking-normal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.inbox-item__sub--light {
+  color: var(--color-text-tertiary);
+}
+
+/* 右側ステータス（全背景でコントラスト確保） */
+.inbox-item__status {
+  flex-shrink: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-medium);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  background: rgba(245, 196, 105, 0.15);
+  color: #D4A040;
+}
+.inbox-item__status--light {
+  background: rgba(91, 106, 191, 0.1);
+  color: var(--color-primary);
+}
+
+/* 削除ボタン */
+.inbox-item__delete {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: var(--night-text-tertiary);
+  font-size: var(--text-body);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity var(--duration-fast) var(--ease-out),
+              background-color var(--duration-fast) var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+.inbox-item__delete:active {
+  opacity: 1;
+  background: rgba(201, 91, 104, 0.15);
+}
+.inbox-item__delete--light {
+  color: var(--color-text-tertiary);
+}
+.inbox-item__delete--light:active {
+  background: rgba(201, 91, 104, 0.1);
+}
+
+/* --- 空状態 --- */
+.inbox-empty {
+  display: none;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  text-align: center;
+}
+.inbox-empty.active {
+  display: flex;
+}
+.inbox-empty__icon {
+  font-size: 2.5rem;
+  margin-bottom: var(--space-4);
+  opacity: 0.3;
+}
+.inbox-empty__text {
+  font-family: var(--font-letter);
+  font-size: var(--text-body);
+  color: rgba(255, 255, 255, 0.35);
+  line-height: var(--leading-relaxed);
+  max-width: 240px;
+}
+.inbox-empty__text--light {
+  color: var(--color-text-tertiary);
+}
+
+/* --- FAB: 手紙を書く --- */
+.home-fab {
+  position: absolute;
+  right: var(--space-5);
+  bottom: calc(var(--tab-bar-height) + var(--safe-area-bottom) + var(--space-5));
+  z-index: 10;
+  height: 52px;
+  padding: 0 var(--space-6) 0 var(--space-5);
+  border-radius: var(--radius-full);
+  background: var(--night-accent);
+  color: var(--night-bg-deep);
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-normal);
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(245, 196, 105, 0.3);
+  transition:
+    transform var(--duration-fast) var(--ease-spring),
+    box-shadow var(--duration-normal) var(--ease-out);
+}
+.home-fab:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(245, 196, 105, 0.2);
+}
+.home-fab--light {
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(91, 106, 191, 0.3);
+}
+.home-fab svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* 手紙を書く画面 — 2026 ミニマル */
+#write-screen {
+  background: var(--night-bg-mid);
+}
+#write-screen .stars { display: none; }
+#write-screen .header--night {
+  background-color: transparent;
+  border-bottom: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.write-screen-content {
+  padding: var(--space-6);
+  padding-top: calc(var(--header-height) + var(--safe-area-top) + var(--space-8));
+  padding-bottom: calc(var(--safe-area-bottom) + var(--space-6));
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex: 1;
+}
+.write-prompt {
+  text-align: center;
+  font-family: var(--font-letter);
+  font-size: var(--text-h2);
+  color: var(--night-text-primary);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-normal);
+  letter-spacing: var(--tracking-normal);
+  margin-bottom: var(--space-8);
+}
+.delivery-info {
+  text-align: center;
+  font-size: var(--text-caption);
+  color: var(--night-text-tertiary);
+  min-height: 16px;
+  letter-spacing: var(--tracking-normal);
+  margin-bottom: var(--space-6);
+}
+.delivery-info .hl { color: var(--night-accent); font-weight: var(--weight-medium); }
+
+.write-actions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: center;
+  margin-top: auto;
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-4);
+}
+
+/* 夜用card-letter — 2026 ボーダーレス */
+.card-letter--night {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.card-letter--night::before { display: none; }
+.card-letter--night::after { display: none; }
+.card-letter--night .card-letter__label {
+  font-family: var(--font-letter);
+  font-size: var(--text-caption);
+  color: var(--night-text-tertiary);
+  margin-bottom: var(--space-3);
+  letter-spacing: var(--tracking-wide);
+  text-transform: none;
+}
+.card-letter--night .textarea-letter {
+  color: var(--night-text-primary);
+  min-height: 140px;
+  flex: 1;
+  caret-color: var(--night-accent);
+  font-size: var(--text-body);
+  line-height: var(--leading-loose);
+  padding: var(--space-5) 0;
+  border-top: 1px solid var(--night-border);
+}
+.card-letter--night .textarea-letter::placeholder {
+  color: var(--night-text-tertiary);
+  font-style: normal;
+}
+.card-letter--night .textarea-letter:focus {
+  border-top-color: rgba(255, 255, 255, 0.12);
+  transition: border-color var(--duration-normal) var(--ease-out);
+}
+
+/* おやすみなさい画面 */
+.goodnight-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: var(--space-8);
+  text-align: center;
+}
+.goodnight-text {
+  font-size: var(--text-h1);
+  color: var(--night-text-primary);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-6);
+  letter-spacing: 0.02em;
+}
+.goodnight-sub {
+  font-size: var(--text-body-sm);
+  color: var(--night-text-tertiary);
+}
+
+/* アラーム画面 */
+.alarm-screen-content {
+  padding: var(--space-4);
+  padding-top: calc(var(--safe-area-top) + var(--space-4));
+  padding-bottom: calc(var(--safe-area-bottom) + var(--space-4));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  position: relative;
+  z-index: 1;
+}
+.alarm-arrival {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) 0 0;
+}
+.alarm-arrival__icon {
+  font-size: 1.75rem;
+  animation: postDrop 600ms var(--ease-spring) both;
+}
+.alarm-arrival__text {
+  font-size: var(--text-body);
+  color: var(--morning-text-primary);
+  font-weight: var(--weight-regular);
+  letter-spacing: 0.04em;
+}
+.alarm-time-display {
+  text-align: center;
+  color: var(--morning-text-secondary);
+  font-size: var(--text-h1);
+  font-weight: var(--weight-light);
+}
+.alarm-actions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* アラーム: 返事を書くフェーズ（シートスタイル） */
+.alarm-reply-phase {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg-secondary);
+  z-index: 3;
+}
+.alarm-reply-header {
+  flex-shrink: 0;
+  padding: calc(var(--safe-area-top) + var(--space-3)) var(--space-4) var(--space-3);
+}
+.alarm-reply-back {
+  background: none;
+  border: none;
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  color: var(--color-primary);
+  cursor: pointer;
+  padding: var(--space-2) var(--space-3);
+  -webkit-tap-highlight-color: transparent;
+}
+.alarm-reply-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-2) var(--space-5);
+}
+
+/* アラーム: 完了フェーズ */
+.alarm-complete-phase {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  background-color: var(--color-bg-secondary);
+  z-index: 4;
+  text-align: center;
+}
+.alarm-complete-icon {
+  font-size: 3rem;
+  margin-bottom: var(--space-5);
+  animation: postDrop 600ms var(--ease-spring) both;
+}
+.alarm-complete-main {
+  font-size: var(--text-h2);
+  color: var(--color-text-primary);
+  font-weight: var(--weight-medium);
+  margin-bottom: var(--space-3);
+}
+.alarm-complete-sub {
+  font-size: var(--text-body);
+  color: var(--color-text-tertiary);
+  font-weight: var(--weight-light);
+}
+
+/* いってらっしゃい画面 */
+.itterasshai-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: var(--space-8);
+  text-align: center;
+}
+.itterasshai-main {
+  font-size: var(--text-hero);
+  color: var(--morning-text-primary);
+  font-weight: var(--weight-bold);
+  margin-bottom: var(--space-6);
+  letter-spacing: -0.01em;
+}
+.itterasshai-summary {
+  max-width: 300px;
+  margin-bottom: var(--space-4);
+}
+.itterasshai-summary .letter-preview,
+.itterasshai-summary .reply-preview {
+  font-family: var(--font-letter);
+  font-size: var(--text-body-sm);
+  color: var(--morning-text-secondary);
+  line-height: var(--leading-normal);
+  margin-bottom: var(--space-2);
+}
+.itterasshai-sub {
+  font-size: var(--text-body-sm);
+  color: var(--morning-text-secondary);
+  font-weight: var(--weight-light);
+}
+
+/* 記録画面 */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.history-empty {
+  text-align: center;
+  padding: var(--space-10) var(--space-6);
+  color: var(--color-text-tertiary);
+  font-size: var(--text-body-sm);
+  line-height: var(--leading-relaxed);
+}
+
+/* 設定画面 */
+.settings-section {
+  margin-bottom: var(--space-6);
+}
+.settings-section-title {
+  font-size: var(--text-caption);
+  color: var(--color-text-tertiary);
+  letter-spacing: var(--tracking-wide);
+  margin-bottom: var(--space-3);
+  padding-left: var(--space-1);
+}
+.settings-item {
+  background-color: var(--color-bg-elevated);
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-border-secondary);
+}
+.settings-item:first-of-type { border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+.settings-item:last-of-type { border-radius: 0 0 var(--radius-lg) var(--radius-lg); border-bottom: none; }
+.settings-item:only-of-type { border-radius: var(--radius-lg); border-bottom: none; }
+.settings-item-label {
+  font-size: var(--text-body);
+  color: var(--color-text-primary);
+}
+.settings-item-value {
+  font-size: var(--text-body-sm);
+  color: var(--color-text-tertiary);
+}
+
+/* アイコン選択グリッド */
+.emoji-picker {
+  display: none;
+  background-color: var(--color-bg-elevated);
+  border-top: 1px solid var(--color-border-secondary);
+  padding: var(--space-4) var(--space-5);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+.emoji-picker.open { display: block; }
+.emoji-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-2);
+}
+.emoji-picker__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1;
+  font-size: 1.5rem;
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  background: none;
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease-out),
+              background-color var(--duration-fast) var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+.emoji-picker__item:active { background: var(--color-bg-secondary); }
+.emoji-picker__item.selected {
+  border-color: var(--color-primary);
+  background: rgba(91, 106, 191, 0.08);
+}
+
+/* トグルスイッチ */
+.toggle {
+  position: relative;
+  width: 48px; height: 28px;
+  background-color: var(--color-bg-tertiary);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background-color var(--duration-normal) var(--ease-out);
+  border: none;
+}
+.toggle.active { background-color: var(--color-primary); }
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 22px; height: 22px;
+  background: white;
+  border-radius: 50%;
+  transition: transform var(--duration-normal) var(--ease-spring);
+  box-shadow: var(--shadow-xs);
+}
+.toggle.active::after { transform: translateX(20px); }
+
+/* スライダー */
+.range-slider {
+  width: 120px;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-full);
+  outline: none;
+}
+.range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(91, 106, 191, 0.3);
+}
+
+/* 封筒アイコン（タイムカプセル） */
+.envelope-icon {
+  font-size: 2.5rem;
+  margin-bottom: var(--space-3);
+  cursor: pointer;
+  transition: transform var(--duration-normal) var(--ease-spring);
+}
+.envelope-icon:active { transform: scale(1.1); }
+
+/* オンボーディング */
+.onboarding-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: var(--space-8);
+  text-align: center;
+}
+.onboarding-text {
+  font-size: var(--text-h1);
+  color: var(--night-text-primary);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-8);
+  max-width: 300px;
+}
+.onboarding-desc {
+  font-size: var(--text-body);
+  color: var(--night-text-secondary);
+  font-weight: var(--weight-light);
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-8);
+  max-width: 300px;
+}
+
+/* --- Responsive: iPhone SE (375x667) --- */
+@media (max-width: 380px) {
+  :root {
+    --text-hero:    2.75rem;   /* 44px */
+    --text-h1:      1.75rem;   /* 28px */
+    --text-h2:      1.25rem;   /* 20px */
+  }
+
+  /* ---- HOME (inbox) ---- */
+  .home-header {
+    padding: var(--space-4) var(--space-4) var(--space-3);
+  }
+  .home-header__clock {
+    font-size: 2.75rem;
+  }
+  .inbox-item {
+    padding: var(--space-3) var(--space-4);
+    gap: var(--space-3);
+  }
+  .inbox-item__icon {
+    width: 40px;
+    height: 40px;
+    font-size: var(--text-body);
+  }
+  .inbox-item__title {
+    font-size: var(--text-body-sm);
+  }
+  .inbox-item__sub {
+    font-size: var(--text-caption);
+  }
+  .home-fab {
+    height: 44px;
+    padding: 0 var(--space-5) 0 var(--space-4);
+    font-size: var(--text-body-sm);
+    right: var(--space-4);
+    bottom: calc(var(--tab-bar-height) + var(--safe-area-bottom) + var(--space-4));
+  }
+  .home-fab svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* ---- WRITE (2026 minimal) ---- */
+  .write-screen-content {
+    padding: var(--space-4);
+    padding-top: calc(var(--header-height) + var(--safe-area-top) + var(--space-4));
+    padding-bottom: calc(var(--safe-area-bottom) + var(--space-4));
+  }
+  .write-prompt {
+    font-size: var(--text-h3);
+    margin-bottom: var(--space-5);
+    line-height: var(--leading-normal);
+  }
+  .time-picker {
+    padding: var(--space-2) var(--space-4);
+    margin-bottom: var(--space-1);
+  }
+  .time-picker__input {
+    width: 44px;
+    font-size: var(--text-h2);
+    padding: var(--space-1) 0;
+  }
+  .time-picker__separator {
+    font-size: var(--text-h2);
+  }
+  .delivery-info {
+    margin-bottom: var(--space-4);
+    min-height: 14px;
+    font-size: 11px;
+  }
+  .card-letter--night .textarea-letter {
+    min-height: 100px;
+    font-size: var(--text-body-sm);
+    line-height: var(--leading-relaxed);
+    padding: var(--space-4) 0;
+  }
+  .write-actions {
+    padding-top: var(--space-4);
+    padding-bottom: var(--space-2);
+  }
+  .btn--lg {
+    padding: var(--space-4) var(--space-6);
+    font-size: var(--text-body-sm);
+  }
+}
+@media (min-width: 421px) {
+  body {
+    display: flex;
+    justify-content: center;
+    background-color: #F0F0F5;
+  }
+  .app-shell {
+    box-shadow: var(--shadow-xl);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    margin: var(--space-5) 0;
+    max-height: calc(100vh - var(--space-10));
+  }
+  .tab-bar {
+    position: absolute;
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   Firebase / フレンド / ソーシャル手紙 追加CSS
+   ============================================================ */
+
+/* セグメントコントロール */
+.segment-control {
+  display: flex;
+  background: var(--night-bg-elevated);
+  border-radius: var(--radius-full);
+  padding: 3px;
+  margin-bottom: var(--space-5);
+}
+.segment {
+  flex: 1;
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--night-text-secondary);
+  font-family: var(--font-sans);
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-out);
+}
+.segment.active {
+  background: var(--night-accent);
+  color: var(--night-bg-deep);
+}
+
+/* フォーム入力（認証画面用） */
+.form-input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
+  outline: none;
+  transition: border-color var(--duration-normal) var(--ease-out);
+}
+.form-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(91, 106, 191, 0.15);
+}
+.form-label {
+  display: block;
+  font-size: var(--text-body-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-2);
+}
+.form-group {
+  margin-bottom: var(--space-5);
+}
+.form-error {
+  font-size: var(--text-caption);
+  color: var(--color-error);
+  margin-top: var(--space-1);
+}
+
+/* フレンドカード */
+.friend-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-3);
+}
+.friend-card__name {
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-primary);
+}
+.friend-card__code {
+  font-size: var(--text-caption);
+  color: var(--color-text-tertiary);
+}
+.friend-request-card {
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-3);
+}
+.friend-request-card__actions {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+/* タブバーバッジ */
+.tab-bar__item {
+  position: relative;
+}
+.tab-bar__badge {
+  position: absolute;
+  top: 4px;
+  right: calc(50% - 16px);
+  min-width: 16px;
+  height: 16px;
+  background: var(--color-accent);
+  color: white;
+  font-size: 10px;
+  font-weight: var(--weight-medium);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+/* 認証画面のモード切り替えタブ */
+.auth-tabs {
+  display: flex;
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-full);
+  padding: 3px;
+  margin-bottom: var(--space-6);
+}
+.auth-tab {
+  flex: 1;
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-out);
+}
+.auth-tab.active {
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-xs);
+}
+
+/* 認証エラーメッセージ */
+.auth-error {
+  background: rgba(217, 91, 104, 0.1);
+  color: var(--color-error);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--text-body-sm);
+  margin-bottom: var(--space-4);
+  display: none;
+}
+.auth-error.show { display: block; }
+
+/* ローディングスピナー */
+.btn-loading {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+}
+.btn-loading::after {
+  content: '';
+  position: absolute;
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* フレンド選択リスト（手紙を書く画面） */
+.friend-select-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+.friend-select-item {
+  padding: var(--space-3) var(--space-4);
+  background: var(--night-bg-elevated);
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--night-text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-out);
+  text-align: left;
+}
+.friend-select-item.selected {
+  border-color: var(--night-accent);
+  background: rgba(245, 196, 105, 0.1);
+}
+
+/* ホーム画面のフレンド手紙通知 */
+.home-friend-letters {
+  font-size: var(--text-body-sm);
+  color: var(--night-accent);
+  margin-bottom: var(--space-3);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+}
+.home-friend-letters--dark {
+  color: var(--color-accent);
+}
+
+/* フレンド手紙の返信セクション */
+.friend-reply-section {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px dashed var(--color-paper-line);
+}
+
+/* フレンド申請入力エリア */
+.friend-add-area {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+}
+.friend-add-area .form-input {
+  flex: 1;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  font-weight: var(--weight-medium);
+}
+
+/* 設定画面のフレンドコードコピーボタン */
+.copy-btn {
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-bg-tertiary);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-size: var(--text-caption);
+  color: var(--color-primary);
+  cursor: pointer;
+  font-weight: var(--weight-medium);
+}
+.copy-btn:active { opacity: 0.6; }
+
+/* セクションタイトル（フレンド画面用） */
+.section-title {
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-3);
+}
+
+/* ログイン誘導カード */
+.login-prompt-card {
+  text-align: center;
+  padding: var(--space-8) var(--space-6);
+}
+.login-prompt-card__text {
+  font-size: var(--text-body);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-5);
+}
+
+/* ============================================================
+   BOTTOM SHEET SYSTEM — 手紙を書く
+   ============================================================ */
+
+/* --- Overlay --- */
+.sheet-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background-color: rgba(13, 13, 26, 0);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    background-color 400ms var(--ease-page),
+    opacity 400ms var(--ease-page);
+  will-change: opacity;
+}
+.sheet-overlay.active {
+  background-color: rgba(0, 0, 0, 0.3);
+  opacity: 1;
+  pointer-events: auto;
+}
+.sheet-overlay.goodnight {
+  background-color: rgba(13, 13, 26, 1.0);
+  transition: background-color 800ms var(--ease-page);
+}
+
+/* --- Sheet Container --- */
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 300;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.12);
+  height: 88vh;
+  max-height: calc(100dvh - var(--safe-area-top) - var(--space-6));
+  transform: translateY(100%);
+  transition:
+    transform 500ms var(--ease-page),
+    height 350ms var(--ease-page),
+    border-radius 350ms var(--ease-page),
+    max-height 350ms var(--ease-page);
+  will-change: transform;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.sheet.open {
+  transform: translateY(0);
+}
+.sheet.expanded {
+  /* No-op: sheet is already large */
+}
+.sheet.goodnight-expand {
+  height: 100dvh;
+  max-height: 100dvh;
+  border-radius: 0;
+  transition:
+    height 800ms var(--ease-page),
+    max-height 800ms var(--ease-page),
+    border-radius 800ms var(--ease-page);
+}
+
+/* --- Handle --- */
+.sheet__handle-area {
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
+  min-height: 24px;
+  align-items: center;
+  cursor: grab;
+  touch-action: none;
+}
+.sheet__handle {
+  width: 36px;
+  height: 4px;
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-full);
+}
+
+/* --- Sheet Content --- */
+.sheet__content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  transition: opacity var(--duration-slow) var(--ease-out);
+}
+.sheet__content.fading { opacity: 0; pointer-events: none; }
+
+/* --- Sheet Form (settings-style layout) --- */
+.sheet__form {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding: var(--space-4) var(--space-5);
+}
+.sheet__section {
+  margin-bottom: var(--space-5);
+}
+.sheet__section-title {
+  font-size: var(--text-caption);
+  color: var(--color-text-tertiary);
+  letter-spacing: var(--tracking-wide);
+  margin-bottom: var(--space-3);
+  padding-left: var(--space-1);
+  text-transform: uppercase;
+}
+.sheet__field-group {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.sheet__field {
+  background-color: var(--color-bg-elevated);
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-border-secondary);
+}
+.sheet__field:last-child { border-bottom: none; }
+.sheet__field-label {
+  font-size: var(--text-body);
+  color: var(--color-text-primary);
+  flex-shrink: 0;
+}
+.sheet__field-value {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.sheet__field-input {
+  width: 28px;
+  padding: var(--space-1) 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  text-align: center;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--color-primary);
+  caret-color: var(--color-primary);
+}
+.sheet__field-sep {
+  font-size: var(--text-body);
+  color: var(--color-text-tertiary);
+  padding: 0 1px;
+}
+.sheet__field-static {
+  font-size: var(--text-body);
+  color: var(--color-primary);
+}
+.sheet__field-arrow {
+  font-size: var(--text-caption);
+  color: var(--color-text-tertiary);
+  margin-left: var(--space-2);
+}
+.sheet__field--tap {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.sheet__field--tap:active {
+  background-color: var(--color-bg-secondary);
+}
+
+/* --- Message textarea field --- */
+.sheet__field--textarea {
+  display: block;
+  padding: var(--space-4) var(--space-5);
+}
+.sheet__textarea {
+  width: 100%;
+  min-height: 180px;
+  border: none;
+  background: transparent;
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  color: var(--color-text-primary);
+  resize: none;
+  outline: none;
+  line-height: var(--leading-relaxed);
+  caret-color: var(--color-primary);
+  padding: 0;
+}
+.sheet__textarea::placeholder {
+  color: var(--color-text-tertiary);
+  font-style: normal;
+}
+
+/* --- Friend picker dropdown in sheet --- */
+.sheet__friend-picker {
+  display: none;
+  border-top: 1px solid var(--color-border-secondary);
+  background-color: var(--color-bg-elevated);
+  max-height: 200px;
+  overflow-y: auto;
+}
+.sheet__friend-picker.open { display: block; }
+.sheet__friend-option {
+  display: flex;
+  align-items: center;
+  padding: var(--space-3) var(--space-5);
+  font-size: var(--text-body);
+  color: var(--color-text-primary);
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  border-bottom: 1px solid var(--color-border-secondary);
+  font-family: var(--font-sans);
+}
+.sheet__friend-option:last-child { border-bottom: none; }
+.sheet__friend-option:active { background-color: var(--color-bg-secondary); }
+.sheet__friend-option.selected { color: var(--color-primary); font-weight: var(--weight-medium); }
+.sheet__friend-empty {
+  padding: var(--space-4) var(--space-5);
+  font-size: var(--text-body-sm);
+  color: var(--color-text-tertiary);
+  text-align: center;
+  line-height: var(--leading-relaxed);
+}
+
+/* --- CTA pinned bottom --- */
+.sheet__cta-area {
+  flex-shrink: 0;
+  padding: var(--space-4) var(--space-6);
+  padding-bottom: calc(var(--safe-area-bottom) + var(--space-4));
+  border-top: 1px solid var(--color-border-secondary);
+}
+.sheet__cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: var(--space-4) var(--space-6);
+  min-height: 52px;
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-tertiary);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-normal);
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition:
+    transform var(--duration-fast) var(--ease-spring),
+    background-color var(--duration-normal) var(--ease-out),
+    color var(--duration-normal) var(--ease-out);
+  user-select: none;
+}
+.sheet__cta.sheet__cta--ready {
+  background: var(--color-primary);
+  color: #fff;
+}
+.sheet__cta:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.sheet__cta:disabled { opacity: 0.25; cursor: not-allowed; }
+
+/* --- Confirmation phase (in-sheet) --- */
+.sheet__goodnight {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  background: var(--color-bg-secondary);
+  opacity: 0;
+  transition: opacity 400ms var(--ease-out);
+  pointer-events: none;
+  z-index: 2;
+}
+.sheet__goodnight.active { opacity: 1; pointer-events: auto; }
+.sheet__goodnight-icon {
+  font-size: 3rem;
+  margin-bottom: var(--space-5);
+  animation: postDrop 600ms var(--ease-spring) both;
+}
+@keyframes postDrop {
+  0%   { transform: translateY(-40px) scale(0.8); opacity: 0; }
+  60%  { transform: translateY(4px) scale(1.05); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+.sheet__goodnight-main {
+  font-size: var(--text-h2);
+  color: var(--color-text-primary);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-relaxed);
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+.sheet__goodnight-sub {
+  font-size: var(--text-body);
+  color: var(--color-text-tertiary);
+  text-align: center;
+  margin-top: var(--space-3);
+}
+
+/* ============================================================
+   HOME: Write CTA + Scheduled Letter Card
+   ============================================================ */
+
+.home-write-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  margin: 0 auto var(--space-4);
+  padding: var(--space-5) var(--space-6);
+  background: var(--night-accent);
+  color: var(--night-bg-deep);
+  border: none;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: var(--text-h3);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-normal);
+  min-height: 56px;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: 0 4px 16px rgba(245, 196, 105, 0.2);
+  transition:
+    transform var(--duration-fast) var(--ease-spring),
+    background-color var(--duration-normal) var(--ease-out);
+}
+.home-write-cta:active {
+  transform: scale(0.97);
+  background: var(--color-secondary-dark);
+  box-shadow: 0 2px 8px rgba(245, 196, 105, 0.15);
+}
+.home-write-cta--light {
+  background: var(--color-primary);
+  color: #fff;
+}
+.home-write-cta__icon {
+  width: 18px; height: 18px;
+  display: flex; align-items: center; justify-content: center;
+}
+.home-write-cta__icon svg {
+  width: 16px; height: 16px;
+  fill: none; stroke: currentColor; stroke-width: 2;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+
+/* --- Scheduled letter card --- */
+.scheduled-letters-list {
+  width: 100%;
+  margin: 0 auto var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.scheduled-letter {
+  width: 100%;
+  padding: var(--space-4) var(--space-5);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--night-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: transform var(--duration-fast) var(--ease-spring);
+}
+.scheduled-letter:active { transform: scale(0.98); }
+.scheduled-letter--light {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+.scheduled-letter__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.scheduled-letter__date {
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  color: var(--night-text-primary);
+  letter-spacing: var(--tracking-normal);
+}
+.scheduled-letter__date--light {
+  color: var(--color-text-primary);
+}
+.scheduled-letter__time {
+  font-family: var(--font-sans);
+  font-size: var(--text-body-sm);
+  color: var(--night-text-tertiary);
+  letter-spacing: var(--tracking-normal);
+}
+.scheduled-letter__time--light {
+  color: var(--color-text-tertiary);
+}
+.scheduled-letter__status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-sans);
+  font-size: var(--text-caption);
+  color: var(--night-accent);
+  letter-spacing: var(--tracking-normal);
+  flex-shrink: 0;
+}
+.scheduled-letter__status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--night-accent);
+  opacity: 0.6;
+  animation: gentleFloat 3s ease-in-out infinite;
+}
+
+/* --- Sheet SE responsive --- */
+@media (max-width: 380px) {
+  .sheet { height: 90vh; }
+  .sheet__form {
+    padding: var(--space-3) var(--space-4);
+  }
+  .sheet__section { margin-bottom: var(--space-4); }
+  .sheet__field {
+    padding: var(--space-3) var(--space-4);
+  }
+  .sheet__textarea {
+    min-height: 120px;
+  }
+  .sheet__cta {
+    padding: var(--space-3) var(--space-5);
+    min-height: 48px;
+  }
+  .sheet__cta-area {
+    padding: var(--space-3) var(--space-4);
+    padding-bottom: calc(var(--safe-area-bottom) + var(--space-3));
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="app-shell" id="app">
+
+  <!-- トースト -->
+  <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+  <!-- ===== 1. オンボーディング画面 ===== -->
+  <div class="screen screen--night" id="onboarding" role="main" aria-label="オンボーディング">
+    <div class="stars" id="onboarding-stars"></div>
+    <div class="onboarding-content" id="onboarding-content">
+      <!-- JSで制御 -->
+    </div>
+  </div>
+
+  <!-- ===== 2. ホーム画面 ===== -->
+  <div class="screen" id="home" role="main" aria-label="ホーム">
+    <div class="home-bg home-bg--night" id="home-bg"></div>
+    <div class="stars" id="stars"></div>
+    <div class="home-content" id="home-content">
+      <!-- ヘッダー: 日付＋時刻 -->
+      <div class="home-header" id="home-header">
+        <div class="home-header__date" id="date-display"></div>
+        <div class="home-header__clock" id="clock">00:00</div>
+      </div>
+      <!-- 受信ボックス形式のリスト -->
+      <div class="inbox" id="home-letter-area"></div>
+      <!-- 空状態（中央寄せ） -->
+      <div class="inbox-empty" id="home-empty-state"></div>
+    </div>
+    <!-- FAB: 手紙を書く -->
+    <button class="home-fab" id="home-fab" onclick="openWriteSheet()" aria-label="手紙を書く">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      <span>手紙を書く</span>
+    </button>
+  </div>
+
+  <!-- ===== 3. 手紙を書く画面 ===== -->
+  <div class="screen screen--night" id="write-screen" role="main" aria-label="手紙を書く">
+    <div class="stars" id="write-stars"></div>
+    <div class="header header--night" role="banner">
+      <button class="header__action header__action--left" onclick="navigateTo('home')" aria-label="もどる" style="opacity:0.5;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <span class="header__title" id="write-header-title" style="opacity:0;"></span>
+    </div>
+    <div class="write-screen-content animate-slide-up" style="position:relative;z-index:2;">
+      <!-- セグメントコントロール（ログイン時のみ表示） -->
+      <div id="write-segment-area" style="display:none;">
+        <div class="segment-control">
+          <button class="segment active" data-target="self" onclick="switchWriteTarget('self')">自分へ</button>
+          <button class="segment" data-target="friend" onclick="switchWriteTarget('friend')">ともだちへ</button>
+        </div>
+      </div>
+      <!-- フレンド選択リスト（ともだちへ選択時） -->
+      <div id="friend-select-area" style="display:none;">
+        <div class="section-title" style="color:var(--night-text-secondary);">だれに送る？</div>
+        <div class="friend-select-list" id="friend-select-list"></div>
+      </div>
+      <div id="write-self-area">
+      <div class="write-prompt" id="daily-prompt"></div>
+      <div class="time-picker" aria-label="アラーム時刻設定">
+        <input type="text" inputmode="numeric" class="time-picker__input" id="alarm-hour" maxlength="2" value="07" placeholder="07" aria-label="時">
+        <span class="time-picker__separator">:</span>
+        <input type="text" inputmode="numeric" class="time-picker__input" id="alarm-minute" maxlength="2" value="00" placeholder="00" aria-label="分">
+      </div>
+      <div class="delivery-info" id="delivery-date" aria-live="polite"></div>
+      <div class="card-letter card-letter--night">
+        <div class="card-letter__label" id="letter-label">あしたの朝の、わたしへ。</div>
+        <textarea class="textarea-letter" id="letter-input" aria-label="手紙の内容"></textarea>
+      </div>
+      <div class="write-actions">
+        <button class="btn btn-night-primary btn--lg btn--block" onclick="setAlarm()" aria-label="あしたの自分にとどける">あしたの自分にとどける</button>
+      </div>
+      </div><!-- /write-self-area -->
+      <!-- フレンドへの手紙エリア -->
+      <div id="write-friend-area" style="display:none;">
+        <div class="time-picker" aria-label="配達時刻設定">
+          <input type="text" inputmode="numeric" class="time-picker__input" id="friend-alarm-hour" maxlength="2" value="07" placeholder="07" aria-label="時">
+          <span class="time-picker__separator">:</span>
+          <input type="text" inputmode="numeric" class="time-picker__input" id="friend-alarm-minute" maxlength="2" value="00" placeholder="00" aria-label="分">
+        </div>
+        <div class="delivery-info" id="friend-delivery-date" aria-live="polite"></div>
+        <div class="card-letter card-letter--night">
+          <div class="card-letter__label" id="friend-letter-label">ともだちの朝に、とどける手紙。</div>
+          <textarea class="textarea-letter" id="friend-letter-input" aria-label="手紙の内容"></textarea>
+        </div>
+        <div class="write-actions">
+          <button class="btn btn-night-primary btn--lg btn--block" id="friend-send-btn" onclick="sendFriendLetter()" aria-label="あしたのともだちにとどける">あしたのともだちにとどける</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 4. おやすみなさい画面 ===== -->
+  <div class="screen screen--night" id="goodnight-screen" role="main" aria-label="おやすみなさい">
+    <div class="stars" id="goodnight-stars"></div>
+    <div class="goodnight-content animate-fade-in" style="position:relative;z-index:2;">
+      <div class="goodnight-text animate-soft-rise" id="goodnight-main">手紙、あずかったよ。</div>
+      <div class="goodnight-sub animate-soft-rise" style="animation-delay:500ms;" id="goodnight-sub">あしたの朝、届けるからね</div>
+      <div class="goodnight-sub animate-soft-rise" style="animation-delay:2500ms;margin-top:var(--space-6);opacity:0;" id="goodnight-extra">おやすみなさい。</div>
+    </div>
+  </div>
+
+  <!-- ===== 5. アラーム画面 ===== -->
+  <div class="screen screen--morning" id="alarm-screen" role="main" aria-label="アラーム">
+    <div class="morning-blobs" id="morning-blobs">
+      <div class="morning-blob morning-blob--1"></div>
+      <div class="morning-blob morning-blob--2"></div>
+      <div class="morning-blob morning-blob--3"></div>
+      <div class="morning-blob morning-blob--4"></div>
+    </div>
+    <!-- Phase 1: 手紙を読む -->
+    <div class="alarm-screen-content" id="alarm-phase-letter">
+      <div class="alarm-arrival animate-soft-rise">
+        <div class="alarm-arrival__icon">📮</div>
+        <div class="alarm-arrival__text">手紙が届きました</div>
+      </div>
+      <div class="alarm-time-display animate-soft-rise" id="alarm-current-time" style="animation-delay:100ms;"></div>
+      <div class="card-letter animate-soft-rise" id="alarm-letter-card" style="animation-delay:200ms;">
+        <div class="card-letter__label">ゆうべのわたしから</div>
+        <div class="card-letter__date" id="letter-sent-date"></div>
+        <div class="card-letter__body" id="letter-content"></div>
+      </div>
+      <div id="timecapsule-area"></div>
+      <div id="friend-letters-area"></div>
+      <div class="alarm-actions animate-soft-rise" style="animation-delay:400ms;padding:0 var(--space-5);">
+        <button class="sheet__cta sheet__cta--ready" onclick="showAlarmReply()" id="alarm-reply-btn" style="width:100%;">返信を書く</button>
+      </div>
+      <div class="alarm-actions" style="margin-top:var(--space-3);">
+        <button class="btn btn--sm btn-ghost" onclick="snooze()" aria-label="5分後にもう一度アラーム" style="color:var(--morning-text-secondary);">もうすこしだけ...</button>
+      </div>
+      <div class="alarm-actions" style="margin-top:var(--space-1);">
+        <button class="btn btn--sm btn-ghost" onclick="dismissAlarmReadOnly()" aria-label="読んだよ" style="color:var(--morning-text-secondary);opacity:0;pointer-events:none;transition:opacity 0.5s ease;" id="read-only-btn">今朝はそっと読むだけ</button>
+      </div>
+    </div>
+    <!-- Phase 2: 返事を書く（シートスタイル） -->
+    <div class="alarm-reply-phase" id="alarm-phase-reply" style="display:none;">
+      <div class="alarm-reply-header">
+        <button class="alarm-reply-back" onclick="hideAlarmReply()" aria-label="戻る">&#x2039; もどる</button>
+      </div>
+      <div class="alarm-reply-body">
+        <div class="sheet__section">
+          <div class="sheet__section-title" style="color:var(--color-text-tertiary);">けさのわたしから</div>
+          <div class="sheet__field-group">
+            <div class="sheet__field sheet__field--textarea">
+              <textarea class="sheet__textarea" id="reply-input" placeholder="おはよう、きのうの自分。" aria-label="返事を書く"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sheet__cta-area" style="border-top:1px solid var(--color-border-secondary);">
+        <button class="sheet__cta" id="dismiss-btn" onclick="dismissAlarm()" disabled>返事をとどける</button>
+      </div>
+    </div>
+    <!-- Phase 3: 完了 -->
+    <div class="alarm-complete-phase" id="alarm-phase-complete" style="display:none;cursor:pointer;" onclick="if(currentScreen==='alarm-screen'){navigateTo('home');updateHomeLetterArea();}">
+      <div class="alarm-complete-icon">💌</div>
+      <div class="alarm-complete-main">お返事ありがとう。</div>
+      <div class="alarm-complete-sub">きょうが、はじまったよ。</div>
+    </div>
+  </div>
+
+  <!-- ===== 6. いってらっしゃい画面 ===== -->
+  <div class="screen" id="itterasshai-screen" role="main" aria-label="いってらっしゃい" style="background: var(--morning-gradient);">
+    <div class="itterasshai-content animate-fade-in">
+      <div class="itterasshai-main animate-soft-rise" id="itterasshai-main">いってらっしゃい。</div>
+      <div class="itterasshai-summary animate-soft-rise" style="animation-delay:200ms;" id="itterasshai-summary"></div>
+      <div class="itterasshai-sub animate-soft-rise" style="animation-delay:400ms;" id="itterasshai-sub"></div>
+    </div>
+  </div>
+
+  <!-- ===== 7. 文通の記録画面 ===== -->
+  <div class="screen screen--day" id="history-screen" role="main" aria-label="文通">
+    <div class="header" role="banner">
+      <button class="header__action header__action--left" onclick="navigateTo('home')" aria-label="もどる">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <span class="header__title">文通</span>
+    </div>
+    <div class="screen-content" style="padding-bottom: calc(var(--tab-bar-height) + var(--safe-area-bottom) + var(--space-4));">
+      <div class="history-list" id="history-list"></div>
+    </div>
+  </div>
+
+  <!-- ===== 8. 認証画面 ===== -->
+  <div class="screen screen--day" id="auth-screen" role="main" aria-label="ログイン・新規登録">
+    <div class="header" role="banner">
+      <button class="header__action header__action--left" onclick="navigateTo('settings-screen')" aria-label="もどる">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <span class="header__title">アカウント</span>
+    </div>
+    <div class="screen-content">
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchAuthMode('login')">ログイン</button>
+        <button class="auth-tab" onclick="switchAuthMode('register')">新規登録</button>
+      </div>
+      <div class="auth-error" id="auth-error"></div>
+      <div id="auth-form-area">
+        <div class="form-group" id="auth-name-group" style="display:none;">
+          <label class="form-label">表示名</label>
+          <input type="text" class="form-input" id="auth-name" placeholder="ともだちに見える名前" autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">メールアドレス</label>
+          <input type="email" class="form-input" id="auth-email" placeholder="example@mail.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label class="form-label">パスワード</label>
+          <input type="password" class="form-input" id="auth-password" placeholder="6文字以上" autocomplete="current-password">
+        </div>
+        <button class="btn btn-primary btn--block btn--lg" id="auth-submit-btn" onclick="handleAuth()">ログイン</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 9. ともだち画面 ===== -->
+  <div class="screen screen--day" id="friends-screen" role="main" aria-label="ともだち">
+    <div class="header" role="banner">
+      <button class="header__action header__action--left" onclick="navigateTo('home')" aria-label="もどる">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <span class="header__title">ともだち</span>
+    </div>
+    <div class="screen-content" id="friends-content" style="padding-bottom: calc(var(--tab-bar-height) + var(--safe-area-bottom) + var(--space-4));">
+      <!-- JSで描画 -->
+    </div>
+  </div>
+
+  <!-- ===== 10. 設定画面 ===== -->
+  <div class="screen screen--day" id="settings-screen" role="main" aria-label="設定">
+    <div class="header" role="banner">
+      <button class="header__action header__action--left" onclick="navigateTo('home')" aria-label="もどる">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <span class="header__title">設定</span>
+    </div>
+    <div class="screen-content" style="padding-bottom: calc(var(--tab-bar-height) + var(--safe-area-bottom) + var(--space-4));">
+      <!-- アカウント -->
+      <div class="settings-section" id="settings-account-section">
+        <div class="settings-section-title">アカウント</div>
+        <div id="settings-account-content">
+          <!-- 未ログイン時 -->
+          <div class="settings-item" style="border-radius: var(--radius-lg); border-bottom:none; cursor:pointer;" onclick="navigateTo('auth-screen')">
+            <span class="settings-item-label">ログイン / 新規登録</span>
+            <span class="settings-item-value">&rsaquo;</span>
+          </div>
+        </div>
+      </div>
+      <!-- 音量 -->
+      <div class="settings-section">
+        <div class="settings-section-title">サウンド</div>
+        <div class="settings-item" style="border-radius: var(--radius-lg) var(--radius-lg) 0 0;">
+          <span class="settings-item-label">アラーム音量</span>
+          <div style="display:flex;align-items:center;gap:var(--space-2);">
+            <input type="range" min="0" max="100" class="range-slider" id="volume-slider" aria-label="アラーム音量">
+            <span class="settings-item-value" id="volume-value">30</span>
+          </div>
+        </div>
+        <div class="settings-item" style="border-radius: 0 0 var(--radius-lg) var(--radius-lg); border-bottom:none;">
+          <span class="settings-item-label">読み上げ</span>
+          <button class="toggle active" id="tts-toggle" onclick="toggleTTS()" aria-label="読み上げ切り替え"></button>
+        </div>
+      </div>
+      <!-- データ -->
+      <div class="settings-section">
+        <div class="settings-section-title">手紙のデータ</div>
+        <div class="settings-item" style="border-radius: var(--radius-lg) var(--radius-lg) 0 0;">
+          <span class="settings-item-label">手紙をまとめて保存</span>
+          <button class="btn btn--sm btn-secondary" onclick="exportData()" aria-label="手紙をまとめて保存">ダウンロード</button>
+        </div>
+        <div class="settings-item" style="border-radius: 0 0 var(--radius-lg) var(--radius-lg); border-bottom:none;">
+          <span class="settings-item-label" style="color:var(--color-error);">すべての手紙を消す</span>
+          <button class="btn btn--sm" style="background:var(--color-error);color:white;" onclick="deleteAllData()" aria-label="すべての手紙を消す">消す</button>
+        </div>
+      </div>
+      <div style="text-align:center;padding:var(--space-6);color:var(--color-text-tertiary);font-size:var(--text-caption);">
+        めざめの手紙 v4.0
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ボトムシート: 手紙を書く ===== -->
+  <div class="sheet-overlay" id="sheet-overlay" onclick="closeWriteSheet()"></div>
+  <div class="sheet" id="write-sheet">
+    <div class="sheet__handle-area" id="sheet-handle">
+      <div class="sheet__handle"></div>
+    </div>
+    <div class="sheet__content" id="sheet-content">
+      <div class="sheet__form">
+        <!-- 設定日時 -->
+        <div class="sheet__section">
+          <div class="sheet__section-title">設定日時</div>
+          <div class="sheet__field-group">
+            <div class="sheet__field">
+              <span class="sheet__field-label">日付</span>
+              <div class="sheet__field-value">
+                <input type="text" inputmode="numeric" class="sheet__field-input" id="sheet-alarm-month" maxlength="2" placeholder="2" aria-label="月">
+                <span class="sheet__field-sep">月</span>
+                <input type="text" inputmode="numeric" class="sheet__field-input" id="sheet-alarm-day" maxlength="2" placeholder="12" aria-label="日">
+                <span class="sheet__field-sep">日</span>
+              </div>
+            </div>
+            <div class="sheet__field">
+              <span class="sheet__field-label">時刻</span>
+              <div class="sheet__field-value">
+                <input type="text" inputmode="numeric" class="sheet__field-input" id="sheet-alarm-hour" maxlength="2" value="07" placeholder="07" aria-label="時">
+                <span class="sheet__field-sep">:</span>
+                <input type="text" inputmode="numeric" class="sheet__field-input" id="sheet-alarm-minute" maxlength="2" value="00" placeholder="00" aria-label="分">
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- 宛先 -->
+        <div class="sheet__section">
+          <div class="sheet__section-title">宛先</div>
+          <div class="sheet__field-group">
+            <div class="sheet__field sheet__field--tap" id="sheet-recipient-field" onclick="toggleSheetFriendPicker()">
+              <span class="sheet__field-label">あて先</span>
+              <div class="sheet__field-value">
+                <span class="sheet__field-static" id="sheet-recipient-name">自分</span>
+                <span class="sheet__field-arrow">&#x25BC;</span>
+              </div>
+            </div>
+            <div class="sheet__friend-picker" id="sheet-friend-picker"></div>
+          </div>
+        </div>
+        <!-- メッセージ -->
+        <div class="sheet__section">
+          <div class="sheet__section-title">メッセージ</div>
+          <div class="sheet__field-group">
+            <div class="sheet__field sheet__field--textarea">
+              <textarea class="sheet__textarea" id="sheet-letter-input" placeholder="あしたの朝の自分に、ひとこと。" aria-label="手紙の内容"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sheet__cta-area">
+        <button class="sheet__cta" id="sheet-send-btn" onclick="setAlarmFromSheet()">設定する</button>
+      </div>
+    </div>
+    <div class="sheet__goodnight" id="sheet-goodnight">
+      <div class="sheet__goodnight-icon">📮</div>
+      <div class="sheet__goodnight-main">手紙がセットされました</div>
+      <div class="sheet__goodnight-sub" id="sheet-goodnight-sub">設定日時にお届けします</div>
+    </div>
+  </div>
+
+  <!-- ===== タブバー (4タブ) ===== -->
+  <nav class="tab-bar" id="tab-bar" role="navigation" aria-label="メインナビゲーション">
+    <button class="tab-bar__item active" data-tab="home" onclick="navigateTo('home')" aria-label="ホーム">
+      <span class="tab-bar__icon">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      </span>
+      <span class="tab-bar__label">ホーム</span>
+    </button>
+    <button class="tab-bar__item" data-tab="friends-screen" onclick="navigateTo('friends-screen')" aria-label="ともだち" id="tab-friends">
+      <span class="tab-bar__icon">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+      </span>
+      <span class="tab-bar__label">ともだち</span>
+    </button>
+    <button class="tab-bar__item" data-tab="history-screen" onclick="navigateTo('history-screen')" aria-label="文通">
+      <span class="tab-bar__icon">
+        <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+      </span>
+      <span class="tab-bar__label">文通</span>
+    </button>
+    <button class="tab-bar__item" data-tab="settings-screen" onclick="navigateTo('settings-screen')" aria-label="設定">
+      <span class="tab-bar__icon">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      </span>
+      <span class="tab-bar__label">設定</span>
+    </button>
+  </nav>
+</div>
+
+<script>
+// ===== 状態管理 =====
+let alarmData = null;
+let audioCtx = null;
+let alarmPlaying = false;
+let alarmOscillators = [];
+let currentScreen = 'home';
+let goodnightTimer = null;
+let itterasshaiTimer = null;
+let clockInterval = null; // setInterval二重起動防止用
+
+// ===== 定数 =====
+const placeholders = [
+  'きょう一番うれしかったこと、なに？',
+  'あしたの自分に伝えたいこと、ある？',
+  'いま、どんな気持ち？',
+  'あしたの朝、起きたらなにがしたい？',
+  'だれかに言えなかったこと、ここに書いてみて。',
+  'きょうの自分に点数をつけるなら？',
+  'あしたの天気、しってる？',
+  'きょう一番がんばったこと、なに？',
+  'いまの自分にひとこと。',
+];
+
+const dailyPrompts = [
+  'あしたの自分に、なにか伝えたいことは？',
+  'あしたの自分へ、ひとこと。',
+  'あしたの自分が読んだら、うれしいこと。',
+  'あしたの朝、思い出したいこと。',
+  'きょうあったこと、あしたの自分に共有しよう。',
+];
+
+// 夜(18-3時)と朝(3-18時)で問いかけを分ける
+const nightPrompts = [
+  'あしたの朝の自分に、ひとこと。',
+  'あしたの自分へ、きょうの報告。',
+  'あしたの自分が元気になること、書いてみよう。',
+  'あしたの朝、目覚めたときに読みたいこと。',
+  'あしたの自分に、おやすみの手紙。',
+];
+const morningPrompts = [
+  'あしたの自分へ、きょうの目標。',
+  'あしたの朝、思い出したいこと。',
+  'あしたの自分へ、いま感じていること。',
+  'あしたの自分が読んだら、うれしいこと。',
+];
+
+// ===== 初期化 =====
+function init() {
+  // オンボーディングチェック
+  if (!localStorage.getItem('mezame_onboarded')) {
+    showOnboarding();
+    return;
+  }
+
+  createStars('stars');
+  createStars('write-stars');
+  createStars('goodnight-stars');
+  updateClock();
+  if (!clockInterval) clockInterval = setInterval(updateClock, 1000);
+  loadAlarm();
+  loadSnooze();
+  loadSettings();
+  updateHomeLetterArea();
+  updateStreak();
+  updateTodayQuote();
+  navigateTo('home');
+
+  // 返事入力監視: 文字を入力したらTTSループ停止 + ボタン有効化
+  document.getElementById('reply-input').addEventListener('input', function() {
+    const hasText = this.value.trim() !== '';
+    const ctaBtn = document.getElementById('dismiss-btn');
+    ctaBtn.disabled = !hasText;
+    ctaBtn.classList.toggle('sheet__cta--ready', hasText);
+    if (hasText && ttsLooping) stopTTSLoop();
+  });
+
+  // アラーム時刻入力監視
+  document.getElementById('alarm-hour').addEventListener('input', updateDeliveryDate);
+  document.getElementById('alarm-minute').addEventListener('input', updateDeliveryDate);
+
+  // フレンド手紙時刻入力監視
+  document.getElementById('friend-alarm-hour').addEventListener('input', updateFriendDeliveryDate);
+  document.getElementById('friend-alarm-minute').addEventListener('input', updateFriendDeliveryDate);
+
+  // 音量スライダー
+  document.getElementById('volume-slider').addEventListener('input', function() {
+    document.getElementById('volume-value').textContent = this.value;
+    localStorage.setItem('mezame_volume', this.value);
+  });
+
+  // バックグラウンド復帰チェック
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+      checkAlarmOnResume();
+      // ストリーク途切れ後の復帰チェック
+      checkStreakRecovery();
+    }
+  });
+
+  // ヘッダーのスクロール連動blur
+  document.querySelectorAll('.screen').forEach(screen => {
+    screen.addEventListener('scroll', function() {
+      const headers = this.querySelectorAll('.header');
+      headers.forEach(h => h.classList.toggle('scrolled', this.scrollTop > 8));
+    }, { passive: true });
+  });
+
+  // Notification許可要求
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+
+  // おやすみなさい画面タップでホームへ
+  document.getElementById('goodnight-screen').addEventListener('click', function() {
+    if (currentScreen === 'goodnight-screen') {
+      clearTimeout(goodnightTimer);
+      navigateTo('home');
+    }
+  });
+
+  // いってらっしゃい画面タップでホームへ
+  document.getElementById('itterasshai-screen').addEventListener('click', function() {
+    if (currentScreen === 'itterasshai-screen') {
+      clearTimeout(itterasshaiTimer);
+      navigateTo('home');
+      updateStreak();
+      updateTodayQuote();
+    }
+  });
+}
+
+// ===== オンボーディング =====
+function showOnboarding() {
+  hideTabBar();
+  showScreen('onboarding');
+  createStars('onboarding-stars');
+  renderOnboardingStep(1);
+}
+
+function renderOnboardingStep(step) {
+  const el = document.getElementById('onboarding-content');
+
+  if (step === 1) {
+    el.innerHTML = '<div class="onboarding-text animate-fade-in">こんばんは。</div>';
+    setTimeout(() => renderOnboardingStep(2), 3000);
+  } else if (step === 2) {
+    el.innerHTML = `
+      <div class="onboarding-desc animate-fade-in">
+        これは、自分と文通するアプリです。<br><br>
+        夜、寝る前に手紙を書いてみてください。<br>
+        朝、アラームといっしょにとどきます。
+      </div>
+      <button class="btn btn-night-primary animate-soft-rise" style="animation-delay:300ms;" onclick="renderOnboardingStep(3)">つぎへ</button>
+    `;
+  } else if (step === 3) {
+    el.innerHTML = `
+      <div class="onboarding-text animate-fade-in">
+        じゃあ、今夜の手紙を<br>書いてみよう。
+      </div>
+      <button class="btn btn-night-primary btn--lg animate-soft-rise" style="animation-delay:300ms;" onclick="finishOnboarding()">はじめる</button>
+    `;
+  }
+}
+
+function finishOnboarding() {
+  localStorage.setItem('mezame_onboarded', '1');
+  init();
+  showTabBar();
+  // ホームに着地して、シートを自動で開く（糸井重里提案）
+  navigateTo('home');
+  setTimeout(() => openWriteSheet(), 600);
+}
+
+// ===== 画面遷移 =====
+function navigateTo(id) {
+  const prev = currentScreen;
+  if (prev === id) return;
+  currentScreen = id;
+
+  // 遷移アニメーション付きの画面切り替え
+  transitionScreen(prev, id);
+  updateTabBar(id);
+
+  // タブバー表示制御
+  const noTabScreens = ['onboarding', 'goodnight-screen', 'alarm-screen', 'itterasshai-screen', 'auth-screen'];
+  if (noTabScreens.includes(id)) {
+    hideTabBar();
+  } else {
+    showTabBar();
+  }
+
+  // 画面固有の更新
+  if (id === 'home') {
+    updateTodayQuote();
+    updateHomeLetterArea();
+    updateStreak();
+    updateHomeEmptyState();
+    updateHomeFriendLetters();
+  }
+  if (id === 'write-screen') {
+    updateWriteScreen();
+    updateDeliveryDate();
+    updateWriteSegment();
+  }
+  if (id === 'history-screen') {
+    renderHistory();
+  }
+  if (id === 'friends-screen') {
+    renderFriendsScreen();
+  }
+  if (id === 'settings-screen') {
+    updateSettingsAccount();
+  }
+  if (id === 'auth-screen') {
+    resetAuthForm();
+  }
+}
+
+function getTransitionType(fromId, toId) {
+  // 感情的な遷移
+  if (toId === 'goodnight-screen' || toId === 'itterasshai-screen') return 'fade';
+  if (fromId === 'goodnight-screen' || fromId === 'itterasshai-screen') return 'fade';
+  // 朝の覚醒
+  if (toId === 'alarm-screen') return 'fade';
+  if (fromId === 'alarm-screen') return 'fade';
+  // 通常ナビ（タブ間はpush/pop）
+  const tabs = ['home', 'write-screen', 'friends-screen', 'history-screen', 'settings-screen'];
+  const fromIdx = tabs.indexOf(fromId);
+  const toIdx = tabs.indexOf(toId);
+  if (fromIdx >= 0 && toIdx >= 0) return toIdx > fromIdx ? 'push' : 'pop';
+  // サブ画面
+  if (toId === 'auth-screen') return 'push';
+  if (fromId === 'auth-screen') return 'pop';
+  return 'fade';
+}
+
+const TR_DURATIONS = { push: 300, pop: 300, rise: 400, fade: 500, dawn: 800 };
+const TR_CLASSES = ['tr-push', 'tr-pop', 'tr-rise', 'tr-fade', 'tr-dawn', 'screen-entering', 'screen-leaving'];
+
+function transitionScreen(fromId, toId) {
+  const from = document.getElementById(fromId);
+  const to = document.getElementById(toId);
+  if (!from || !to) { showScreen(toId); return; }
+
+  const type = getTransitionType(fromId, toId);
+  const trClass = `tr-${type}`;
+  const duration = TR_DURATIONS[type] || 480;
+
+  // 前画面の退場
+  from.classList.remove('active');
+  from.classList.add('screen-leaving', trClass);
+
+  // 新画面の入場
+  to.classList.add('screen-entering', trClass, 'active');
+
+  // クリーンアップ
+  setTimeout(() => {
+    from.classList.remove(...TR_CLASSES);
+    to.classList.remove(...TR_CLASSES);
+  }, duration + 50);
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active', ...TR_CLASSES);
+  });
+  document.getElementById(id).classList.add('active');
+}
+
+function hideTabBar() {
+  document.getElementById('tab-bar').style.display = 'none';
+}
+
+function showTabBar() {
+  document.getElementById('tab-bar').style.display = '';
+}
+
+function updateTabBar(id) {
+  const mapping = {
+    'home': 'home',
+    'friends-screen': 'friends-screen',
+    'history-screen': 'history-screen',
+    'settings-screen': 'settings-screen'
+  };
+  document.querySelectorAll('.tab-bar__item').forEach(t => t.classList.remove('active'));
+  const tabId = mapping[id];
+  if (tabId) {
+    const tab = document.querySelector(`.tab-bar__item[data-tab="${tabId}"]`);
+    if (tab) tab.classList.add('active');
+  }
+}
+
+// ===== 星パーティクル =====
+function createStars(containerId) {
+  const c = document.getElementById(containerId);
+  if (!c || c.children.length > 0) return;
+
+  // 通常の星（30個に削減、大小の差をつける）
+  for (let i = 0; i < 30; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = Math.random() * 75 + '%';
+    s.style.animationDelay = (Math.random() * 4) + 's';
+    s.style.animationDuration = (2.5 + Math.random() * 3) + 's';
+    // 3段階のサイズ: 小(70%), 中(20%), 明るい大(10%)
+    const r = Math.random();
+    if (r < 0.7) {
+      s.style.width = s.style.height = (1 + Math.random()) + 'px';
+      s.style.opacity = 0.4 + Math.random() * 0.3;
+    } else if (r < 0.9) {
+      s.style.width = s.style.height = (2 + Math.random()) + 'px';
+      s.style.opacity = 0.5 + Math.random() * 0.3;
+    } else {
+      // 明るい星
+      s.style.width = s.style.height = (2.5 + Math.random()) + 'px';
+      s.style.opacity = 0.7 + Math.random() * 0.3;
+      s.style.boxShadow = '0 0 4px rgba(255,255,255,0.4)';
+    }
+    c.appendChild(s);
+  }
+
+  // 流れ星（まれに表示）
+  function addShootingStar() {
+    if (document.hidden) return;
+    const ss = document.createElement('div');
+    ss.className = 'shooting-star';
+    ss.style.left = (20 + Math.random() * 60) + '%';
+    ss.style.top = (5 + Math.random() * 30) + '%';
+    c.appendChild(ss);
+    setTimeout(() => ss.remove(), 1200);
+  }
+
+  // 15〜45秒間隔で流れ星
+  function scheduleShootingStar() {
+    const delay = 15000 + Math.random() * 30000;
+    setTimeout(() => {
+      addShootingStar();
+      scheduleShootingStar();
+    }, delay);
+  }
+  scheduleShootingStar();
+}
+
+// ===== 時計・背景更新 =====
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = String(now.getMinutes()).padStart(2, '0');
+  document.getElementById('clock').textContent = `${h}:${m}`;
+
+  const days = ['日', '月', '火', '水', '木', '金', '土'];
+  document.getElementById('date-display').textContent =
+    `${now.getMonth()+1}月${now.getDate()}日 ${days[now.getDay()]}曜日`;
+
+  // アラームチェック（複数アラーム対応）
+  if (!alarmPlaying) {
+    const alarms = loadAlarms();
+    for (const alarm of alarms) {
+      const t = new Date(alarm.targetDate);
+      if (now.getHours() === alarm.hour && now.getMinutes() === alarm.minute &&
+          now.getFullYear() === t.getFullYear() && now.getMonth() === t.getMonth() && now.getDate() === t.getDate()) {
+        alarmData = alarm;
+        triggerAlarm();
+        break;
+      }
+    }
+  }
+
+  // ホーム背景更新
+  updateHomeBackground(now.getHours());
+
+  // 書くタブラベル更新
+  updateWriteTabLabel(now.getHours());
+}
+
+function updateHomeBackground(hour) {
+  const bg = document.getElementById('home-bg');
+  const stars = document.getElementById('stars');
+  const letterArea = document.getElementById('home-letter-area');
+
+  bg.className = 'home-bg';
+
+  const isDark = (hour >= 19 || hour < 5);
+  const isDawn = (hour >= 5 && hour < 7);
+  const isMorning = (hour >= 7 && hour < 10);
+  const isDaytime = (hour >= 10 && hour < 16);
+  const isEvening = (hour >= 16 && hour < 19);
+
+  if (isDawn) {
+    bg.classList.add('home-bg--dawn');
+    stars.style.opacity = '0.3';
+  } else if (isMorning) {
+    bg.classList.add('home-bg--morning');
+    stars.style.opacity = '0';
+  } else if (isDaytime) {
+    bg.classList.add('home-bg--daytime');
+    stars.style.opacity = '0';
+  } else if (isEvening) {
+    bg.classList.add('home-bg--evening');
+    stars.style.opacity = '0.2';
+  } else {
+    bg.classList.add('home-bg--night');
+    stars.style.opacity = '1';
+  }
+
+  // 明るい時間帯はテキストカラー変更
+  const lightTime = isMorning || isDaytime;
+
+  // ヘッダーのライトモード
+  const clockEl = document.getElementById('clock');
+  const dateEl = document.getElementById('date-display');
+  if (clockEl) clockEl.classList.toggle('home-header__clock--light', lightTime);
+  if (dateEl) dateEl.classList.toggle('home-header__date--light', lightTime);
+
+  // FABのライトモード
+  const fab = document.getElementById('home-fab');
+  if (fab) fab.classList.toggle('home-fab--light', lightTime);
+
+  // 受信ボックスアイテムのライトモード
+  if (letterArea) {
+    letterArea.querySelectorAll('.inbox-item').forEach(item => {
+      item.classList.toggle('inbox-item--light', lightTime);
+    });
+    letterArea.querySelectorAll('.inbox-item__icon--self').forEach(ic => {
+      ic.classList.toggle('inbox-item__icon--light', lightTime);
+    });
+    letterArea.querySelectorAll('.inbox-item__icon--friend').forEach(ic => {
+      ic.classList.toggle('inbox-item__icon--light', lightTime);
+    });
+    letterArea.querySelectorAll('.inbox-item__title').forEach(t => {
+      t.classList.toggle('inbox-item__title--light', lightTime);
+    });
+    letterArea.querySelectorAll('.inbox-item__sub').forEach(s => {
+      s.classList.toggle('inbox-item__sub--light', lightTime);
+    });
+    letterArea.querySelectorAll('.inbox-item__status').forEach(s => {
+      s.classList.toggle('inbox-item__status--light', lightTime);
+    });
+    letterArea.querySelectorAll('.inbox-item__delete').forEach(d => {
+      d.classList.toggle('inbox-item__delete--light', lightTime);
+    });
+  }
+
+  // 空状態のライトモード
+  const emptyEl = document.getElementById('home-empty-state');
+  if (emptyEl) {
+    const txt = emptyEl.querySelector('.inbox-empty__text');
+    if (txt) txt.classList.toggle('inbox-empty__text--light', lightTime);
+  }
+}
+
+// ===== 手紙を書くタブラベル（レガシー: タブ削除済み） =====
+function updateWriteTabLabel(hour) {
+  // タブは削除済み、ホームCTAのラベルで対応
+}
+
+// ===== 手紙を書く画面の更新 =====
+function updateWriteScreen() {
+  const today = new Date();
+  const seed = today.getFullYear() * 10000 + (today.getMonth()+1) * 100 + today.getDate();
+  const hour = today.getHours();
+
+  // 夜(18時以降)なら明日の日付、それ以外は今日の日付
+  const targetDate = new Date(today);
+  if (hour >= 18) targetDate.setDate(targetDate.getDate() + 1);
+  const month = targetDate.getMonth() + 1;
+  const day = targetDate.getDate();
+
+  // 日付ベースの見出し: "2月12日の自分への手紙"
+  document.getElementById('daily-prompt').textContent =
+    `${month}月${day}日の自分への手紙`;
+
+  // 旧プロンプトをプレースホルダーに転用（書き出しのヒント）
+  const isNight = (hour >= 18 || hour < 3);
+  const hints = isNight ? nightPrompts : (hour < 10 ? morningPrompts : dailyPrompts);
+  document.getElementById('letter-input').placeholder = hints[(seed * 3) % hints.length];
+}
+
+// ===== ホーム空状態 =====
+function updateHomeEmptyState() {
+  // 空状態はupdateHomeLetterAreaで管理
+}
+
+// ===== きょうのひとこと =====
+function updateTodayQuote() {
+  const el = document.getElementById('today-quote');
+  if (!el) return;
+  const allEntries = getAllEntries();
+  if (allEntries.length === 0) {
+    el.innerHTML = '';
+    return;
+  }
+
+  const today = new Date();
+  const seed = today.getFullYear() * 10000 + (today.getMonth()+1) * 100 + today.getDate();
+  const idx = seed % allEntries.length;
+  const entry = allEntries[idx];
+
+  const d = new Date(entry.date);
+  const days = ['日', '月', '火', '水', '木', '金', '土'];
+  const dateStr = `${d.getMonth()+1}/${d.getDate()}（${days[d.getDay()]}）`;
+
+  let text = entry.text;
+  if (text.length > 40) text = text.substring(0, 40) + '...';
+
+  el.innerHTML = `
+    <div class="quote-label">きょうのひとこと</div>
+    <div class="quote-text">「${escapeHtml(text)}」</div>
+    <div class="quote-date">${dateStr} のわたし</div>
+  `;
+}
+
+function getAllEntries() {
+  const entries = [];
+  const history = JSON.parse(localStorage.getItem('mezame_history') || '[]');
+  history.forEach(item => {
+    if (item.letter) entries.push({ text: item.letter, date: item.letterDate });
+    if (item.reply) entries.push({ text: item.reply, date: item.replyDate });
+  });
+  return entries;
+}
+
+// ===== 配達日時計算 =====
+function getDeliveryDate(hour, minute) {
+  const now = new Date();
+  const target = new Date(now);
+  target.setHours(hour, minute, 0, 0);
+  if (target <= now) target.setDate(target.getDate() + 1);
+  return target;
+}
+
+function updateDeliveryDate() {
+  const el = document.getElementById('delivery-date');
+  const label = document.getElementById('letter-label');
+  const hour = parseInt(document.getElementById('alarm-hour').value);
+  const minute = parseInt(document.getElementById('alarm-minute').value);
+
+  if (isNaN(hour) || isNaN(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+    el.innerHTML = '';
+    label.textContent = 'あしたの朝の、わたしへ。';
+    return;
+  }
+
+  const target = getDeliveryDate(hour, minute);
+  const days = ['日', '月', '火', '水', '木', '金', '土'];
+  const dateStr = `${target.getMonth()+1}月${target.getDate()}日（${days[target.getDay()]}）`;
+
+  const now = new Date(); now.setHours(0,0,0,0);
+  const td = new Date(target); td.setHours(0,0,0,0);
+  const diff = Math.round((td - now) / 86400000);
+
+  el.innerHTML = `<span class="hl">${dateStr}</span> の朝にとどきます`;
+  label.textContent = `${diff === 0 ? 'きょう' : 'あした'}の朝の、わたしへ。`;
+}
+
+// ===== アラーム設定 =====
+function setAlarm() {
+  const hour = parseInt(document.getElementById('alarm-hour').value);
+  const minute = parseInt(document.getElementById('alarm-minute').value);
+  const letter = document.getElementById('letter-input').value.trim();
+
+  if (isNaN(hour) || isNaN(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+    showToast('時刻を正しく入れてね');
+    return;
+  }
+  if (!letter) {
+    showToast('ひとこと、なんでもいいよ。');
+    return;
+  }
+
+  const target = getDeliveryDate(hour, minute);
+  alarmData = {
+    hour, minute, letter,
+    setDate: new Date().toISOString(),
+    targetDate: target.toISOString()
+  };
+  localStorage.setItem('mezame_alarm', JSON.stringify(alarmData));
+  document.getElementById('letter-input').value = '';
+
+  // おやすみなさい画面へ
+  navigateTo('goodnight-screen');
+
+  // 段階的なメッセージ表示
+  const extra = document.getElementById('goodnight-extra');
+  if (extra) {
+    setTimeout(() => { extra.style.opacity = '1'; extra.style.transition = 'opacity 1.5s var(--ease-gentle)'; }, 2500);
+  }
+
+  // 8秒後にホームへ（カーネマン: 余韻を長めに）
+  goodnightTimer = setTimeout(() => {
+    if (currentScreen === 'goodnight-screen') {
+      navigateTo('home');
+    }
+  }, 8000);
+}
+
+function loadAlarm() {
+  const saved = localStorage.getItem('mezame_alarm');
+  if (saved) alarmData = JSON.parse(saved);
+}
+
+function updateAlarmStatus() {
+  // Legacy: kept for backward compat, now home-letter-area replaces alarm-status
+  const el = document.getElementById('alarm-status');
+  if (el) el.textContent = '';
+}
+
+// ===== ボトムシート: 手紙を書く =====
+let sheetOpen = false;
+let sheetGoodnightTimer = null;
+let editingAlarmId = null; // 編集中のアラームID
+let sheetRecipientUid = null; // null = 自分
+let sheetRecipientName = null;
+
+// --- 複数アラーム管理 ---
+function loadAlarms() {
+  const saved = localStorage.getItem('mezame_alarms');
+  if (saved) return JSON.parse(saved);
+  // 旧形式からの移行
+  if (alarmData) {
+    const alarms = [{ ...alarmData, id: Date.now() }];
+    localStorage.setItem('mezame_alarms', JSON.stringify(alarms));
+    return alarms;
+  }
+  return [];
+}
+
+function saveAlarms(alarms) {
+  localStorage.setItem('mezame_alarms', JSON.stringify(alarms));
+  // alarmDataは次のアラーム（互換性のため）
+  const next = getNextAlarm(alarms);
+  if (next) {
+    alarmData = next;
+    localStorage.setItem('mezame_alarm', JSON.stringify(next));
+  } else {
+    alarmData = null;
+    localStorage.removeItem('mezame_alarm');
+  }
+}
+
+function getNextAlarm(alarms) {
+  const now = new Date();
+  const future = alarms.filter(a => new Date(a.targetDate) > now);
+  if (future.length === 0) return null;
+  future.sort((a, b) => new Date(a.targetDate) - new Date(b.targetDate));
+  return future[0];
+}
+
+function getFutureAlarms() {
+  const alarms = loadAlarms();
+  const now = new Date();
+  return alarms
+    .filter(a => new Date(a.targetDate) > now)
+    .sort((a, b) => new Date(a.targetDate) - new Date(b.targetDate));
+}
+
+function deleteAlarm(alarmId) {
+  if (!confirm('この手紙を削除しますか？')) return;
+  let alarms = loadAlarms();
+  alarms = alarms.filter(a => a.id !== alarmId);
+  saveAlarms(alarms);
+  updateHomeLetterArea();
+  updateHomeEmptyState();
+  showToast('手紙を削除しました');
+}
+
+function openWriteSheet(alarmId) {
+  const sheet = document.getElementById('write-sheet');
+  const overlay = document.getElementById('sheet-overlay');
+  const content = document.getElementById('sheet-content');
+  const goodnight = document.getElementById('sheet-goodnight');
+
+  // Reset states
+  content.classList.remove('fading');
+  goodnight.classList.remove('active');
+  sheet.classList.remove('goodnight-expand', 'expanded');
+  overlay.classList.remove('goodnight');
+  editingAlarmId = alarmId || null;
+
+  const today = new Date();
+  const seed = today.getFullYear() * 10000 + (today.getMonth()+1) * 100 + today.getDate();
+  const hour = today.getHours();
+
+  // Default date: tomorrow if night, today otherwise
+  const defaultDate = new Date(today);
+  if (hour >= 18) defaultDate.setDate(defaultDate.getDate() + 1);
+
+  // Placeholder
+  const isNight = (hour >= 18 || hour < 3);
+  const hints = isNight ? nightPrompts : (hour < 10 ? morningPrompts : dailyPrompts);
+  document.getElementById('sheet-letter-input').placeholder = hints[(seed * 3) % hints.length];
+
+  // Pre-fill if editing existing alarm
+  if (alarmId) {
+    const alarms = loadAlarms();
+    const alarm = alarms.find(a => a.id === alarmId);
+    if (alarm) {
+      const t = new Date(alarm.targetDate);
+      document.getElementById('sheet-alarm-month').value = String(t.getMonth() + 1);
+      document.getElementById('sheet-alarm-day').value = String(t.getDate());
+      document.getElementById('sheet-alarm-hour').value = String(alarm.hour).padStart(2, '0');
+      document.getElementById('sheet-alarm-minute').value = String(alarm.minute).padStart(2, '0');
+      document.getElementById('sheet-letter-input').value = alarm.letter || '';
+    }
+  } else {
+    // New letter: default date/time
+    document.getElementById('sheet-alarm-month').value = String(defaultDate.getMonth() + 1);
+    document.getElementById('sheet-alarm-day').value = String(defaultDate.getDate());
+    document.getElementById('sheet-alarm-hour').value = '07';
+    document.getElementById('sheet-alarm-minute').value = '00';
+    document.getElementById('sheet-letter-input').value = '';
+  }
+
+  updateSheetDeliveryDate();
+
+  // Update CTA ready state based on text
+  const ctaBtn = document.getElementById('sheet-send-btn');
+  const letterVal = document.getElementById('sheet-letter-input').value.trim();
+  if (ctaBtn) ctaBtn.classList.toggle('sheet__cta--ready', letterVal.length > 0);
+
+  // Reset recipient to self
+  sheetRecipientUid = null;
+  sheetRecipientName = null;
+  const recipientEl = document.getElementById('sheet-recipient-name');
+  if (recipientEl) recipientEl.textContent = '自分';
+  const picker = document.getElementById('sheet-friend-picker');
+  if (picker) picker.classList.remove('open');
+
+  // Open
+  overlay.classList.add('active');
+  requestAnimationFrame(() => { sheet.classList.add('open'); });
+  sheetOpen = true;
+
+}
+
+function expandSheet() {
+  document.getElementById('write-sheet').classList.add('expanded');
+}
+
+function toggleSheetFriendPicker() {
+  const picker = document.getElementById('sheet-friend-picker');
+  if (!picker) return;
+  const isOpen = picker.classList.toggle('open');
+  if (isOpen) {
+    // Render options
+    let html = '';
+    // Always show "自分" option
+    const selfSelected = !sheetRecipientUid;
+    html += `<button class="sheet__friend-option${selfSelected ? ' selected' : ''}" onclick="selectSheetRecipient(null, null)">自分</button>`;
+
+    if (typeof friendsList !== 'undefined' && friendsList.length > 0) {
+      friendsList.forEach(f => {
+        const sel = sheetRecipientUid === f.uid ? ' selected' : '';
+        html += `<button class="sheet__friend-option${sel}" data-uid="${f.uid}" onclick="selectSheetRecipient('${f.uid}', '${escapeHtml(f.displayName)}')">${escapeHtml(f.displayName)}</button>`;
+      });
+    } else {
+      html += '<div class="sheet__friend-empty">ともだちがまだいません。<br>設定画面からフレンドコードを<br>送って招待してね。</div>';
+    }
+    picker.innerHTML = html;
+  }
+}
+
+function selectSheetRecipient(uid, name) {
+  sheetRecipientUid = uid;
+  sheetRecipientName = name;
+  const label = document.getElementById('sheet-recipient-name');
+  if (label) label.textContent = uid ? name : '自分';
+  // Update placeholder based on recipient
+  const textarea = document.getElementById('sheet-letter-input');
+  if (textarea) {
+    textarea.placeholder = uid ? `${name}の朝に届く手紙。` : 'あしたの朝の自分に、ひとこと。';
+  }
+  // Close picker
+  const picker = document.getElementById('sheet-friend-picker');
+  if (picker) picker.classList.remove('open');
+}
+
+function closeWriteSheet() {
+  if (!sheetOpen) return;
+  const sheet = document.getElementById('write-sheet');
+  const overlay = document.getElementById('sheet-overlay');
+  const textarea = document.getElementById('sheet-letter-input');
+
+  if (textarea.value.trim() && !sheet.classList.contains('goodnight-expand')) {
+    if (!confirm('書きかけの手紙があるよ。閉じていい？')) return;
+  }
+
+  sheet.classList.remove('open', 'expanded', 'goodnight-expand');
+  overlay.classList.remove('active', 'goodnight');
+  sheetOpen = false;
+  editingAlarmId = null;
+  if (sheetGoodnightTimer) { clearTimeout(sheetGoodnightTimer); sheetGoodnightTimer = null; }
+
+  setTimeout(() => {
+    textarea.value = '';
+    document.getElementById('sheet-content').classList.remove('fading');
+    const gn = document.getElementById('sheet-goodnight');
+    gn.classList.remove('active');
+  }, 500);
+}
+
+function setAlarmFromSheet() {
+  // If recipient is a friend, delegate to friend letter sender
+  if (sheetRecipientUid) {
+    sendSheetFriendLetter();
+    return;
+  }
+
+  const monthVal = parseInt(document.getElementById('sheet-alarm-month').value);
+  const dayVal = parseInt(document.getElementById('sheet-alarm-day').value);
+  const hour = parseInt(document.getElementById('sheet-alarm-hour').value);
+  const minute = parseInt(document.getElementById('sheet-alarm-minute').value);
+  const letter = document.getElementById('sheet-letter-input').value.trim();
+
+  if (isNaN(monthVal) || isNaN(dayVal) || monthVal < 1 || monthVal > 12 || dayVal < 1 || dayVal > 31) {
+    showToast('日付を正しく入れてね');
+    return;
+  }
+  if (isNaN(hour) || isNaN(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+    showToast('時刻を正しく入れてね');
+    return;
+  }
+  if (!letter) {
+    showToast('ひとこと、なんでもいいよ。');
+    return;
+  }
+
+  // Build target date
+  const now = new Date();
+  let year = now.getFullYear();
+  const target = new Date(year, monthVal - 1, dayVal, hour, minute, 0, 0);
+  // If target is in the past, try next year
+  if (target <= now) {
+    target.setFullYear(year + 1);
+  }
+
+  const alarmEntry = {
+    id: editingAlarmId || Date.now(),
+    hour, minute, letter,
+    month: monthVal,
+    day: dayVal,
+    setDate: now.toISOString(),
+    targetDate: target.toISOString()
+  };
+
+  let alarms = loadAlarms();
+  if (editingAlarmId) {
+    // Update existing
+    alarms = alarms.map(a => a.id === editingAlarmId ? alarmEntry : a);
+  } else {
+    alarms.push(alarmEntry);
+  }
+  saveAlarms(alarms);
+
+  startSheetGoodnight();
+}
+
+function startSheetGoodnight() {
+  const sheet = document.getElementById('write-sheet');
+  const overlay = document.getElementById('sheet-overlay');
+  const content = document.getElementById('sheet-content');
+  const goodnight = document.getElementById('sheet-goodnight');
+
+  content.classList.add('fading');
+  setTimeout(() => { goodnight.classList.add('active'); }, 200);
+
+  sheetGoodnightTimer = setTimeout(() => { finishSheetGoodnight(); }, 2500);
+  goodnight.onclick = () => {
+    if (sheetGoodnightTimer) clearTimeout(sheetGoodnightTimer);
+    finishSheetGoodnight();
+  };
+}
+
+function finishSheetGoodnight() {
+  const sheet = document.getElementById('write-sheet');
+  const overlay = document.getElementById('sheet-overlay');
+
+  sheet.classList.remove('open', 'goodnight-expand');
+  overlay.classList.remove('active', 'goodnight');
+  sheetOpen = false;
+  editingAlarmId = null;
+
+  setTimeout(() => {
+    document.getElementById('sheet-content').classList.remove('fading');
+    const gn = document.getElementById('sheet-goodnight');
+    gn.classList.remove('active');
+    sheet.classList.remove('expanded');
+    document.getElementById('sheet-letter-input').value = '';
+
+    updateHomeLetterArea();
+    updateStreak();
+    updateHomeEmptyState();
+  }, 500);
+}
+
+function updateSheetDeliveryDate() {
+  // Delivery info is now shown inline in the chip meta row
+  // This function is kept for input event listener compatibility
+}
+
+// Sheet inputs: update delivery date on change
+document.addEventListener('DOMContentLoaded', () => {
+  ['sheet-alarm-month', 'sheet-alarm-day', 'sheet-alarm-hour', 'sheet-alarm-minute'].forEach(id => {
+    const input = document.getElementById(id);
+    if (input) {
+      input.addEventListener('input', updateSheetDeliveryDate);
+      input.addEventListener('blur', function() {
+        if (id.includes('hour') || id.includes('minute')) {
+          if (this.value.length === 1) this.value = '0' + this.value;
+        }
+      });
+    }
+  });
+
+  // CTA ready state: highlight when letter text is entered
+  const sheetTextarea = document.getElementById('sheet-letter-input');
+  const sheetCta = document.getElementById('sheet-send-btn');
+  if (sheetTextarea && sheetCta) {
+    sheetTextarea.addEventListener('input', () => {
+      sheetCta.classList.toggle('sheet__cta--ready', sheetTextarea.value.trim().length > 0);
+    });
+  }
+});
+
+// ===== ホーム: 手紙エリア（CTA / 予約済みカード） =====
+function updateHomeLetterArea() {
+  const el = document.getElementById('home-letter-area');
+  const emptyEl = document.getElementById('home-empty-state');
+  if (!el) return;
+
+  const futureAlarms = getFutureAlarms();
+  const hasItems = futureAlarms.length > 0;
+
+  let html = '';
+
+  // 受信ボックス形式で予約済み手紙を表示
+  futureAlarms.forEach(alarm => {
+    const t = new Date(alarm.targetDate);
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
+    const dateStr = `${t.getMonth()+1}/${t.getDate()}（${days[t.getDay()]}）`;
+    const h = String(alarm.hour).padStart(2, '0');
+    const m = String(alarm.minute).padStart(2, '0');
+    const preview = alarm.letter ? alarm.letter.substring(0, 40) + (alarm.letter.length > 40 ? '…' : '') : '';
+
+    html += `
+      <div class="inbox-item">
+        <div class="inbox-item__icon inbox-item__icon--self" onclick="openWriteSheet(${alarm.id})">${getUserIcon()}</div>
+        <div class="inbox-item__body" onclick="openWriteSheet(${alarm.id})">
+          <div class="inbox-item__title">${dateStr} ${h}:${m} にとどく</div>
+          <div class="inbox-item__sub">${preview || '手紙をあずかり中'}</div>
+        </div>
+        <span class="inbox-item__status">あずかり中</span>
+        <button class="inbox-item__delete" onclick="deleteAlarm(${alarm.id})" aria-label="削除">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
+      </div>
+    `;
+  });
+
+  el.innerHTML = html;
+
+  // 空状態の表示切替
+  if (emptyEl) {
+    if (!hasItems) {
+      emptyEl.classList.add('active');
+      emptyEl.innerHTML = `
+        <div class="inbox-empty__icon">${getUserIcon()}</div>
+        <div class="inbox-empty__text">今夜、自分に手紙を<br>書いてみませんか</div>
+      `;
+    } else {
+      emptyEl.classList.remove('active');
+      emptyEl.innerHTML = '';
+    }
+  }
+}
+
+// ===== ストリーク =====
+function getStreak() {
+  const history = JSON.parse(localStorage.getItem('mezame_history') || '[]');
+  if (history.length === 0) return 0;
+  let streak = 0;
+  const today = new Date(); today.setHours(0,0,0,0);
+  for (let i = 0; i < history.length; i++) {
+    const rd = new Date(history[i].replyDate); rd.setHours(0,0,0,0);
+    const exp = new Date(today); exp.setDate(exp.getDate() - i);
+    if (rd.getTime() === exp.getTime()) streak++;
+    else break;
+  }
+  return streak;
+}
+
+function getStreakMessage(streak) {
+  if (streak === 0) return '';
+  if (streak === 1) return '最初の一通。ここから始まるよ。';
+  if (streak === 2) return 'きのうも、きょうも';
+  if (streak === 3) return '3日。つづいてるね';
+  if (streak === 7) return '1週間、静かにすごい';
+  if (streak === 14) return '2週間。もう日課だね';
+  if (streak === 30) return '1ヶ月。習慣になったね';
+  if (streak === 100) return '100日。ここまで来たんだ';
+  if (streak === 365) return '1年。ずっと、ここにいたね';
+  return `${streak}日つづいてるね`;
+}
+
+function updateStreak() {
+  const el = document.getElementById('streak-display');
+  if (!el) return;
+  const s = getStreak();
+  const history = JSON.parse(localStorage.getItem('mezame_history') || '[]');
+  if (s > 0) {
+    el.innerHTML = `<span class="count">${getStreakMessage(s)}</span>`;
+  } else if (history.length > 0) {
+    // ストリーク0: 合計数で保有フレームに（カーネマン: エンダウメント効果）
+    el.innerHTML = `<span class="count">${history.length}通</span>の手紙が、ここにあるよ`;
+  } else {
+    el.innerHTML = '';
+  }
+}
+
+// ===== ストリーク途切れ復帰チェック =====
+function checkStreakRecovery() {
+  const history = JSON.parse(localStorage.getItem('mezame_history') || '[]');
+  if (history.length === 0) return;
+
+  const streak = getStreak();
+  if (streak === 0 && history.length > 0) {
+    // ストリーク途切れ後に復帰
+    const lastShown = localStorage.getItem('mezame_recovery_shown');
+    const today = new Date().toDateString();
+    if (lastShown !== today) {
+      showToast('おかえり。またはじめよう。');
+      localStorage.setItem('mezame_recovery_shown', today);
+    }
+  }
+}
+
+// ===== タイムカプセル =====
+function getTimeCapsule() {
+  const history = JSON.parse(localStorage.getItem('mezame_history') || '[]');
+  const now = new Date();
+  const candidates = [];
+
+  // 7日以上前の手紙
+  history.forEach(item => {
+    const d = new Date(item.letterDate);
+    const diffDays = Math.floor((now - d) / 86400000);
+    if (diffDays >= 7) {
+      candidates.push({ ...item, daysAgo: diffDays });
+    }
+  });
+
+  if (candidates.length === 0) return null;
+
+  // 3日に1回の確率でのみ表示
+  const daySeed = now.getFullYear() * 10000 + (now.getMonth()+1) * 100 + now.getDate();
+  if (daySeed % 3 !== 0) return null;
+
+  const seed = daySeed * 7;
+  return candidates[seed % candidates.length];
+}
+
+function getTimeCapsuleLabel(daysAgo) {
+  if (daysAgo === 7) return '1週間前の自分から';
+  if (daysAgo === 30) return '1ヶ月前の自分から';
+  if (daysAgo === 365) return '1年前の今日の自分から';
+  return `${daysAgo}日前の自分から`;
+}
+
+function renderTimeCapsule() {
+  const area = document.getElementById('timecapsule-area');
+  const capsule = getTimeCapsule();
+
+  if (!capsule) { area.innerHTML = ''; return; }
+
+  const d = new Date(capsule.letterDate);
+  const days = ['日', '月', '火', '水', '木', '金', '土'];
+  const dateStr = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}（${days[d.getDay()]}）`;
+  const label = getTimeCapsuleLabel(capsule.daysAgo);
+
+  let replyHtml = '';
+  if (capsule.reply) {
+    replyHtml = `<div style="margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px dashed var(--color-paper-line);font-family:var(--font-letter);font-size:var(--text-body-sm);color:var(--color-text-secondary);line-height:var(--leading-relaxed);white-space:pre-wrap;">-> ${escapeHtml(capsule.reply)}</div>`;
+  }
+
+  // 最初は封筒アイコン、タップで開封
+  area.innerHTML = `
+    <div class="card-timecapsule animate-soft-rise" style="text-align:center;cursor:pointer;" id="timecapsule-envelope" onclick="openTimeCapsule()">
+      <div class="envelope-icon">&#9993;</div>
+      <div class="card-timecapsule__label">${escapeHtml(label)}、手紙がとどいています</div>
+    </div>
+  `;
+
+  // 開封後のコンテンツを隠し持つ
+  window._timeCapsuleContent = `
+    <div class="card-timecapsule animate-envelope">
+      <div class="card-timecapsule__label">${escapeHtml(label)}</div>
+      <div class="card-timecapsule__inner">
+        <div style="font-size:var(--text-caption);color:var(--color-text-tertiary);margin-bottom:var(--space-2);">${dateStr}</div>
+        <div style="font-family:var(--font-letter);font-size:var(--text-body);color:var(--color-text-primary);line-height:var(--leading-relaxed);white-space:pre-wrap;word-wrap:break-word;">${escapeHtml(capsule.letter)}</div>
+        ${replyHtml}
+      </div>
+    </div>
+  `;
+}
+
+function openTimeCapsule() {
+  const area = document.getElementById('timecapsule-area');
+  if (window._timeCapsuleContent) {
+    area.innerHTML = window._timeCapsuleContent;
+  }
+}
+
+// ===== アラーム画面フェーズ遷移 =====
+function showAlarmReply() {
+  stopTTSLoop();
+  const letterPhase = document.getElementById('alarm-phase-letter');
+  const replyPhase = document.getElementById('alarm-phase-reply');
+  letterPhase.style.display = 'none';
+  replyPhase.style.display = 'flex';
+  // フォーカスをtextareaに
+  setTimeout(() => {
+    const ta = document.getElementById('reply-input');
+    if (ta) ta.focus();
+  }, 300);
+}
+
+function hideAlarmReply() {
+  const letterPhase = document.getElementById('alarm-phase-letter');
+  const replyPhase = document.getElementById('alarm-phase-reply');
+  replyPhase.style.display = 'none';
+  letterPhase.style.display = 'flex';
+  // TTSを再開
+  const ttsEnabled = localStorage.getItem('mezame_tts') !== 'off';
+  const replyText = document.getElementById('reply-input').value.trim();
+  if (ttsEnabled && !replyText && alarmPlaying) {
+    ttsLooping = true;
+    readLetterAloud(alarmData.letter);
+  }
+}
+
+function showAlarmComplete() {
+  const replyPhase = document.getElementById('alarm-phase-reply');
+  const completePhase = document.getElementById('alarm-phase-complete');
+  replyPhase.style.display = 'none';
+  completePhase.style.display = 'flex';
+}
+
+// ===== アラーム発火 =====
+function triggerAlarm() {
+  if (alarmPlaying) return;
+  alarmPlaying = true;
+
+  const now = new Date();
+  document.getElementById('alarm-current-time').textContent =
+    String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+
+  const setDate = new Date(alarmData.setDate);
+  const days = ['日', '月', '火', '水', '木', '金', '土'];
+  document.getElementById('letter-sent-date').textContent =
+    `${setDate.getMonth()+1}月${setDate.getDate()}日（${days[setDate.getDay()]}）の夜に書きました`;
+
+  document.getElementById('letter-content').textContent = alarmData.letter;
+  document.getElementById('reply-input').value = '';
+  const ctaBtn = document.getElementById('dismiss-btn');
+  ctaBtn.disabled = true;
+  ctaBtn.classList.remove('sheet__cta--ready');
+
+  // 3フェーズの初期状態: Phase1（手紙）だけ表示
+  document.getElementById('alarm-phase-letter').style.display = 'flex';
+  document.getElementById('alarm-phase-reply').style.display = 'none';
+  document.getElementById('alarm-phase-complete').style.display = 'none';
+
+  renderTimeCapsule();
+
+  // フレンドからの手紙を読み込み・表示
+  if (currentUser) {
+    loadIncomingLetters().then(() => renderFriendLettersInAlarm());
+  }
+
+  navigateTo('alarm-screen');
+  startAlarmSound();
+
+  // 「読んだよ」ボタン: 10秒後にフェードイン
+  const readOnlyBtn = document.getElementById('read-only-btn');
+  readOnlyBtn.style.opacity = '0';
+  readOnlyBtn.style.pointerEvents = 'none';
+  setTimeout(() => {
+    readOnlyBtn.style.opacity = '1';
+    readOnlyBtn.style.pointerEvents = 'auto';
+  }, 10000);
+
+  // TTS読み上げ: 返事を書くまでループ再生
+  const ttsEnabled = localStorage.getItem('mezame_tts') !== 'off';
+  if (ttsEnabled) {
+    ttsLooping = true;
+    setTimeout(() => readLetterAloud(alarmData.letter), 5000);
+  }
+
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification('めざめの手紙', { body: 'ゆうべの自分から、手紙が届いてるよ。' });
+  }
+}
+
+// ===== サウンド =====
+// iOS Safari対策: ユーザージェスチャーでAudioContextを事前生成
+function warmUpAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // サイレントバッファを再生してiOSのロック解除
+    const buf = audioCtx.createBuffer(1, 1, audioCtx.sampleRate);
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    src.connect(audioCtx.destination);
+    src.start(0);
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+}
+document.addEventListener('touchstart', warmUpAudio, { once: true });
+document.addEventListener('click', warmUpAudio, { once: true });
+
+function startAlarmSound() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  playMelody();
+}
+
+function playMelody() {
+  if (!alarmPlaying || !audioCtx) return;
+  const volume = parseInt(localStorage.getItem('mezame_volume') || '30') / 100;
+
+  // 坂本龍一 × Jony Ive: Dmaj7 + 9th の和声パレット
+  // D4, F#4, A4, C#5, E5 — 温かく、静かな朝の音
+  const notes = [293.66, 369.99, 440.00, 554.37, 329.63, 493.88];
+  const melody = [0, 2, 4, 5, 3, 1, 0, 2];
+  const dur = 0.55; // よりゆったりとしたテンポ
+
+  // コンプレッサーでダイナミクス制御
+  const compressor = audioCtx.createDynamicsCompressor();
+  compressor.threshold.value = -24;
+  compressor.ratio.value = 4;
+  compressor.connect(audioCtx.destination);
+
+  melody.forEach((n, i) => {
+    // デュアルオシレーター: sine + detuned triangle で温かみ
+    const osc1 = audioCtx.createOscillator();
+    const osc2 = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc1.type = 'sine';
+    osc1.frequency.value = notes[n];
+
+    osc2.type = 'triangle';
+    osc2.frequency.value = notes[n] * 1.002; // 微細なデチューン
+    const gain2 = audioCtx.createGain();
+    gain2.gain.value = 0.3; // triangleは控えめに
+
+    // エンベロープ: ゆるやかなアタック＆リリース
+    const t = audioCtx.currentTime + i * dur;
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.06 * volume, t + 0.15);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + dur - 0.05);
+
+    osc1.connect(gain);
+    osc2.connect(gain2);
+    gain2.connect(gain);
+    gain.connect(compressor);
+
+    osc1.start(t);
+    osc1.stop(t + dur);
+    osc2.start(t);
+    osc2.stop(t + dur);
+    alarmOscillators.push(osc1, osc2);
+  });
+
+  // ループ: 3秒の静寂を挟んでリピート
+  setTimeout(() => playMelody(), (melody.length * dur + 3) * 1000);
+}
+
+function stopAlarmSound() {
+  alarmPlaying = false;
+  alarmOscillators.forEach(o => { try { o.stop(); } catch(e) {} });
+  alarmOscillators = [];
+  if (audioCtx) { audioCtx.close(); audioCtx = null; }
+  stopTTSLoop();
+}
+
+// ===== TTS =====
+let ttsLooping = false;
+let ttsLoopTimer = null;
+
+function readLetterAloud(text) {
+  if (!('speechSynthesis' in window) || !alarmPlaying) return;
+
+  // 読み上げ前の間（2秒の沈黙で期待感）
+  const intro = new SpeechSynthesisUtterance('......');
+  intro.lang = 'ja-JP';
+  intro.rate = 0.3;
+  intro.volume = 0;
+
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'ja-JP';
+  u.rate = 0.78;
+  u.pitch = 0.95;
+  const volume = parseInt(localStorage.getItem('mezame_volume') || '30') / 100;
+  u.volume = Math.min(volume * 1.5, 1.0);
+  const voices = speechSynthesis.getVoices();
+  const ja = voices.find(v => v.lang.startsWith('ja'));
+  if (ja) { intro.voice = ja; u.voice = ja; }
+
+  // ループ: 読み終わり→8秒の沈黙→再度読み上げ（返事を書くまで）
+  u.onend = function() {
+    if (ttsLooping && alarmPlaying) {
+      ttsLoopTimer = setTimeout(() => {
+        if (ttsLooping && alarmPlaying) readLetterAloud(text);
+      }, 8000);
+    }
+  };
+
+  speechSynthesis.speak(intro);
+  speechSynthesis.speak(u);
+}
+
+function stopTTSLoop() {
+  ttsLooping = false;
+  if (ttsLoopTimer) { clearTimeout(ttsLoopTimer); ttsLoopTimer = null; }
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
+}
+if ('speechSynthesis' in window) {
+  speechSynthesis.getVoices();
+  speechSynthesis.addEventListener('voiceschanged', () => speechSynthesis.getVoices());
+}
+
+// ===== スヌーズ =====
+function snooze() {
+  stopAlarmSound();
+  navigateTo('home');
+  showToast('5分後にまたとどけるよ');
+  const until = Date.now() + 5 * 60 * 1000;
+  localStorage.setItem('mezame_snooze', String(until));
+  setTimeout(() => {
+    localStorage.removeItem('mezame_snooze');
+    if (alarmData && !alarmPlaying) triggerAlarm();
+  }, 5 * 60 * 1000);
+}
+
+function loadSnooze() {
+  const snoozeUntil = localStorage.getItem('mezame_snooze');
+  if (snoozeUntil && alarmData) {
+    const remaining = parseInt(snoozeUntil) - Date.now();
+    if (remaining > 0) {
+      setTimeout(() => {
+        localStorage.removeItem('mezame_snooze');
+        if (alarmData && !alarmPlaying) triggerAlarm();
+      }, remaining);
+    } else {
+      localStorage.removeItem('mezame_snooze');
+      triggerAlarm();
+    }
+  }
+}
+
+// ===== バックグラウンド復帰チェック =====
+function checkAlarmOnResume() {
+  if (!alarmPlaying) {
+    const now = new Date();
+    const alarms = loadAlarms();
+    for (const alarm of alarms) {
+      const t = new Date(alarm.targetDate);
+      if (now.getHours() === alarm.hour && now.getMinutes() === alarm.minute &&
+          now.getFullYear() === t.getFullYear() && now.getMonth() === t.getMonth() && now.getDate() === t.getDate()) {
+        alarmData = alarm;
+        triggerAlarm();
+        return;
+      }
+    }
+
+    const snoozeUntil = localStorage.getItem('mezame_snooze');
+    if (snoozeUntil && Date.now() >= parseInt(snoozeUntil)) {
+      localStorage.removeItem('mezame_snooze');
+      if (alarmData) triggerAlarm();
+    }
+  }
+}
+
+// ===== アラーム解除（返事あり） =====
+function dismissAlarm() {
+  const reply = document.getElementById('reply-input').value.trim();
+  if (!reply) return;
+
+  const history = JSON.parse(localStorage.getItem('mezame_history') || '[]');
+  history.unshift({
+    letter: alarmData.letter,
+    letterDate: alarmData.setDate,
+    reply,
+    replyDate: new Date().toISOString(),
+    fromName: alarmData.recipientName || 'じぶん'
+  });
+  if (history.length > 100) history.length = 100;
+  localStorage.setItem('mezame_history', JSON.stringify(history));
+
+  stopAlarmSound();
+  const savedLetter = alarmData.letter;
+
+  // 配列からこのアラームを削除
+  let alarms = loadAlarms();
+  alarms = alarms.filter(a => a.id !== alarmData.id);
+  saveAlarms(alarms);
+
+  // フレンド手紙も既読に
+  markFriendLettersRead();
+
+  // 完了フェーズを表示 → 2.5秒後にホームへ
+  showAlarmComplete();
+  updateStreak();
+  updateTodayQuote();
+  setTimeout(() => {
+    navigateTo('home');
+    updateHomeLetterArea();
+  }, 2500);
+}
+
+// ===== アラーム解除（読んだよ） =====
+function dismissAlarmReadOnly() {
+  const history = JSON.parse(localStorage.getItem('mezame_history') || '[]');
+  history.unshift({
+    letter: alarmData.letter,
+    letterDate: alarmData.setDate,
+    reply: '(読んだよ)',
+    replyDate: new Date().toISOString(),
+    fromName: alarmData.recipientName || 'じぶん'
+  });
+  if (history.length > 100) history.length = 100;
+  localStorage.setItem('mezame_history', JSON.stringify(history));
+
+  stopAlarmSound();
+
+  // 配列からこのアラームを削除
+  let alarms = loadAlarms();
+  alarms = alarms.filter(a => a.id !== alarmData.id);
+  saveAlarms(alarms);
+
+  // フレンド手紙も既読に
+  markFriendLettersRead();
+
+  navigateTo('home');
+  showToast('おはよう。いい一日を。');
+  updateStreak();
+  updateTodayQuote();
+}
+
+// ===== いってらっしゃい画面 =====
+function showItterasshai(letter, reply) {
+  const streak = getStreak();
+  let main = 'いってらっしゃい。';
+  let sub = '';
+
+  // ストリーク優先の分岐（積み重ねを可視化）
+  if (streak >= 30) {
+    main = 'いってらっしゃい。きょうも。';
+    sub = `${streak}日、毎朝ちゃんと起きてるね。もう、すごいよ。`;
+  } else if (streak >= 7) {
+    sub = '今週も、毎朝の文通がつづいてるね。';
+  } else if (reply.length >= 30) {
+    sub = 'たくさん書いてくれたね。きっと、いい朝だ。';
+  } else if (reply.length >= 10) {
+    sub = 'いい一日になりますように。';
+  } else {
+    sub = 'ひとこと、それだけで充分だよ。';
+  }
+
+  document.getElementById('itterasshai-main').textContent = main;
+  document.getElementById('itterasshai-sub').textContent = sub;
+
+  // 要約
+  const letterPreview = letter.length > 20 ? letter.substring(0, 20) + '...' : letter;
+  const replyPreview = reply.length > 20 ? reply.substring(0, 20) + '...' : reply;
+  document.getElementById('itterasshai-summary').innerHTML = `
+    <div class="letter-preview">ゆうべ: 「${escapeHtml(letterPreview)}」</div>
+    <div class="reply-preview">けさ: 「${escapeHtml(replyPreview)}」</div>
+  `;
+
+  navigateTo('itterasshai-screen');
+
+  // 8秒後にホームへ（余韻を大切に）
+  itterasshaiTimer = setTimeout(() => {
+    if (currentScreen === 'itterasshai-screen') {
+      navigateTo('home');
+      updateStreak();
+      updateTodayQuote();
+    }
+  }, 8000);
+}
+
+// ===== 記録画面 =====
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  const history = JSON.parse(localStorage.getItem('mezame_history') || '[]');
+
+  if (history.length === 0) {
+    list.innerHTML = '<div class="history-empty">まだ手紙はないよ。<br>書いたら、ここにたまっていくからね。</div>';
+    return;
+  }
+
+  const days = ['日', '月', '火', '水', '木', '金', '土'];
+  list.innerHTML = history.map((item, idx) => {
+    const ld = new Date(item.letterDate);
+    const rd = new Date(item.replyDate);
+    const replyText = item.reply === '(読んだよ)' ? '(読んだよ)' : escapeHtml(item.reply);
+    const from = item.fromName || 'じぶん';
+    const isSelf = from === 'じぶん';
+    const icon = isSelf ? getUserIcon() : (from[0] || '?');
+    return `
+      <div class="card-history">
+        <div class="card-history__header">
+          <div class="card-history__avatar">${icon}</div>
+          <div class="card-history__meta">
+            <div class="card-history__from">${escapeHtml(from)}との文通</div>
+            <div class="card-history__date">
+              ${ld.getMonth()+1}/${ld.getDate()}（${days[ld.getDay()]}）の夜 → ${rd.getMonth()+1}/${rd.getDate()}（${days[rd.getDay()]}）の朝
+            </div>
+          </div>
+        </div>
+        <div class="card-history__section">
+          <div class="card-history__section-label">${isSelf ? 'ゆうべのわたし' : escapeHtml(from) + 'から'}</div>
+          <div class="card-history__section-text">${escapeHtml(item.letter)}</div>
+        </div>
+        <div class="card-history__section">
+          <div class="card-history__section-label">けさのわたし</div>
+          <div class="card-history__section-text">${replyText}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  // スクロールフェードイン: IntersectionObserverでカードを順次表示
+  requestAnimationFrame(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    list.querySelectorAll('.card-history').forEach(card => observer.observe(card));
+  });
+}
+
+// ===== 設定 =====
+function loadSettings() {
+  // 音量
+  const vol = localStorage.getItem('mezame_volume') || '30';
+  document.getElementById('volume-slider').value = vol;
+  document.getElementById('volume-value').textContent = vol;
+
+  // TTS
+  const tts = localStorage.getItem('mezame_tts') !== 'off';
+  const toggle = document.getElementById('tts-toggle');
+  toggle.classList.toggle('active', tts);
+}
+
+function toggleTTS() {
+  const toggle = document.getElementById('tts-toggle');
+  const isActive = toggle.classList.toggle('active');
+  localStorage.setItem('mezame_tts', isActive ? 'on' : 'off');
+}
+
+function exportData() {
+  const history = JSON.parse(localStorage.getItem('mezame_history') || '[]');
+  if (history.length === 0) {
+    showToast('まだ手紙がないよ');
+    return;
+  }
+
+  const days = ['日', '月', '火', '水', '木', '金', '土'];
+  let text = 'めざめの手紙 -- 文通\n';
+  text += '='.repeat(40) + '\n\n';
+
+  history.forEach(item => {
+    const ld = new Date(item.letterDate);
+    const rd = new Date(item.replyDate);
+    const from = item.fromName || 'じぶん';
+    text += `--- ${ld.getFullYear()}/${ld.getMonth()+1}/${ld.getDate()}（${days[ld.getDay()]}）${from}との文通 ---\n`;
+    text += `[ゆうべ] ${item.letter}\n`;
+    text += `[けさ] ${item.reply}\n\n`;
+  });
+
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `mezame-no-tegami-${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('手紙をまとめたよ');
+}
+
+function deleteAllData() {
+  if (!confirm('ここにある全部の手紙を手放しますか？')) return;
+  if (!confirm('もとに戻せないけど、本当にいい？')) return;
+
+  localStorage.removeItem('mezame_history');
+  localStorage.removeItem('mezame_alarm');
+  localStorage.removeItem('mezame_alarms');
+  localStorage.removeItem('mezame_snooze');
+  alarmData = null;
+  updateHomeLetterArea();
+  updateStreak();
+  updateTodayQuote();
+  showToast('おつかれさま。新しいはじまりだね。');
+}
+
+// ===== ユーティリティ =====
+function escapeHtml(text) {
+  const d = document.createElement('div');
+  d.textContent = text;
+  return d.innerHTML;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ===== デバッグ =====
+window.testAlarm = function() {
+  alarmData = {
+    id: 'test-' + Date.now(),
+    hour: new Date().getHours(),
+    minute: new Date().getMinutes(),
+    letter: 'おはよう、わたし。\nきのう遅くまでがんばったね。\nきょうはすこしだけ、やさしくしよう。',
+    setDate: new Date(Date.now() - 8 * 3600000).toISOString(),
+    targetDate: new Date().toISOString()
+  };
+  triggerAlarm();
+};
+
+// デバッグ: タイムカプセル表示テスト
+window.testTimeCapsule = function() {
+  const history = JSON.parse(localStorage.getItem('mezame_history') || '[]');
+  if (history.length === 0) {
+    // テストデータ追加
+    const d = new Date(Date.now() - 10 * 86400000);
+    history.push({
+      letter: 'テスト用の10日前の手紙です',
+      letterDate: d.toISOString(),
+      reply: 'テスト返事',
+      replyDate: new Date(d.getTime() + 10 * 3600000).toISOString()
+    });
+    localStorage.setItem('mezame_history', JSON.stringify(history));
+  }
+  // 強制表示
+  const area = document.getElementById('timecapsule-area');
+  area.innerHTML = `
+    <div class="card-timecapsule animate-envelope">
+      <div class="card-timecapsule__label">10日前の自分から</div>
+      <div class="card-timecapsule__inner">
+        <div style="font-size:var(--text-caption);color:var(--color-text-tertiary);margin-bottom:var(--space-2);">テスト日</div>
+        <div style="font-family:var(--font-letter);font-size:var(--text-body);color:var(--color-text-primary);line-height:var(--leading-relaxed);">テスト用の手紙です</div>
+      </div>
+    </div>
+  `;
+};
+
+// デバッグ: ログアウト（コンソールから window.logout() で実行可能）
+window.logout = async function() {
+  try {
+    await firebase.auth().signOut();
+    userProfile = null;
+    currentUser = null;
+    friendsList = [];
+    pendingRequests = [];
+    incomingLetters = [];
+    updateAuthUI();
+    updateFriendBadge();
+    showToast('ログアウトしたよ');
+    console.log('ログアウト完了');
+  } catch (e) {
+    console.error('Logout error:', e);
+  }
+};
+
+// デバッグ: 現在の認証状態を確認
+window.authStatus = function() {
+  console.log('currentUser:', currentUser ? currentUser.email : 'null');
+  console.log('userProfile:', userProfile);
+  console.log('friendsList:', friendsList);
+};
+
+// ============================================================
+// Firebase 初期化 + 認証 + フレンド + ソーシャル手紙
+// ============================================================
+
+// Firebase設定
+const firebaseConfig = {
+  apiKey: "FIREBASE_KEY_REMOVED",
+  authDomain: "letter-alerm.firebaseapp.com",
+  projectId: "letter-alerm",
+  storageBucket: "letter-alerm.firebasestorage.app",
+  messagingSenderId: "855847545018",
+  appId: "1:855847545018:web:cc15aa6cbbc6cac23ffa83",
+  measurementId: "G-19TWJ3EMKK"
+};
+
+// Firebase初期化
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// ソーシャル状態管理
+let currentUser = null;
+let userProfile = null;
+let friendsList = [];
+let pendingRequests = [];
+let incomingLetters = [];
+let authMode = 'login'; // 'login' or 'register'
+let writeTarget = 'self'; // 'self' or 'friend'
+let selectedFriendUid = null;
+let selectedFriendName = null;
+
+// ===== 認証状態の監視 =====
+auth.onAuthStateChanged(async (user) => {
+  console.log('[Auth] onAuthStateChanged:', user ? user.email : 'signed out');
+  currentUser = user;
+  if (user) {
+    try {
+      // userProfileが未読み込みの場合のみ読み込む（handleAuthで先に設定済みの場合はスキップ）
+      if (!userProfile) {
+        console.log('[Auth] userProfile is null, loading from Firestore...');
+        await loadUserProfile();
+      } else {
+        console.log('[Auth] userProfile already loaded:', userProfile);
+      }
+      await loadFriends();
+      await loadPendingRequests();
+      console.log('[Auth] All data loaded. userProfile:', userProfile, 'friends:', friendsList.length);
+    } catch (e) {
+      console.error('[Auth] Firebase data load error:', e);
+    }
+  } else {
+    userProfile = null;
+    friendsList = [];
+    pendingRequests = [];
+    incomingLetters = [];
+  }
+  updateAuthUI();
+  updateFriendBadge();
+});
+
+// ===== ユーザープロフィール読み込み =====
+async function loadUserProfile() {
+  if (!currentUser) { console.log('[Auth] loadUserProfile: no currentUser, skipping'); return; }
+  console.log('[Auth] loadUserProfile: fetching for uid:', currentUser.uid);
+  try {
+    const docRef = db.collection('users').doc(currentUser.uid);
+    const snap = await docRef.get();
+    if (snap.exists) {
+      userProfile = snap.data();
+      console.log('[Auth] loadUserProfile success:', userProfile);
+    } else {
+      console.warn('[Auth] loadUserProfile: document not found for uid:', currentUser.uid);
+      // ドキュメントが存在しない場合（Firestoreに書き込めなかった場合など）
+      // Auth displayNameがあればフォールバック
+      if (currentUser.displayName) {
+        userProfile = { displayName: currentUser.displayName, friendCode: '------' };
+        console.log('[Auth] loadUserProfile: using Auth displayName as fallback');
+      }
+    }
+  } catch (e) {
+    console.error('[Auth] loadUserProfile error:', e);
+    if (e.code === 'permission-denied') {
+      console.error('[Auth] Firestoreのセキュリティルールで読み取りが拒否されています。Firebase ConsoleでFirestoreルールを確認してください。');
+      // permission-deniedの場合、ユーザーがログインしていることは確かなので
+      // 最低限の情報でフォールバック表示
+      userProfile = {
+        displayName: currentUser.displayName || currentUser.email.split('@')[0],
+        friendCode: null,
+        _firestoreError: true
+      };
+      console.log('[Auth] loadUserProfile: using fallback profile due to permission error');
+    } else {
+      console.error('[Auth] loadUserProfile: unexpected error:', e.message);
+    }
+  }
+}
+
+// ===== フレンドコード生成（重複チェック付き） =====
+async function generateFriendCode() {
+  let code = '';
+  let exists = true;
+  while (exists) {
+    code = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const q = db.collection('users').where('friendCode', '==', code);
+    const snap = await q.get();
+    exists = !snap.empty;
+  }
+  return code;
+}
+
+// ===== 認証画面のモード切り替え =====
+function switchAuthMode(mode) {
+  authMode = mode;
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.auth-tab:${mode === 'login' ? 'first-child' : 'last-child'}`).classList.add('active');
+  document.getElementById('auth-name-group').style.display = mode === 'register' ? 'block' : 'none';
+  document.getElementById('auth-submit-btn').textContent = mode === 'login' ? 'ログイン' : '新規登録';
+  document.getElementById('auth-error').classList.remove('show');
+}
+
+function resetAuthForm() {
+  document.getElementById('auth-email').value = '';
+  document.getElementById('auth-password').value = '';
+  document.getElementById('auth-name').value = '';
+  document.getElementById('auth-error').classList.remove('show');
+  switchAuthMode('login');
+}
+
+// ===== 認証エラーの日本語変換 =====
+function getAuthErrorMessage(code) {
+  const map = {
+    'auth/invalid-email': 'メールアドレスの形式が正しくないよ',
+    'auth/user-disabled': 'このアカウントは無効になっています',
+    'auth/user-not-found': 'メールアドレスかパスワードが間違っています',
+    'auth/wrong-password': 'メールアドレスかパスワードが間違っています',
+    'auth/invalid-credential': 'メールアドレスかパスワードが間違っています',
+    'auth/email-already-in-use': 'このメールアドレスはすでに登録されています',
+    'auth/weak-password': 'パスワードは6文字以上にしてね',
+    'auth/too-many-requests': 'しばらく待ってからもう一度試してね',
+    'auth/network-request-failed': 'ネットワークに接続できないよ',
+    'auth/operation-not-allowed': 'メール認証が有効になっていないよ。Firebase Consoleで有効にしてね',
+    'auth/configuration-not-found': 'Firebase Authの設定が見つからないよ。Consoleを確認してね'
+  };
+  return map[code] || `エラーが発生しました（${code || '不明'}）`;
+}
+
+// ===== 認証実行 =====
+async function handleAuth() {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const errorEl = document.getElementById('auth-error');
+  const btn = document.getElementById('auth-submit-btn');
+
+  // バリデーション
+  if (!email) { errorEl.textContent = 'メールアドレスを入力してね'; errorEl.classList.add('show'); return; }
+  if (!password || password.length < 6) { errorEl.textContent = 'パスワードは6文字以上にしてね'; errorEl.classList.add('show'); return; }
+  if (authMode === 'register') {
+    const name = document.getElementById('auth-name').value.trim();
+    if (!name) { errorEl.textContent = '表示名を入力してね'; errorEl.classList.add('show'); return; }
+  }
+
+  errorEl.classList.remove('show');
+  btn.classList.add('btn-loading');
+
+  try {
+    if (authMode === 'login') {
+      console.log('[Auth] handleAuth: logging in...');
+      const cred = await auth.signInWithEmailAndPassword(email, password);
+      console.log('[Auth] handleAuth: login success, uid:', cred.user.uid);
+      // ログイン後、プロフィールを手動で読み込んでUI更新
+      await loadUserProfile();
+      await loadFriends();
+      await loadPendingRequests();
+      updateAuthUI();
+      updateFriendBadge();
+      showToast('おかえり！');
+    } else {
+      const name = document.getElementById('auth-name').value.trim();
+      console.log('[Auth] handleAuth: registering...', name);
+      const cred = await auth.createUserWithEmailAndPassword(email, password);
+      console.log('[Auth] handleAuth: registration success, uid:', cred.user.uid);
+      // Auth profileにもdisplayNameを設定（フォールバック用）
+      await cred.user.updateProfile({ displayName: name });
+      // プロフィール作成
+      const friendCode = await generateFriendCode();
+      const profileData = {
+        displayName: name,
+        friendCode: friendCode,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      console.log('[Auth] handleAuth: writing profile to Firestore...');
+      await db.collection('users').doc(cred.user.uid).set(profileData);
+      console.log('[Auth] handleAuth: Firestore profile saved');
+      // 即座にローカルの状態を更新（Firestoreの読み込みを待たない）
+      userProfile = { displayName: name, friendCode: friendCode };
+      updateAuthUI();
+      updateFriendBadge();
+      showToast('ようこそ！');
+    }
+    navigateTo('settings-screen');
+  } catch (e) {
+    console.error('[Auth] handleAuth error:', e.code, e.message, e);
+    errorEl.textContent = getAuthErrorMessage(e.code);
+    errorEl.classList.add('show');
+  } finally {
+    btn.classList.remove('btn-loading');
+  }
+}
+
+// ===== ログアウト =====
+async function handleLogout() {
+  if (!confirm('ログアウトしますか？')) return;
+  console.log('[Auth] handleLogout: signing out...');
+  await auth.signOut();
+  console.log('[Auth] handleLogout: signed out');
+  showToast('ログアウトしたよ');
+  writeTarget = 'self';
+  selectedFriendUid = null;
+  selectedFriendName = null;
+}
+
+// ===== 認証UIの更新 =====
+function updateAuthUI() {
+  console.log('[Auth] updateAuthUI called. currentUser:', currentUser ? currentUser.email : 'null', 'userProfile:', userProfile);
+  updateSettingsAccount();
+  updateWriteSegment();
+  updateHomeFriendLetters();
+}
+
+// ===== 設定画面のアカウントセクション更新 =====
+// ===== ユーザーアイコン（絵文字）管理 =====
+const ICON_EMOJIS = ['😊','😎','🐱','🐶','🐻','🦊','🐸','🐰','🐼','🦁','🐧','🐨','🌸','🌻','🍀','⭐','🌙','🔥','💎','🎵','📮','✉️','☕','🍩'];
+
+function getUserIcon() {
+  return localStorage.getItem('mezame_user_icon') || '✉️';
+}
+
+function setUserIcon(emoji) {
+  localStorage.setItem('mezame_user_icon', emoji);
+  // Update preview
+  const preview = document.getElementById('settings-icon-preview');
+  if (preview) preview.textContent = emoji + ' ›';
+  // Update home inbox icons
+  updateHomeLetterArea();
+}
+
+function toggleEmojiPicker() {
+  const picker = document.getElementById('emoji-picker');
+  if (!picker) return;
+  const isOpen = picker.classList.toggle('open');
+  if (isOpen) {
+    const current = getUserIcon();
+    picker.innerHTML = '<div class="emoji-picker__grid">' +
+      ICON_EMOJIS.map(e =>
+        `<button class="emoji-picker__item${e === current ? ' selected' : ''}" onclick="selectEmoji('${e}')">${e}</button>`
+      ).join('') +
+    '</div>';
+  }
+}
+
+function selectEmoji(emoji) {
+  setUserIcon(emoji);
+  // Update selection state
+  document.querySelectorAll('.emoji-picker__item').forEach(el => {
+    el.classList.toggle('selected', el.textContent === emoji);
+  });
+  // Close after brief delay
+  setTimeout(() => {
+    const picker = document.getElementById('emoji-picker');
+    if (picker) picker.classList.remove('open');
+  }, 200);
+}
+
+function updateSettingsAccount() {
+  const container = document.getElementById('settings-account-content');
+  if (!container) { console.warn('[Auth] updateSettingsAccount: container not found'); return; }
+
+  console.log('[Auth] updateSettingsAccount:', currentUser ? currentUser.email : 'no user', userProfile);
+
+  if (currentUser && userProfile) {
+    // Firestoreエラーで読み込めなかった場合の警告メッセージ
+    const errorBanner = userProfile._firestoreError ? `
+      <div style="background:rgba(232,168,124,0.15);padding:var(--space-3) var(--space-4);border-radius:var(--radius-md);margin-bottom:var(--space-3);font-size:var(--text-body-sm);color:var(--color-secondary-dark);text-align:center;">
+        プロフィールの読み込みに失敗しました。リロードしてみてね
+      </div>
+    ` : '';
+
+    // フレンドコード表示（nullの場合は非表示）
+    const friendCodeSection = userProfile.friendCode ? `
+      <div style="background:var(--color-bg-tertiary);border-radius:var(--radius-md);padding:var(--space-5);margin-bottom:var(--space-3);text-align:center;">
+        <div style="font-size:var(--text-caption);color:var(--color-text-secondary);margin-bottom:var(--space-2);letter-spacing:var(--tracking-wide);">このコードをともだちに教えてね</div>
+        <div style="font-size:var(--text-h1);font-weight:var(--weight-medium);letter-spacing:0.25em;color:var(--color-primary);font-family:var(--font-sans);margin-bottom:var(--space-3);">${escapeHtml(userProfile.friendCode)}</div>
+        <button class="btn btn-primary btn--sm" onclick="copyFriendCode()" style="gap:var(--space-1);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          コピー
+        </button>
+      </div>
+    ` : '';
+
+    const currentIcon = getUserIcon();
+    container.innerHTML = `
+      ${errorBanner}
+      <div class="settings-item" style="border-radius: var(--radius-lg) var(--radius-lg) 0 0; cursor:pointer;" onclick="toggleEmojiPicker()">
+        <span class="settings-item-label">アイコン</span>
+        <span class="settings-item-value" style="font-size:1.5rem;" id="settings-icon-preview">${currentIcon} ›</span>
+      </div>
+      <div class="emoji-picker" id="emoji-picker"></div>
+      <div class="settings-item">
+        <span class="settings-item-label">表示名</span>
+        <span class="settings-item-value">${escapeHtml(userProfile.displayName)}</span>
+      </div>
+      <div class="settings-item" style="border-radius: 0 0 var(--radius-lg) var(--radius-lg); border-bottom:none;">
+        <span class="settings-item-label">メール</span>
+        <span class="settings-item-value" style="font-size:var(--text-body-sm);">${escapeHtml(currentUser.email)}</span>
+      </div>
+      <div style="height:var(--space-3);"></div>
+      ${friendCodeSection}
+      <div class="settings-item" style="border-radius: var(--radius-lg); border-bottom:none; cursor:pointer;" onclick="handleLogout()">
+        <span class="settings-item-label" style="color:var(--color-error);">ログアウト</span>
+        <span class="settings-item-value">&rsaquo;</span>
+      </div>
+    `;
+  } else if (currentUser && !userProfile) {
+    // ログイン済みだがプロフィール未読み込み（読み込み中 or エラー）
+    container.innerHTML = `
+      <div style="text-align:center;padding:var(--space-6);color:var(--color-text-secondary);font-size:var(--text-body-sm);">
+        読み込み中...
+      </div>
+    `;
+  } else {
+    const currentIcon = getUserIcon();
+    container.innerHTML = `
+      <div class="settings-item" style="border-radius: var(--radius-lg) var(--radius-lg) 0 0; cursor:pointer;" onclick="toggleEmojiPicker()">
+        <span class="settings-item-label">アイコン</span>
+        <span class="settings-item-value" style="font-size:1.5rem;" id="settings-icon-preview">${currentIcon} ›</span>
+      </div>
+      <div class="emoji-picker" id="emoji-picker"></div>
+      <div class="settings-item" style="border-radius: 0 0 var(--radius-lg) var(--radius-lg); border-bottom:none; cursor:pointer;" onclick="navigateTo('auth-screen')">
+        <span class="settings-item-label">ログイン / 新規登録</span>
+        <span class="settings-item-value">&rsaquo;</span>
+      </div>
+    `;
+  }
+}
+
+// ===== フレンドコードコピー =====
+function copyFriendCode() {
+  if (!userProfile) return;
+  navigator.clipboard.writeText(userProfile.friendCode).then(() => {
+    showToast('コピーしたよ');
+  }).catch(() => {
+    showToast(userProfile.friendCode);
+  });
+}
+
+// ===== フレンド一覧の読み込み =====
+async function loadFriends() {
+  if (!currentUser) { friendsList = []; return; }
+  friendsList = [];
+  try {
+    // user1またはuser2が自分のフレンドシップを検索
+    const q1 = db.collection('friends').where('user1', '==', currentUser.uid);
+    const q2 = db.collection('friends').where('user2', '==', currentUser.uid);
+    const [snap1, snap2] = await Promise.all([q1.get(), q2.get()]);
+
+    const friendUids = new Set();
+    snap1.forEach(doc => { const d = doc.data(); friendUids.add(d.user2); });
+    snap2.forEach(doc => { const d = doc.data(); friendUids.add(d.user1); });
+
+    // フレンドのプロフィールを取得
+    for (const uid of friendUids) {
+      const uDoc = await db.collection('users').doc(uid).get();
+      if (uDoc.exists) {
+        friendsList.push({ uid, ...uDoc.data() });
+      }
+    }
+  } catch (e) {
+    console.warn('loadFriends error:', e);
+  }
+}
+
+// ===== 申請の読み込み =====
+async function loadPendingRequests() {
+  if (!currentUser) { pendingRequests = []; return; }
+  try {
+    const q = db.collection('friendRequests')
+      .where('toUid', '==', currentUser.uid)
+      .where('status', '==', 'pending');
+    const snap = await q.get();
+    pendingRequests = [];
+    snap.forEach(doc => {
+      pendingRequests.push({ id: doc.id, ...doc.data() });
+    });
+  } catch (e) {
+    console.warn('loadPendingRequests error:', e);
+  }
+  updateFriendBadge();
+}
+
+// ===== フレンド申請送信 =====
+async function sendFriendRequest(friendCode) {
+  if (!currentUser || !userProfile) { showToast('ログインしてね'); return; }
+  friendCode = friendCode.trim().toUpperCase();
+  if (!friendCode || friendCode.length < 4) { showToast('コードを入力してね'); return; }
+
+  try {
+    // コードからユーザーを検索
+    const q = db.collection('users').where('friendCode', '==', friendCode);
+    const snap = await q.get();
+    if (snap.empty) { showToast('そのコードの人は見つからなかったよ'); return; }
+    const targetDoc = snap.docs[0];
+    const targetUid = targetDoc.id;
+
+    if (targetUid === currentUser.uid) { showToast('自分には送れないよ'); return; }
+
+    // 既にフレンドか確認
+    const isFriend = friendsList.some(f => f.uid === targetUid);
+    if (isFriend) { showToast('もうともだちだよ'); return; }
+
+    // 既に申請済みか確認
+    const existQ = db.collection('friendRequests')
+      .where('fromUid', '==', currentUser.uid)
+      .where('toUid', '==', targetUid)
+      .where('status', '==', 'pending');
+    const existSnap = await existQ.get();
+    if (!existSnap.empty) { showToast('もう申請してるよ'); return; }
+
+    // 相手からの申請があればそのまま承認
+    const reverseQ = db.collection('friendRequests')
+      .where('fromUid', '==', targetUid)
+      .where('toUid', '==', currentUser.uid)
+      .where('status', '==', 'pending');
+    const reverseSnap = await reverseQ.get();
+    if (!reverseSnap.empty) {
+      const reqDoc = reverseSnap.docs[0];
+      await acceptFriendRequest(reqDoc.id, targetUid);
+      return;
+    }
+
+    // 申請作成
+    await db.collection('friendRequests').add({
+      fromUid: currentUser.uid,
+      fromName: userProfile.displayName,
+      toUid: targetUid,
+      status: 'pending',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast('手紙を送りたい気持ち、とどけたよ');
+    renderFriendsScreen();
+  } catch (e) {
+    console.error('sendFriendRequest error:', e);
+    showToast('エラーが起きたよ。もう一度試してね');
+  }
+}
+
+// ===== フレンド承認 =====
+async function acceptFriendRequest(requestId, fromUid) {
+  try {
+    const uids = [currentUser.uid, fromUid].sort();
+    await db.collection('friends').add({
+      users: uids,
+      user1: uids[0],
+      user2: uids[1],
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    await db.collection('friendRequests').doc(requestId).update({
+      status: 'accepted',
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast('これから手紙を送りあえるね');
+    await loadFriends();
+    await loadPendingRequests();
+    renderFriendsScreen();
+  } catch (e) {
+    console.error('acceptFriendRequest error:', e);
+    showToast('エラーが起きたよ');
+  }
+}
+
+// ===== フレンド申請拒否 =====
+async function rejectFriendRequest(requestId) {
+  try {
+    await db.collection('friendRequests').doc(requestId).update({
+      status: 'rejected',
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast('申請をお断りしたよ');
+    await loadPendingRequests();
+    renderFriendsScreen();
+  } catch (e) {
+    showToast('エラーが起きたよ');
+  }
+}
+
+// ===== タブバッジ更新 =====
+function updateFriendBadge() {
+  const tab = document.getElementById('tab-friends');
+  if (!tab) return;
+  // 既存バッジを削除
+  const existingBadge = tab.querySelector('.tab-bar__badge');
+  if (existingBadge) existingBadge.remove();
+
+  if (pendingRequests.length > 0) {
+    const badge = document.createElement('span');
+    badge.className = 'tab-bar__badge';
+    badge.textContent = pendingRequests.length;
+    tab.appendChild(badge);
+  }
+}
+
+// ===== フレンド画面の描画 =====
+function renderFriendsScreen() {
+  const content = document.getElementById('friends-content');
+  if (!content) return;
+
+  // 未ログイン時
+  if (!currentUser) {
+    content.innerHTML = `
+      <div class="card login-prompt-card">
+        <div class="login-prompt-card__text">
+          ともだちに手紙を送るには<br>ログインしてね
+        </div>
+        <button class="btn btn-primary" onclick="navigateTo('auth-screen')">ログイン / 新規登録</button>
+      </div>
+    `;
+    return;
+  }
+
+  let html = '';
+
+  // フレンドを追加
+  html += `
+    <div class="section-title">フレンドを追加</div>
+    <div class="friend-add-area">
+      <input type="text" class="form-input" id="friend-code-input" placeholder="フレンドコード" maxlength="6" style="text-transform:uppercase;">
+      <button class="btn btn-primary btn--sm" onclick="sendFriendRequest(document.getElementById('friend-code-input').value)">送る</button>
+    </div>
+  `;
+
+  // 届いている申請
+  if (pendingRequests.length > 0) {
+    html += `<div class="section-title">申請がとどいています</div>`;
+    pendingRequests.forEach(req => {
+      html += `
+        <div class="friend-request-card">
+          <div class="friend-card__name">${escapeHtml(req.fromName)}</div>
+          <div class="friend-request-card__actions">
+            <button class="btn btn-primary btn--sm" onclick="acceptFriendRequest('${req.id}', '${req.fromUid}')">ともだちになる</button>
+            <button class="btn btn-secondary btn--sm" onclick="rejectFriendRequest('${req.id}')">やめとく</button>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  // フレンド一覧
+  html += `<div class="section-title" style="margin-top:var(--space-4);">ともだち (${friendsList.length})</div>`;
+  if (friendsList.length === 0) {
+    html += `<div style="text-align:center;color:var(--color-text-tertiary);font-size:var(--text-body-sm);padding:var(--space-6);">まだともだちがいないよ。<br>フレンドコードを教え合おう。</div>`;
+  } else {
+    friendsList.forEach(f => {
+      html += `
+        <div class="friend-card">
+          <div>
+            <div class="friend-card__name">${escapeHtml(f.displayName)}</div>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  content.innerHTML = html;
+}
+
+// ===== 手紙を書く画面のセグメント切り替え =====
+function updateWriteSegment() {
+  const area = document.getElementById('write-segment-area');
+  if (!area) return;
+  area.style.display = (currentUser && userProfile && friendsList.length > 0) ? 'block' : 'none';
+  // ログアウト時にselfに戻す
+  if (!currentUser) {
+    switchWriteTarget('self');
+  }
+}
+
+function switchWriteTarget(target) {
+  writeTarget = target;
+  selectedFriendUid = null;
+  selectedFriendName = null;
+
+  // セグメントボタンのactive切り替え
+  document.querySelectorAll('.segment').forEach(s => {
+    s.classList.toggle('active', s.dataset.target === target);
+  });
+
+  const selfArea = document.getElementById('write-self-area');
+  const friendSelectArea = document.getElementById('friend-select-area');
+  const friendWriteArea = document.getElementById('write-friend-area');
+
+  if (target === 'self') {
+    selfArea.style.display = 'block';
+    friendSelectArea.style.display = 'none';
+    friendWriteArea.style.display = 'none';
+  } else {
+    selfArea.style.display = 'none';
+    friendSelectArea.style.display = 'block';
+    friendWriteArea.style.display = 'none';
+    renderFriendSelectList();
+  }
+}
+
+function renderFriendSelectList() {
+  const list = document.getElementById('friend-select-list');
+  if (!list) return;
+  if (friendsList.length === 0) {
+    list.innerHTML = '<div style="color:var(--night-text-tertiary);font-size:var(--text-body-sm);text-align:center;padding:var(--space-4);">まだともだちがいないよ</div>';
+    return;
+  }
+  list.innerHTML = friendsList.map(f => `
+    <button class="friend-select-item" data-uid="${f.uid}" data-name="${escapeHtml(f.displayName)}" onclick="selectFriendForLetter(this, '${f.uid}', '${escapeHtml(f.displayName)}')">
+      ${escapeHtml(f.displayName)}
+    </button>
+  `).join('');
+}
+
+function selectFriendForLetter(el, uid, name) {
+  selectedFriendUid = uid;
+  selectedFriendName = name;
+
+  // 選択状態の切り替え
+  document.querySelectorAll('.friend-select-item').forEach(i => i.classList.remove('selected'));
+  el.classList.add('selected');
+
+  // フレンド手紙エリア表示
+  const friendWriteArea = document.getElementById('write-friend-area');
+  friendWriteArea.style.display = 'block';
+
+  // ラベル更新
+  document.getElementById('friend-letter-label').textContent = `${name}の朝に、とどける手紙。`;
+  document.getElementById('friend-send-btn').textContent = `あしたの${name}にとどける`;
+  document.getElementById('friend-letter-input').value = '';
+  document.getElementById('friend-letter-input').placeholder = `${name}へ`;
+  updateFriendDeliveryDate();
+}
+
+function updateFriendDeliveryDate() {
+  const el = document.getElementById('friend-delivery-date');
+  const hour = parseInt(document.getElementById('friend-alarm-hour').value);
+  const minute = parseInt(document.getElementById('friend-alarm-minute').value);
+  if (isNaN(hour) || isNaN(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+    el.innerHTML = '';
+    return;
+  }
+  const target = getDeliveryDate(hour, minute);
+  const days = ['日', '月', '火', '水', '木', '金', '土'];
+  const dateStr = `${target.getMonth()+1}月${target.getDate()}日（${days[target.getDay()]}）`;
+  el.innerHTML = `<span class="hl">${dateStr}</span> の朝にとどきます`;
+}
+
+// ===== フレンドに手紙を送信 =====
+async function sendFriendLetter() {
+  if (!currentUser || !userProfile) { showToast('ログインしてね'); return; }
+  if (!selectedFriendUid) { showToast('送る相手を選んでね'); return; }
+
+  const letter = document.getElementById('friend-letter-input').value.trim();
+  if (!letter) { showToast('ひとこと、なんでもいいよ。'); return; }
+
+  const hour = parseInt(document.getElementById('friend-alarm-hour').value);
+  const minute = parseInt(document.getElementById('friend-alarm-minute').value);
+  if (isNaN(hour) || isNaN(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+    showToast('時刻を正しく入れてね');
+    return;
+  }
+
+  const deliverAt = getDeliveryDate(hour, minute);
+
+  try {
+    await db.collection('letters').add({
+      fromUid: currentUser.uid,
+      fromName: userProfile.displayName,
+      toUid: selectedFriendUid,
+      letter: letter,
+      deliverAt: firebase.firestore.Timestamp.fromDate(deliverAt),
+      setDate: firebase.firestore.Timestamp.now(),
+      reply: null,
+      replyDate: null,
+      read: false,
+      createdAt: firebase.firestore.Timestamp.now()
+    });
+
+    document.getElementById('friend-letter-input').value = '';
+    showToast(`${selectedFriendName}に手紙をあずけたよ`);
+
+    // おやすみなさい画面へ
+    navigateTo('goodnight-screen');
+    goodnightTimer = setTimeout(() => {
+      if (currentScreen === 'goodnight-screen') navigateTo('home');
+    }, 5000);
+  } catch (e) {
+    console.error('sendFriendLetter error:', e);
+    showToast('手紙を送れなかったよ。もう一度試してね');
+  }
+}
+
+// ===== シートからフレンドに手紙を送信 =====
+async function sendSheetFriendLetter() {
+  if (!currentUser || !userProfile) { showToast('ログインしてね'); return; }
+  if (!sheetRecipientUid) { showToast('送る相手を選んでね'); return; }
+
+  const letter = document.getElementById('sheet-letter-input').value.trim();
+  if (!letter) { showToast('ひとこと、なんでもいいよ。'); return; }
+
+  const monthVal = parseInt(document.getElementById('sheet-alarm-month').value);
+  const dayVal = parseInt(document.getElementById('sheet-alarm-day').value);
+  const hour = parseInt(document.getElementById('sheet-alarm-hour').value);
+  const minute = parseInt(document.getElementById('sheet-alarm-minute').value);
+
+  if (isNaN(monthVal) || isNaN(dayVal) || monthVal < 1 || monthVal > 12 || dayVal < 1 || dayVal > 31) {
+    showToast('日付を正しく入れてね'); return;
+  }
+  if (isNaN(hour) || isNaN(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+    showToast('時刻を正しく入れてね'); return;
+  }
+
+  const now = new Date();
+  let year = now.getFullYear();
+  const deliverAt = new Date(year, monthVal - 1, dayVal, hour, minute, 0, 0);
+  if (deliverAt <= now) deliverAt.setFullYear(year + 1);
+
+  try {
+    await db.collection('letters').add({
+      fromUid: currentUser.uid,
+      fromName: userProfile.displayName,
+      toUid: sheetRecipientUid,
+      letter: letter,
+      deliverAt: firebase.firestore.Timestamp.fromDate(deliverAt),
+      setDate: firebase.firestore.Timestamp.now(),
+      reply: null,
+      replyDate: null,
+      read: false,
+      createdAt: firebase.firestore.Timestamp.now()
+    });
+
+    showToast(`${sheetRecipientName}に手紙をセットしました`);
+    startSheetGoodnight();
+  } catch (e) {
+    console.error('sendSheetFriendLetter error:', e);
+    showToast('送信に失敗しました。もう一度お試しください');
+  }
+}
+
+// ===== フレンドからの手紙を取得（アラーム画面用） =====
+async function loadIncomingLetters() {
+  incomingLetters = [];
+  if (!currentUser) return;
+
+  try {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const q = db.collection('letters')
+      .where('toUid', '==', currentUser.uid)
+      .where('deliverAt', '>=', firebase.firestore.Timestamp.fromDate(today))
+      .where('deliverAt', '<', firebase.firestore.Timestamp.fromDate(tomorrow));
+
+    const snap = await q.get();
+    snap.forEach(doc => {
+      const d = doc.data();
+      if (!d.read) {
+        incomingLetters.push({ id: doc.id, ...d });
+      }
+    });
+  } catch (e) {
+    console.warn('loadIncomingLetters error:', e);
+  }
+}
+
+// ===== アラーム画面にフレンド手紙を表示 =====
+function renderFriendLettersInAlarm() {
+  const area = document.getElementById('friend-letters-area');
+  if (!area) return;
+
+  if (incomingLetters.length === 0) {
+    area.innerHTML = '';
+    return;
+  }
+
+  let html = '<div class="section-title" style="color:var(--morning-text-secondary);margin-top:var(--space-4);">ともだちからの手紙</div>';
+  incomingLetters.forEach((letter, idx) => {
+    html += `
+      <div class="card-letter animate-envelope" style="animation-delay: ${300 + idx * 200}ms; margin-bottom: var(--space-4);">
+        <div class="card-letter__label">${escapeHtml(letter.fromName)}から</div>
+        <div class="card-letter__date">昨夜書いてくれました</div>
+        <div class="card-letter__body">${escapeHtml(letter.letter)}</div>
+        <div class="friend-reply-section">
+          <textarea class="textarea-reply" id="friend-reply-${letter.id}" placeholder="${escapeHtml(letter.fromName)}に、ひとこと"></textarea>
+        </div>
+      </div>
+    `;
+  });
+  area.innerHTML = html;
+}
+
+// ===== フレンド手紙を既読にして返事を保存 =====
+async function markFriendLettersRead() {
+  if (!currentUser || incomingLetters.length === 0) return;
+
+  try {
+    const batch = db.batch();
+    incomingLetters.forEach(letter => {
+      const replyEl = document.getElementById(`friend-reply-${letter.id}`);
+      const reply = replyEl ? replyEl.value.trim() : '';
+      const ref = db.collection('letters').doc(letter.id);
+      const updateData = { read: true };
+      if (reply) {
+        updateData.reply = reply;
+        updateData.replyDate = firebase.firestore.Timestamp.now();
+      }
+      batch.update(ref, updateData);
+    });
+    await batch.commit();
+    incomingLetters = [];
+  } catch (e) {
+    console.warn('markFriendLettersRead error:', e);
+  }
+}
+
+// ===== ホーム画面のフレンド手紙通知 =====
+async function updateHomeFriendLetters() {
+  const inbox = document.getElementById('home-letter-area');
+  if (!inbox || !currentUser) return;
+
+  try {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const q = db.collection('letters')
+      .where('toUid', '==', currentUser.uid)
+      .where('deliverAt', '>=', firebase.firestore.Timestamp.fromDate(today))
+      .where('deliverAt', '<', firebase.firestore.Timestamp.fromDate(tomorrow));
+
+    const snap = await q.get();
+    let friendHtml = '';
+    snap.forEach(doc => {
+      const d = doc.data();
+      if (!d.read) {
+        const deliverTime = d.deliverAt.toDate();
+        const h = String(deliverTime.getHours()).padStart(2, '0');
+        const m = String(deliverTime.getMinutes()).padStart(2, '0');
+        const preview = d.letter ? d.letter.substring(0, 30) + (d.letter.length > 30 ? '…' : '') : '';
+        const initial = (d.fromName || '?')[0];
+
+        friendHtml += `
+          <div class="inbox-item" onclick="navigateTo('alarm')">
+            <div class="inbox-item__icon inbox-item__icon--friend">${initial}</div>
+            <div class="inbox-item__body">
+              <div class="inbox-item__title">${d.fromName || 'ともだち'}からの手紙</div>
+              <div class="inbox-item__sub">${preview || '手紙が届いています'}</div>
+            </div>
+            <span class="inbox-item__status">未読</span>
+          </div>
+        `;
+      }
+    });
+
+    // 既存の inbox 末尾に追加
+    if (friendHtml) {
+      inbox.insertAdjacentHTML('beforeend', friendHtml);
+      // 空状態を非表示
+      const emptyEl = document.getElementById('home-empty-state');
+      if (emptyEl) { emptyEl.classList.remove('active'); emptyEl.innerHTML = ''; }
+    }
+  } catch (e) {
+    // エラー時は何もしない
+  }
+}
+
+// ===== 起動 =====
+init();
+</script>
+</body>
+</html>

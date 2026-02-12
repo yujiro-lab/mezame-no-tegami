@@ -1,0 +1,1173 @@
+/* ============================================================
+   めざめの手紙 - Design System
+   Version: 1.0
+
+   みてねの品質基準を参考に設計:
+   - クリーンな白ベース + 機能的なアクセントカラー
+   - 一貫したスペーシングシステム (8px base)
+   - 明確なタイポグラフィ階層
+   - カード型レイアウト + 適切なシャドウ
+   - 下部タブバー + ヘッダーバーのネイティブ感
+   ============================================================ */
+
+/* ============================================================
+   1. DESIGN TOKENS (CSS Custom Properties)
+   ============================================================ */
+
+:root {
+  /* --------------------------------------------------------
+     1-A. COLOR PALETTE
+     -------------------------------------------------------- */
+
+  /* --- Semantic Colors (通常モード: ホーム、記録画面) --- */
+  --color-primary:          #5B6ABF;   /* 落ち着いた藤紫。夜と朝の中間色 */
+  --color-primary-light:    #7B88D3;
+  --color-primary-dark:     #424F9A;
+  --color-secondary:        #E8A87C;   /* 暖かみのあるペールオレンジ */
+  --color-secondary-light:  #F0C4A8;
+  --color-secondary-dark:   #D4906A;
+  --color-accent:           #E06B78;   /* ローズ。CTAやバッジ用 */
+  --color-accent-light:     #EDA0A8;
+  --color-success:          #5CB888;
+  --color-warning:          #E8A87C;
+  --color-error:            #D95B68;
+
+  /* --- Text --- */
+  --color-text-primary:     #1A1A2E;   /* ほぼ黒。高コントラスト */
+  --color-text-secondary:   #6B7280;   /* グレー。補助テキスト */
+  --color-text-tertiary:    #9CA3AF;   /* 薄グレー。ヒント、キャプション */
+  --color-text-inverse:     #FFFFFF;
+  --color-text-link:        #5B6ABF;
+
+  /* --- Background --- */
+  --color-bg-primary:       #FFFFFF;
+  --color-bg-secondary:     #F7F7FA;   /* みてね風の薄いグレー背景 */
+  --color-bg-tertiary:      #EEEFF4;
+  --color-bg-elevated:      #FFFFFF;   /* カードやモーダル */
+
+  /* --- Border --- */
+  --color-border-primary:   #E5E7EB;
+  --color-border-secondary: #F0F0F5;
+  --color-border-focus:     #5B6ABF;
+
+  /* --- Paper (手紙の紙の色) --- */
+  --color-paper:            #FDF8F0;
+  --color-paper-line:       #E8DFD0;
+  --color-paper-shadow:     rgba(139, 120, 90, 0.08);
+
+  /* --- Night Mode (夜モード: 手紙を書く画面) --- */
+  --night-bg-deep:          #0F0F1E;
+  --night-bg-mid:           #1A1A35;
+  --night-bg-surface:       #252545;
+  --night-bg-elevated:      #2F2F55;
+  --night-text-primary:     #EAEAF5;
+  --night-text-secondary:   rgba(234, 234, 245, 0.65);
+  --night-text-tertiary:    rgba(234, 234, 245, 0.4);
+  --night-border:           rgba(255, 255, 255, 0.1);
+  --night-accent:           #F5C469;   /* 暖かい金色。夜の中の希望 */
+  --night-accent-glow:      rgba(245, 196, 105, 0.2);
+  --night-gradient:         linear-gradient(170deg, #0F0F1E 0%, #1A1A35 35%, #2A1D42 65%, #3D2548 100%);
+
+  /* --- Morning Mode (朝モード: アラーム画面) --- */
+  --morning-sky-top:        #89A4CF;
+  --morning-sky-mid:        #C8A882;
+  --morning-horizon:        #E8C5A0;
+  --morning-glow:           #F5DFC5;
+  --morning-text-primary:   #2C2416;
+  --morning-text-secondary: rgba(44, 36, 22, 0.6);
+  --morning-gradient:       linear-gradient(170deg, #89A4CF 0%, #C8A882 40%, #E8C5A0 70%, #F5DFC5 100%);
+  --morning-success:        #5CB888;
+
+
+  /* --------------------------------------------------------
+     1-B. TYPOGRAPHY SCALE
+     -------------------------------------------------------- */
+
+  /* Font Family */
+  --font-sans:              'Zen Maru Gothic', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN',
+                            'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-letter:            'Zen Kurenaido', 'Zen Maru Gothic', 'Hiragino Mincho ProN',
+                            'Noto Serif JP', serif;
+
+  /* Font Sizes (Major Third scale: 1.25 ratio) */
+  --text-display:           2.441rem;  /* 39px  - 時計表示 */
+  --text-h1:                1.953rem;  /* 31px  - 画面タイトル(大) */
+  --text-h2:                1.563rem;  /* 25px  - セクションタイトル */
+  --text-h3:                1.25rem;   /* 20px  - カードタイトル */
+  --text-body:              1rem;      /* 16px  - 本文 */
+  --text-body-sm:           0.875rem;  /* 14px  - サブテキスト */
+  --text-caption:           0.75rem;   /* 12px  - キャプション */
+  --text-overline:          0.6875rem; /* 11px  - オーバーライン、バッジ */
+
+  /* Font Weights */
+  --weight-light:           300;
+  --weight-regular:         400;
+  --weight-medium:          500;
+
+  /* Line Heights */
+  --leading-tight:          1.3;       /* 見出し用 */
+  --leading-normal:         1.6;       /* 本文用 */
+  --leading-relaxed:        1.8;       /* 手紙本文用(罫線に合わせる) */
+  --leading-loose:          2.0;       /* 手紙入力欄 */
+
+  /* Letter Spacing */
+  --tracking-tight:         -0.01em;
+  --tracking-normal:        0.02em;
+  --tracking-wide:          0.08em;
+  --tracking-wider:         0.12em;
+
+
+  /* --------------------------------------------------------
+     1-C. SPACING SYSTEM (8px base)
+     -------------------------------------------------------- */
+
+  --space-0:    0;
+  --space-1:    4px;     /* 微調整 */
+  --space-2:    8px;     /* 最小余白 */
+  --space-3:    12px;    /* テキスト間 */
+  --space-4:    16px;    /* 要素内パディング */
+  --space-5:    20px;    /* セクション間(小) */
+  --space-6:    24px;    /* セクション間(中) */
+  --space-8:    32px;    /* セクション間(大) */
+  --space-10:   40px;    /* 画面上部パディング */
+  --space-12:   48px;    /* ヘッダー高さ */
+  --space-16:   64px;    /* 大きなスペーシング */
+  --space-20:   80px;    /* タブバー高さ含む下部余白 */
+
+
+  /* --------------------------------------------------------
+     1-D. BORDER RADIUS
+     -------------------------------------------------------- */
+
+  --radius-sm:    8px;    /* ボタン(小)、バッジ */
+  --radius-md:    12px;   /* 入力フィールド */
+  --radius-lg:    16px;   /* カード */
+  --radius-xl:    20px;   /* モーダル */
+  --radius-full:  9999px; /* ピル型ボタン */
+
+
+  /* --------------------------------------------------------
+     1-E. SHADOWS
+     -------------------------------------------------------- */
+
+  --shadow-xs:    0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm:    0 1px 3px rgba(0, 0, 0, 0.06),
+                  0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md:    0 4px 6px rgba(0, 0, 0, 0.04),
+                  0 2px 4px rgba(0, 0, 0, 0.03);
+  --shadow-lg:    0 8px 24px rgba(0, 0, 0, 0.06),
+                  0 4px 8px rgba(0, 0, 0, 0.04);
+  --shadow-xl:    0 16px 48px rgba(0, 0, 0, 0.08),
+                  0 8px 16px rgba(0, 0, 0, 0.04);
+
+  /* 夜モード用シャドウ */
+  --shadow-night: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+  /* 手紙カード用シャドウ */
+  --shadow-paper: 0 2px 8px rgba(139, 120, 90, 0.1),
+                  0 1px 3px rgba(139, 120, 90, 0.06);
+
+
+  /* --------------------------------------------------------
+     1-F. TRANSITIONS & ANIMATION
+     -------------------------------------------------------- */
+
+  /* Duration */
+  --duration-fast:      120ms;
+  --duration-normal:    200ms;
+  --duration-slow:      350ms;
+  --duration-page:      500ms;
+
+  /* Easing */
+  --ease-out:           cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-in-out:        cubic-bezier(0.42, 0, 0.58, 1);
+  --ease-spring:        cubic-bezier(0.34, 1.56, 0.64, 1);    /* ボタンの弾み */
+  --ease-page:          cubic-bezier(0.22, 1, 0.36, 1);        /* 画面遷移 */
+
+
+  /* --------------------------------------------------------
+     1-G. Z-INDEX SCALE
+     -------------------------------------------------------- */
+
+  --z-base:       0;
+  --z-elevated:   10;
+  --z-header:     100;
+  --z-overlay:    200;
+  --z-modal:      300;
+  --z-toast:      400;
+
+
+  /* --------------------------------------------------------
+     1-H. LAYOUT
+     -------------------------------------------------------- */
+
+  --content-max-width:   420px;
+  --header-height:       48px;
+  --tab-bar-height:      56px;
+  --safe-area-top:       env(safe-area-inset-top, 0px);
+  --safe-area-bottom:    env(safe-area-inset-bottom, 0px);
+}
+
+
+/* ============================================================
+   2. RESET & BASE
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-normal);
+  letter-spacing: var(--tracking-normal);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-secondary);
+  overflow-x: hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+
+/* ============================================================
+   3. TYPOGRAPHY
+   ============================================================ */
+
+.text-display {
+  font-size: var(--text-display);
+  font-weight: var(--weight-light);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+}
+
+.text-h1 {
+  font-size: var(--text-h1);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-tight);
+}
+
+.text-h2 {
+  font-size: var(--text-h2);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-tight);
+}
+
+.text-h3 {
+  font-size: var(--text-h3);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-normal);
+}
+
+.text-body {
+  font-size: var(--text-body);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-normal);
+}
+
+.text-body-sm {
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-normal);
+  color: var(--color-text-secondary);
+}
+
+.text-caption {
+  font-size: var(--text-caption);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-normal);
+  color: var(--color-text-tertiary);
+}
+
+.text-overline {
+  font-size: var(--text-overline);
+  font-weight: var(--weight-medium);
+  line-height: 1;
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.text-letter {
+  font-family: var(--font-letter);
+  font-size: var(--text-h3);
+  line-height: var(--leading-loose);
+  color: var(--color-text-primary);
+}
+
+.text-letter-sm {
+  font-family: var(--font-letter);
+  font-size: var(--text-body);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-primary);
+}
+
+
+/* ============================================================
+   4. LAYOUT
+   ============================================================ */
+
+.app-shell {
+  position: relative;
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.screen {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+.screen.active {
+  display: flex;
+}
+
+.screen-content {
+  flex: 1;
+  padding: var(--space-4);
+  padding-top: calc(var(--header-height) + var(--safe-area-top) + var(--space-4));
+  padding-bottom: calc(var(--tab-bar-height) + var(--safe-area-bottom) + var(--space-4));
+}
+
+.screen-content--full {
+  padding-top: calc(var(--safe-area-top) + var(--space-6));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* ============================================================
+   5. COMPONENT: Header Bar
+   ============================================================ */
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-header);
+  height: calc(var(--header-height) + var(--safe-area-top));
+  padding-top: var(--safe-area-top);
+  background-color: var(--color-bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--color-border-secondary);
+}
+
+.header__title {
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-primary);
+  text-align: center;
+}
+
+.header__action {
+  position: absolute;
+  top: var(--safe-area-top);
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-4);
+  background: none;
+  border: none;
+  font-family: var(--font-sans);
+  font-size: var(--text-body-sm);
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.header__action:active {
+  opacity: 0.5;
+}
+
+.header__action--left {
+  left: 0;
+}
+
+.header__action--right {
+  right: 0;
+}
+
+.header--night {
+  background-color: var(--night-bg-deep);
+  border-bottom-color: var(--night-border);
+}
+
+.header--night .header__title {
+  color: var(--night-text-primary);
+}
+
+.header--night .header__action {
+  color: var(--night-accent);
+}
+
+.header--transparent {
+  background-color: transparent;
+  border-bottom: none;
+}
+
+
+/* ============================================================
+   6. COMPONENT: Tab Bar
+   ============================================================ */
+
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-header);
+  height: calc(var(--tab-bar-height) + var(--safe-area-bottom));
+  padding-bottom: var(--safe-area-bottom);
+  background-color: var(--color-bg-primary);
+  border-top: 1px solid var(--color-border-secondary);
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+}
+
+.tab-bar__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-tertiary);
+  font-family: var(--font-sans);
+  transition: color var(--duration-fast) var(--ease-out);
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tab-bar__item:active {
+  opacity: 0.7;
+}
+
+.tab-bar__icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.tab-bar__label {
+  font-size: var(--text-overline);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-wide);
+}
+
+.tab-bar__item.active {
+  color: var(--color-primary);
+}
+
+.tab-bar__badge {
+  position: absolute;
+  top: 4px;
+  right: calc(50% - 18px);
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-accent);
+  border-radius: var(--radius-full);
+  border: 2px solid var(--color-bg-primary);
+}
+
+
+/* ============================================================
+   7. COMPONENT: Buttons
+   ============================================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  border: none;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    transform var(--duration-fast) var(--ease-spring),
+    box-shadow var(--duration-normal) var(--ease-out),
+    background-color var(--duration-normal) var(--ease-out),
+    opacity var(--duration-fast) var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  box-shadow: 0 2px 8px rgba(91, 106, 191, 0.3);
+}
+
+.btn-primary:active:not(:disabled) {
+  background-color: var(--color-primary-dark);
+  box-shadow: 0 1px 4px rgba(91, 106, 191, 0.3);
+}
+
+.btn-accent {
+  background-color: var(--color-accent);
+  color: var(--color-text-inverse);
+  box-shadow: 0 2px 8px rgba(224, 107, 120, 0.3);
+}
+
+.btn-accent:active:not(:disabled) {
+  background-color: #CC5565;
+  box-shadow: 0 1px 4px rgba(224, 107, 120, 0.3);
+}
+
+.btn-secondary {
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+}
+
+.btn-secondary:active:not(:disabled) {
+  background-color: var(--color-border-primary);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--color-primary);
+  padding: var(--space-2) var(--space-4);
+}
+
+.btn-ghost:active:not(:disabled) {
+  background-color: rgba(91, 106, 191, 0.08);
+}
+
+.btn-night-primary {
+  background-color: var(--night-accent);
+  color: var(--night-bg-deep);
+  box-shadow: 0 2px 12px var(--night-accent-glow);
+}
+
+.btn-night-primary:active:not(:disabled) {
+  background-color: #E0B05A;
+}
+
+.btn-night-secondary {
+  background-color: var(--night-bg-elevated);
+  color: var(--night-text-primary);
+  border: 1px solid var(--night-border);
+}
+
+.btn-night-secondary:active:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.btn-morning-primary {
+  background-color: var(--morning-success);
+  color: var(--color-text-inverse);
+  box-shadow: 0 2px 8px rgba(92, 184, 136, 0.3);
+}
+
+.btn-morning-secondary {
+  background-color: rgba(255, 255, 255, 0.75);
+  color: var(--morning-text-primary);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.btn--sm {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-body-sm);
+}
+
+.btn--lg {
+  padding: var(--space-4) var(--space-8);
+  font-size: var(--text-h3);
+}
+
+.btn--block {
+  width: 100%;
+}
+
+
+/* ============================================================
+   8. COMPONENT: Cards
+   ============================================================ */
+
+.card {
+  background-color: var(--color-bg-elevated);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+}
+
+.card-letter {
+  background-color: var(--color-paper);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-paper);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-letter::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: var(--space-5);
+  right: var(--space-5);
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--color-secondary) 30%,
+    var(--color-secondary-dark) 50%,
+    var(--color-secondary) 70%,
+    transparent 100%
+  );
+  border-radius: 0 0 2px 2px;
+}
+
+.card-letter__label {
+  font-family: var(--font-letter);
+  font-size: var(--text-body-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-3);
+}
+
+.card-letter__date {
+  font-size: var(--text-caption);
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-4);
+}
+
+.card-letter__body {
+  font-family: var(--font-letter);
+  font-size: var(--text-h3);
+  color: var(--color-text-primary);
+  line-height: var(--leading-loose);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.card-history {
+  background-color: var(--color-bg-elevated);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+}
+
+.card-history__date {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-caption);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-3);
+}
+
+.card-history__date-icon {
+  font-size: var(--text-body);
+  line-height: 1;
+}
+
+.card-history__section {
+  font-family: var(--font-letter);
+  margin-bottom: var(--space-3);
+}
+
+.card-history__section:last-child {
+  margin-bottom: 0;
+}
+
+.card-history__section + .card-history__section {
+  padding-top: var(--space-3);
+  border-top: 1px dashed var(--color-border-primary);
+}
+
+.card-history__section-label {
+  font-size: var(--text-caption);
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-1);
+}
+
+.card-history__section-text {
+  font-size: var(--text-body);
+  color: var(--color-text-primary);
+  line-height: var(--leading-relaxed);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.card-timecapsule {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.card-timecapsule__label {
+  font-size: var(--text-caption);
+  color: rgba(255, 255, 255, 0.65);
+  text-align: center;
+  letter-spacing: var(--tracking-wide);
+  margin-bottom: var(--space-3);
+}
+
+.card-timecapsule__inner {
+  background-color: var(--color-paper);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+
+/* ============================================================
+   9. COMPONENT: Text Area
+   ============================================================ */
+
+.textarea-letter {
+  width: 100%;
+  min-height: 120px;
+  border: none;
+  background: transparent;
+  font-family: var(--font-letter);
+  font-size: var(--text-h3);
+  color: var(--color-text-primary);
+  resize: none;
+  outline: none;
+  line-height: var(--leading-loose);
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 31px,
+    var(--color-paper-line) 31px,
+    var(--color-paper-line) 32px
+  );
+  background-position: 0 4px;
+}
+
+.textarea-letter::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.textarea-reply {
+  width: 100%;
+  min-height: 80px;
+  border: none;
+  background: transparent;
+  font-family: var(--font-letter);
+  font-size: var(--text-body);
+  color: var(--color-text-primary);
+  resize: none;
+  outline: none;
+  line-height: var(--leading-loose);
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 31px,
+    var(--color-paper-line) 31px,
+    var(--color-paper-line) 32px
+  );
+  background-position: 0 4px;
+}
+
+.textarea-reply::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+
+/* ============================================================
+   10. COMPONENT: Time Picker
+   ============================================================ */
+
+.time-picker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.time-picker__input {
+  width: 80px;
+  padding: var(--space-4) var(--space-2);
+  font-family: var(--font-sans);
+  font-size: var(--text-h1);
+  font-weight: var(--weight-light);
+  text-align: center;
+  border: 1px solid var(--night-border);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition:
+    border-color var(--duration-normal) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out);
+  background-color: var(--night-bg-elevated);
+  color: var(--night-text-primary);
+}
+
+.time-picker__input:focus {
+  border-color: var(--night-accent);
+  box-shadow: 0 0 0 3px var(--night-accent-glow);
+}
+
+.time-picker__separator {
+  font-size: var(--text-h1);
+  font-weight: var(--weight-light);
+  color: var(--night-text-secondary);
+}
+
+
+/* ============================================================
+   11. COMPONENT: Toast
+   ============================================================ */
+
+.toast {
+  position: fixed;
+  top: calc(var(--safe-area-top) + var(--space-4));
+  left: 50%;
+  transform: translateX(-50%) translateY(-120%);
+  z-index: var(--z-toast);
+  background-color: var(--color-text-primary);
+  color: var(--color-text-inverse);
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-full);
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+  max-width: calc(100% - var(--space-8));
+  box-shadow: var(--shadow-lg);
+  transition: transform var(--duration-slow) var(--ease-spring);
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+}
+
+
+/* ============================================================
+   12. ANIMATIONS
+   ============================================================ */
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes softRise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes dawnBreak {
+  from { background: var(--night-gradient); }
+  to   { background: var(--morning-gradient); }
+}
+
+@keyframes gentleFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.15; }
+  50%      { opacity: 0.9; }
+}
+
+@keyframes envelopeOpen {
+  0%   { transform: scale(0.85) rotateX(30deg); opacity: 0; }
+  60%  { transform: scale(1.02) rotateX(-2deg); opacity: 1; }
+  100% { transform: scale(1) rotateX(0deg); opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn var(--duration-page) var(--ease-page) both;
+}
+
+.animate-slide-up {
+  animation: slideInUp var(--duration-page) var(--ease-page) both;
+}
+
+.animate-soft-rise {
+  animation: softRise var(--duration-slow) var(--ease-out) both;
+}
+
+.animate-envelope {
+  animation: envelopeOpen 800ms var(--ease-spring) both;
+}
+
+.animate-float {
+  animation: gentleFloat 3s ease-in-out infinite;
+}
+
+.stagger-children > * {
+  animation: softRise var(--duration-slow) var(--ease-out) both;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 80ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 160ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 240ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 320ms; }
+
+
+/* ============================================================
+   13. SCREEN THEMES
+   ============================================================ */
+
+.screen--night {
+  background: var(--night-gradient);
+  color: var(--night-text-primary);
+}
+
+.screen--morning {
+  background: var(--morning-gradient);
+  color: var(--morning-text-primary);
+  animation: dawnBreak 3s var(--ease-out) forwards;
+}
+
+.screen--day {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+
+/* ============================================================
+   14. HOME SCREEN backgrounds
+   ============================================================ */
+
+.home-bg {
+  position: absolute;
+  inset: 0;
+  transition: background 2s var(--ease-in-out);
+}
+
+.home-bg--night {
+  background: linear-gradient(170deg,
+    #0C0C1D 0%, #1A1A3E 30%, #2D1B4E 60%, #3D2548 85%, #4A2D55 100%);
+}
+
+.home-bg--dawn {
+  background: linear-gradient(170deg,
+    #1A1A3E 0%, #3D2B5A 20%, #8B6A7D 45%, #D4956E 70%, #F0C89E 100%);
+}
+
+.home-bg--morning {
+  background: linear-gradient(170deg,
+    #89A4CF 0%, #B8C8DE 30%, #E8D8C8 60%, #F5EDE4 100%);
+}
+
+.home-bg--daytime {
+  background: linear-gradient(170deg,
+    #7AADDF 0%, #9FC5E8 30%, #C8DDF0 60%, #E8F0F6 100%);
+}
+
+.home-bg--evening {
+  background: linear-gradient(170deg,
+    #3D2548 0%, #8B4D5A 25%, #D4896E 50%, #F0C89E 75%, #F5DFC5 100%);
+}
+
+
+/* ============================================================
+   15. STARS
+   ============================================================ */
+
+.stars {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: opacity 2s var(--ease-in-out);
+}
+
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+
+/* ============================================================
+   16. CLOCK
+   ============================================================ */
+
+.clock {
+  font-size: 2rem;
+  font-weight: var(--weight-light);
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.clock--dark {
+  color: var(--color-text-secondary);
+}
+
+.date-display {
+  font-size: var(--text-caption);
+  font-weight: var(--weight-light);
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: var(--space-8);
+}
+
+.date-display--dark {
+  color: var(--color-text-tertiary);
+}
+
+
+/* ============================================================
+   17. UTILITY CLASSES
+   ============================================================ */
+
+.mt-1 { margin-top: var(--space-1); }
+.mt-2 { margin-top: var(--space-2); }
+.mt-3 { margin-top: var(--space-3); }
+.mt-4 { margin-top: var(--space-4); }
+.mt-6 { margin-top: var(--space-6); }
+.mt-8 { margin-top: var(--space-8); }
+.mb-1 { margin-bottom: var(--space-1); }
+.mb-2 { margin-bottom: var(--space-2); }
+.mb-3 { margin-bottom: var(--space-3); }
+.mb-4 { margin-bottom: var(--space-4); }
+.mb-6 { margin-bottom: var(--space-6); }
+.mb-8 { margin-bottom: var(--space-8); }
+.p-4  { padding: var(--space-4); }
+.p-5  { padding: var(--space-5); }
+.p-6  { padding: var(--space-6); }
+.px-4 { padding-left: var(--space-4); padding-right: var(--space-4); }
+.py-3 { padding-top: var(--space-3); padding-bottom: var(--space-3); }
+.gap-2 { gap: var(--space-2); }
+.gap-3 { gap: var(--space-3); }
+.gap-4 { gap: var(--space-4); }
+
+.flex        { display: flex; }
+.flex-col    { flex-direction: column; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.flex-wrap   { flex-wrap: wrap; }
+.flex-1      { flex: 1; }
+
+.text-center { text-align: center; }
+.text-white  { color: var(--color-text-inverse); }
+.text-muted  { color: var(--color-text-secondary); }
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* ============================================================
+   18. RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 380px) {
+  :root {
+    --text-display: 2.5rem;   /* 40px: clock must dominate on small screens */
+    --text-h1: 1.75rem;       /* 28px */
+    --text-h2: 1.25rem;       /* 20px */
+  }
+
+  /* Home screen: inbox layout on small screens */
+  .home-content {
+    padding-top: calc(var(--safe-area-top) + var(--space-3));
+  }
+
+  /* Write screen: fit within 553px usable */
+  .write-screen-content {
+    padding: var(--space-5);
+    padding-top: calc(var(--header-height) + var(--safe-area-top) + var(--space-6));
+    padding-bottom: calc(var(--safe-area-bottom) + var(--space-6));
+    gap: var(--space-3);
+  }
+  .time-picker__input {
+    width: 72px;
+    font-size: var(--text-h1);
+    padding: var(--space-3) var(--space-2);
+  }
+  .time-picker__separator {
+    font-size: var(--text-h1);
+  }
+}
+
+@media (min-width: 421px) {
+  body {
+    display: flex;
+    justify-content: center;
+    background-color: #F0F0F5;
+  }
+
+  .app-shell {
+    box-shadow: var(--shadow-xl);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    margin: var(--space-5) 0;
+    max-height: calc(100vh - var(--space-10));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
