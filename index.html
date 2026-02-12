@@ -2768,7 +2768,7 @@ let alarmData = null;
 let audioCtx = null;
 let alarmPlaying = false;
 let alarmOscillators = [];
-let currentScreen = 'home';
+let currentScreen = null;
 let goodnightTimer = null;
 let itterasshaiTimer = null;
 let clockInterval = null; // setInterval二重起動防止用
@@ -2896,6 +2896,7 @@ function init() {
 
 // ===== オンボーディング =====
 function showOnboarding() {
+  currentScreen = 'onboarding';
   hideTabBar();
   showScreen('onboarding');
   createStars('onboarding-stars');
