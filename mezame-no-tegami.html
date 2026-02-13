@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="めざめの手紙">
+<meta name="apple-mobile-web-app-title" content="monipo">
 <meta name="theme-color" content="#0F0F1E" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#F7F7FA" media="(prefers-color-scheme: light)">
-<meta name="description" content="夜、自分に手紙を書く。朝、届く。自分との文通アプリ。">
-<title>めざめの手紙</title>
+<meta name="description" content="夜、自分に手紙を書く。朝、アラームで届く。monipo — 手紙で起きる目覚ましアプリ。">
+<title>monipo</title>
 <!-- 手紙フォント (非同期読み込み) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,7 +20,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 <style>
 /* ============================================================
-   めざめの手紙 - Design System (inline)
+   monipo - Design System (inline)
    ============================================================ */
 /* --- Design Tokens --- */
 :root {
@@ -923,7 +923,39 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
-/* --- ホームヘッダー: 日付＋時刻 --- */
+/* --- ホームヘッダー: ブランド＋日付＋時刻 --- */
+.home-header__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+.home-header__brand-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+}
+.home-header__brand-name {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: var(--weight-medium);
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.06em;
+}
+.home-header__brand-name--light {
+  color: var(--color-text-secondary);
+}
+.home-header__postmsg {
+  font-family: var(--font-sans);
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-regular);
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: var(--space-2);
+  line-height: 1.5;
+}
+.home-header__postmsg--light {
+  color: var(--color-text-tertiary);
+}
 .home-header {
   padding: var(--space-6) var(--space-5) var(--space-4);
   text-align: left;
@@ -2404,10 +2436,15 @@ body {
     <div class="home-bg home-bg--night" id="home-bg"></div>
     <div class="stars" id="stars"></div>
     <div class="home-content" id="home-content">
-      <!-- ヘッダー: 日付＋時刻 -->
+      <!-- ヘッダー: ブランド＋日付＋時刻＋ポストくん -->
       <div class="home-header" id="home-header">
+        <div class="home-header__brand">
+          <img class="home-header__brand-icon" src="画像/Generated_image.png" alt="monipo" onerror="this.style.display='none'">
+          <span class="home-header__brand-name" id="brand-name">monipo</span>
+        </div>
         <div class="home-header__date" id="date-display"></div>
         <div class="home-header__clock" id="clock">00:00</div>
+        <div class="home-header__postmsg" id="home-postmsg"></div>
       </div>
       <!-- 受信ボックス形式のリスト -->
       <div class="inbox" id="home-letter-area"></div>
@@ -2477,9 +2514,9 @@ body {
   <div class="screen screen--night" id="goodnight-screen" role="main" aria-label="おやすみなさい">
     <div class="stars" id="goodnight-stars"></div>
     <div class="goodnight-content animate-fade-in" style="position:relative;z-index:2;">
-      <div class="goodnight-text animate-soft-rise" id="goodnight-main">手紙、あずかったよ。</div>
-      <div class="goodnight-sub animate-soft-rise" style="animation-delay:500ms;" id="goodnight-sub">あしたの朝、届けるからね</div>
-      <div class="goodnight-sub animate-soft-rise" style="animation-delay:2500ms;margin-top:var(--space-6);opacity:0;" id="goodnight-extra">おやすみなさい。</div>
+      <div class="goodnight-text animate-soft-rise" id="goodnight-main">あずかった。</div>
+      <div class="goodnight-sub animate-soft-rise" style="animation-delay:500ms;" id="goodnight-sub">ちゃんと届けるから。</div>
+      <div class="goodnight-sub animate-soft-rise" style="animation-delay:2500ms;margin-top:var(--space-6);opacity:0;" id="goodnight-extra">おやすみ。</div>
     </div>
   </div>
 
@@ -2506,13 +2543,13 @@ body {
       <div id="timecapsule-area"></div>
       <div id="friend-letters-area"></div>
       <div class="alarm-actions animate-soft-rise" style="animation-delay:400ms;padding:0 var(--space-5);">
-        <button class="sheet__cta sheet__cta--ready" onclick="showAlarmReply()" id="alarm-reply-btn" style="width:100%;">返信を書く</button>
+        <button class="sheet__cta sheet__cta--ready" onclick="showAlarmReply()" id="alarm-reply-btn" style="width:100%;">返事を書く</button>
       </div>
       <div class="alarm-actions" style="margin-top:var(--space-3);">
-        <button class="btn btn--sm btn-ghost" onclick="snooze()" aria-label="5分後にもう一度アラーム" style="color:var(--morning-text-secondary);">もうすこしだけ...</button>
+        <button class="btn btn--sm btn-ghost" onclick="snooze()" aria-label="5分後にもう一度アラーム" style="color:var(--morning-text-secondary);">あと5分……</button>
       </div>
       <div class="alarm-actions" style="margin-top:var(--space-1);">
-        <button class="btn btn--sm btn-ghost" onclick="dismissAlarmReadOnly()" aria-label="読んだよ" style="color:var(--morning-text-secondary);opacity:0;pointer-events:none;transition:opacity 0.5s ease;" id="read-only-btn">今朝はそっと読むだけ</button>
+        <button class="btn btn--sm btn-ghost" onclick="dismissAlarmReadOnly()" aria-label="読んだよ" style="color:var(--morning-text-secondary);opacity:0;pointer-events:none;transition:opacity 0.5s ease;" id="read-only-btn">読んだ。</button>
       </div>
     </div>
     <!-- Phase 2: 返事を書く（シートスタイル） -->
@@ -2525,13 +2562,13 @@ body {
           <div class="sheet__section-title" style="color:var(--color-text-tertiary);">けさのわたしから</div>
           <div class="sheet__field-group">
             <div class="sheet__field sheet__field--textarea">
-              <textarea class="sheet__textarea" id="reply-input" placeholder="おはよう、きのうの自分。" aria-label="返事を書く"></textarea>
+              <textarea class="sheet__textarea" id="reply-input" placeholder="おはよう。" aria-label="返事を書く"></textarea>
             </div>
           </div>
         </div>
       </div>
       <div class="sheet__cta-area" style="border-top:1px solid var(--color-border-secondary);">
-        <button class="sheet__cta" id="dismiss-btn" onclick="dismissAlarm()" disabled>返事をとどける</button>
+        <button class="sheet__cta" id="dismiss-btn" onclick="dismissAlarm()" disabled>返事を出す</button>
       </div>
     </div>
     <!-- Phase 3: 完了 -->
@@ -2657,7 +2694,7 @@ body {
         </div>
       </div>
       <div style="text-align:center;padding:var(--space-6);color:var(--color-text-tertiary);font-size:var(--text-caption);">
-        めざめの手紙 v4.0
+        monipo v4.0
       </div>
     </div>
   </div>
@@ -2692,7 +2729,7 @@ body {
               </div>
             </div>
             <div class="sheet__field" id="sheet-friend-date-note" style="display:none;">
-              <span class="sheet__field-label" style="color:var(--color-text-tertiary);font-size:0.85rem;">届く時間は相手が決めるよ</span>
+              <span class="sheet__field-label" style="color:var(--color-text-tertiary);font-size:0.85rem;">届く時間はあいてが決めるよ</span>
             </div>
           </div>
         </div>
@@ -2726,8 +2763,8 @@ body {
     </div>
     <div class="sheet__goodnight" id="sheet-goodnight">
       <div class="sheet__goodnight-icon">📮</div>
-      <div class="sheet__goodnight-main">手紙がセットされました</div>
-      <div class="sheet__goodnight-sub" id="sheet-goodnight-sub">設定日時にお届けします</div>
+      <div class="sheet__goodnight-main">あずかった。</div>
+      <div class="sheet__goodnight-sub" id="sheet-goodnight-sub">あしたの朝届けるね。</div>
     </div>
   </div>
 
@@ -2739,7 +2776,7 @@ body {
       <div class="sheet__form">
         <div class="sheet__section">
           <div class="sheet__section-title" id="friend-alarm-title" style="font-size:1.1rem;">手紙が届いてるよ</div>
-          <p style="color:var(--color-text-tertiary);font-size:0.85rem;margin:0 0 var(--space-4);">届く時間を決めてね。その時間にアラームで届くよ。</p>
+          <p style="color:var(--color-text-tertiary);font-size:0.85rem;margin:0 0 var(--space-4);">届けたい時間をえらんでね。アラームで届くよ。</p>
           <div class="sheet__field-group">
             <div class="sheet__field">
               <span class="sheet__field-label">日付</span>
@@ -2809,29 +2846,29 @@ let clockInterval = null; // setInterval二重起動防止用
 
 // ===== 定数 =====
 const placeholders = [
-  'きょう一番うれしかったこと、なに？',
-  'あしたの自分に伝えたいこと、ある？',
-  'いま、どんな気持ち？',
-  'あしたの朝、起きたらなにがしたい？',
-  'だれかに言えなかったこと、ここに書いてみて。',
-  'きょうの自分に点数をつけるなら？',
-  'あしたの天気、しってる？',
-  'きょう一番がんばったこと、なに？',
+  'きょう、なにがあった？',
+  'あした何時に起きるんだっけ。',
+  'あしたの自分に言っておきたいこと、ある？',
+  'なんでもいいよ、ひとことでも。',
+  '3文字でもOKだよ。',
+  'ぐっすり眠れますように、とかでもいいよ。',
+  '冷蔵庫になにが残ってたか覚えてる？',
+  'きょうちょっと笑ったこと、あった？',
   'いまの自分にひとこと。',
 ];
 
 const dailyPrompts = [
-  'あしたの自分に、なにか伝えたいことは？',
-  'あしたの自分へ、ひとこと。',
-  'あしたの自分が読んだら、うれしいこと。',
+  'あしたの自分に、ひとこと。',
+  'きょうあったこと、なんでもひとつ。',
   'あしたの朝、思い出したいこと。',
-  'きょうあったこと、あしたの自分に共有しよう。',
+  'なにも思いつかなかったら「おはよう」でいいよ。',
+  'きょうの報告、ひとことだけ。',
 ];
 
 // 夜(18-3時)と朝(3-18時)で問いかけを分ける
 const nightPrompts = [
   'あしたの朝の自分に、ひとこと。',
-  'あしたの自分へ、きょうの報告。',
+  'きょうの報告、みじかめに。',
   'あしたの自分が元気になること、書いてみよう。',
   'あしたの朝、目覚めたときに読みたいこと。',
   'あしたの自分に、おやすみの手紙。',
@@ -2861,6 +2898,7 @@ function init() {
   loadSettings();
   updateHomeLetterArea();
   updateStreak();
+  updatePostkunMessage();
   updateTodayQuote();
   navigateTo('home');
 
@@ -2937,23 +2975,32 @@ function renderOnboardingStep(step) {
   const el = document.getElementById('onboarding-content');
 
   if (step === 1) {
-    el.innerHTML = '<div class="onboarding-text animate-fade-in">こんばんは。</div>';
-    setTimeout(() => renderOnboardingStep(2), 3000);
+    el.innerHTML = '<div class="onboarding-text animate-fade-in">……どうも。</div>';
+    setTimeout(() => renderOnboardingStep(2), 2500);
   } else if (step === 2) {
     el.innerHTML = `
-      <div class="onboarding-desc animate-fade-in">
-        これは、自分と文通するアプリです。<br><br>
-        夜、寝る前に手紙を書いてみてください。<br>
-        朝、アラームといっしょにとどきます。
-      </div>
-      <button class="btn btn-night-primary animate-soft-rise" style="animation-delay:300ms;" onclick="renderOnboardingStep(3)">つぎへ</button>
+      <div class="onboarding-text animate-fade-in" style="font-size:1.6rem;">monipo</div>
+      <div class="onboarding-desc animate-fade-in" style="animation-delay:300ms;">目覚ましアプリです。いちおう。</div>
+      <button class="btn btn-night-primary animate-soft-rise" style="animation-delay:600ms;" onclick="renderOnboardingStep(3)">つぎへ</button>
     `;
   } else if (step === 3) {
     el.innerHTML = `
-      <div class="onboarding-text animate-fade-in">
-        じゃあ、今夜の手紙を<br>書いてみよう。
+      <div class="onboarding-desc animate-fade-in">
+        夜、自分にみじかい手紙を書いてください。<br>
+        朝、アラームといっしょに届けます。
       </div>
-      <button class="btn btn-night-primary btn--lg animate-soft-rise" style="animation-delay:300ms;" onclick="finishOnboarding()">はじめる</button>
+      <button class="btn btn-night-primary animate-soft-rise" style="animation-delay:300ms;" onclick="renderOnboardingStep(4)">つぎへ</button>
+    `;
+  } else if (step === 4) {
+    el.innerHTML = `
+      <div class="onboarding-desc animate-fade-in">
+        ともだちにも手紙を届けられます。<br>
+        起こしちゃうかもね。
+      </div>
+      <div class="onboarding-desc animate-fade-in" style="animation-delay:1500ms;margin-top:var(--space-4);">
+        よろしくおねがいします。<br>……ねむい。
+      </div>
+      <button class="btn btn-night-primary btn--lg animate-soft-rise" style="animation-delay:600ms;" onclick="finishOnboarding()">はじめる</button>
     `;
   }
 }
@@ -2987,6 +3034,7 @@ function navigateTo(id) {
 
   // 画面固有の更新
   if (id === 'home') {
+    updatePostkunMessage();
     updateTodayQuote();
     updateHomeLetterArea();
     updateStreak();
@@ -3208,6 +3256,10 @@ function updateHomeBackground(hour) {
   const dateEl = document.getElementById('date-display');
   if (clockEl) clockEl.classList.toggle('home-header__clock--light', lightTime);
   if (dateEl) dateEl.classList.toggle('home-header__date--light', lightTime);
+  const brandEl = document.getElementById('brand-name');
+  if (brandEl) brandEl.classList.toggle('home-header__brand-name--light', lightTime);
+  const postmsgEl = document.getElementById('home-postmsg');
+  if (postmsgEl) postmsgEl.classList.toggle('home-header__postmsg--light', lightTime);
 
   // FABのライトモード
   const fab = document.getElementById('home-fab');
@@ -3279,6 +3331,61 @@ function updateHomeEmptyState() {
 }
 
 // ===== きょうのひとこと =====
+// ===== ポストくんメッセージ（時間帯挨拶 + 日替わり） =====
+const postkunMessages = [
+  'きょうのぼくの調子？ ……ねむい。いつもとおなじ。',
+  'ぼくのなかに手紙がたまると ちょっとくすぐったいんだ。',
+  'きのう夢を見たよ。手紙に足が生えて自分で届けにいく夢。……ぼくいらないじゃん。',
+  '夜に書いた手紙って なんであんなに正直なんだろうね。',
+  '書くことがないって言う人いるけど、「書くことがない」って書けばいいんだよ。',
+  'ポストがしゃべるのって やっぱり変だよね？ ……あんまり気にしないで。',
+  'スマホの画面が暗くなると ぼくも寝てるんだよ。しらなかったでしょ。',
+  '届けられなかった手紙なんてないよ。届けなかっただけで。',
+  'ぼくの趣味？ ……届けること。しかないかも。',
+  'ぼく、ほかのアプリの通知が来るたびにドキッとするんだ。',
+];
+
+function updatePostkunMessage() {
+  const el = document.getElementById('home-postmsg');
+  if (!el) return;
+
+  const now = new Date();
+  const hour = now.getHours();
+  let greeting = '';
+
+  // 時間帯別挨拶（手紙がある場合）
+  const alarms = loadAlarms();
+  const hasAlarm = alarms.length > 0;
+
+  if (hasAlarm) {
+    if (hour >= 5 && hour < 7) greeting = '……はやいね。届けもの、あるよ。';
+    else if (hour >= 7 && hour < 9) greeting = 'おはよ。ゆうべのきみから届きもの。';
+    else if (hour >= 9 && hour < 11) greeting = 'あ、起きた？手紙あるよ。';
+    else if (hour >= 11 && hour < 19) greeting = 'おそよう。手紙、ずっとここにいたよ。';
+    else greeting = '……まだ夜じゃん。でも手紙はあるよ。';
+  }
+
+  // 日替わりメッセージ（手紙なし or 追加表示）
+  const seed = now.getFullYear() * 10000 + (now.getMonth()+1) * 100 + now.getDate();
+  const msg = postkunMessages[seed % postkunMessages.length];
+
+  // 久しぶりの復帰チェック
+  const history = JSON.parse(localStorage.getItem('mezame_history') || '[]');
+  const streak = getStreak();
+  let returnMsg = '';
+  if (history.length > 0 && streak === 0) {
+    returnMsg = '……おかえり。ぼく、ずっとここにいたよ。';
+  }
+
+  if (returnMsg) {
+    el.textContent = returnMsg;
+  } else if (greeting) {
+    el.textContent = greeting;
+  } else {
+    el.textContent = msg;
+  }
+}
+
 function updateTodayQuote() {
   const el = document.getElementById('today-quote');
   if (!el) return;
@@ -3303,7 +3410,7 @@ function updateTodayQuote() {
   el.innerHTML = `
     <div class="quote-label">きょうのひとこと</div>
     <div class="quote-text">「${escapeHtml(text)}」</div>
-    <div class="quote-date">${dateStr} のわたし</div>
+    <div class="quote-date">${dateStr} のきみ</div>
   `;
 }
 
@@ -3361,7 +3468,7 @@ function setAlarm() {
     return;
   }
   if (!letter) {
-    showToast('ひとこと、なんでもいいよ。');
+    showToast('白紙は届けられないんだ。ひとことだけでも。');
     return;
   }
 
@@ -3623,7 +3730,7 @@ function setAlarmFromSheet() {
     return;
   }
   if (!letter) {
-    showToast('ひとこと、なんでもいいよ。');
+    showToast('白紙は届けられないんだ。ひとことだけでも。');
     return;
   }
 
@@ -3769,9 +3876,9 @@ function updateHomeLetterArea() {
           <div class="inbox-item__icon inbox-item__icon--self" onclick="openWriteSheet(${alarm.id})">${getUserIcon()}</div>
           <div class="inbox-item__body" onclick="openWriteSheet(${alarm.id})">
             <div class="inbox-item__title">${dateStr} ${h}:${m} にとどく</div>
-            <div class="inbox-item__sub">${preview || '手紙をあずかり中'}</div>
+            <div class="inbox-item__sub">${preview || 'あずかってるよ'}</div>
           </div>
-          <span class="inbox-item__status">あずかり中</span>
+          <span class="inbox-item__status">あずかってるよ</span>
           <button class="inbox-item__delete" onclick="deleteAlarm(${alarm.id})" aria-label="削除">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
           </button>
@@ -3788,7 +3895,7 @@ function updateHomeLetterArea() {
       emptyEl.classList.add('active');
       emptyEl.innerHTML = `
         <div class="inbox-empty__icon">${getUserIcon()}</div>
-        <div class="inbox-empty__text">今夜、自分に手紙を<br>書いてみませんか</div>
+        <div class="inbox-empty__text">今夜、なにか書いとく？<br>あしたの朝届けるよ。</div>
       `;
     } else {
       emptyEl.classList.remove('active');
@@ -3814,15 +3921,16 @@ function getStreak() {
 
 function getStreakMessage(streak) {
   if (streak === 0) return '';
-  if (streak === 1) return '最初の一通。ここから始まるよ。';
-  if (streak === 2) return 'きのうも、きょうも';
-  if (streak === 3) return '3日。つづいてるね';
-  if (streak === 7) return '1週間、静かにすごい';
-  if (streak === 14) return '2週間。もう日課だね';
-  if (streak === 30) return '1ヶ月。習慣になったね';
-  if (streak === 100) return '100日。ここまで来たんだ';
-  if (streak === 365) return '1年。ずっと、ここにいたね';
-  return `${streak}日つづいてるね`;
+  if (streak === 1) return '1通め。';
+  if (streak === 2) return 'お、きのうも今日も。';
+  if (streak === 3) return '3日つづいた。たいしたもんだ。';
+  if (streak === 7) return '1週間。もう習慣じゃん。';
+  if (streak === 14) return '2週間。ここでやめたらもったいないかもね。';
+  if (streak === 30) return '30日。ポストくん感動してる。たぶん。';
+  if (streak === 50) return '50日。もう手紙なしの朝には戻れないかもよ？';
+  if (streak === 100) return '100日！ もう離れられないよ。';
+  if (streak === 365) return '1年。きみは伝説になった。';
+  return `${streak}日つづいてる。`;
 }
 
 function updateStreak() {
@@ -3995,7 +4103,7 @@ function triggerAlarm() {
     const setDate = new Date(alarmData.setDate);
     const days = ['日', '月', '火', '水', '木', '金', '土'];
     document.getElementById('letter-sent-date').textContent =
-      `${setDate.getMonth()+1}月${setDate.getDate()}日（${days[setDate.getDay()]}）の夜に書きました`;
+      `${setDate.getMonth()+1}月${setDate.getDate()}日（${days[setDate.getDay()]}）の夜のきみより`;
     document.getElementById('letter-content').textContent = alarmData.letter;
 
     renderTimeCapsule();
@@ -4023,9 +4131,9 @@ function triggerAlarm() {
 
   if ('Notification' in window && Notification.permission === 'granted') {
     const body = alarmData.friendLetterId
-      ? `${alarmData.friendFromName}から手紙が届いてるよ。`
-      : 'ゆうべの自分から、手紙が届いてるよ。';
-    new Notification('めざめの手紙', { body });
+      ? `${alarmData.friendFromName}から手紙届いてるよ。`
+      : '届けにきたよ。ゆうべのきみから。';
+    new Notification('monipo', { body });
   }
 }
 
@@ -4316,7 +4424,7 @@ function dismissAlarmReadOnly() {
   saveAlarms(alarms);
 
   navigateTo('home');
-  showToast('おはよう。いい一日を。');
+  showToast('おはよ。');
   updateStreak();
   updateTodayQuote();
   updateHomeLetterArea();
@@ -4331,16 +4439,15 @@ function showItterasshai(letter, reply) {
 
   // ストリーク優先の分岐（積み重ねを可視化）
   if (streak >= 30) {
-    main = 'いってらっしゃい。きょうも。';
-    sub = `${streak}日、毎朝ちゃんと起きてるね。もう、すごいよ。`;
+    sub = `${streak}日、毎朝起きてる。えらい。`;
   } else if (streak >= 7) {
-    sub = '今週も、毎朝の文通がつづいてるね。';
+    sub = '今週も毎朝起きてる。えらい。';
   } else if (reply.length >= 30) {
-    sub = 'たくさん書いてくれたね。きっと、いい朝だ。';
+    sub = 'たくさん書いたね。';
   } else if (reply.length >= 10) {
-    sub = 'いい一日になりますように。';
+    sub = '';
   } else {
-    sub = 'ひとこと、それだけで充分だよ。';
+    sub = '';
   }
 
   document.getElementById('itterasshai-main').textContent = main;
@@ -4447,7 +4554,7 @@ function exportData() {
   }
 
   const days = ['日', '月', '火', '水', '木', '金', '土'];
-  let text = 'めざめの手紙 -- 文通\n';
+  let text = 'monipo -- 文通\n';
   text += '='.repeat(40) + '\n\n';
 
   history.forEach(item => {
@@ -4470,7 +4577,7 @@ function exportData() {
 }
 
 function deleteAllData() {
-  if (!confirm('ここにある全部の手紙を手放しますか？')) return;
+  if (!confirm('ぜんぶの手紙がなくなるけど、いい？')) return;
   if (!confirm('もとに戻せないけど、本当にいい？')) return;
 
   localStorage.removeItem('mezame_history');
@@ -4481,7 +4588,7 @@ function deleteAllData() {
   updateHomeLetterArea();
   updateStreak();
   updateTodayQuote();
-  showToast('おつかれさま。新しいはじまりだね。');
+  showToast('なくなったよ。');
 }
 
 // ===== ユーティリティ =====
@@ -5023,7 +5130,7 @@ async function sendFriendRequest(friendCode) {
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    showToast('手紙を送りたい気持ち、とどけたよ');
+    showToast('申請、届けてきた。');
     renderFriendsScreen();
   } catch (e) {
     console.error('sendFriendRequest error:', e);
@@ -5046,7 +5153,7 @@ async function acceptFriendRequest(requestId, fromUid) {
       status: 'accepted',
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    showToast('これから手紙を送りあえるね');
+    showToast('つながった。手紙、送れるよ。');
     await loadFriends();
     await loadPendingRequests();
     renderFriendsScreen();
@@ -5229,7 +5336,7 @@ function updateFriendDeliveryDate() {
   tomorrow.setDate(tomorrow.getDate() + 1);
   const days = ['日', '月', '火', '水', '木', '金', '土'];
   const dateStr = `${tomorrow.getMonth()+1}月${tomorrow.getDate()}日（${days[tomorrow.getDay()]}）`;
-  el.innerHTML = `<span class="hl">${dateStr}</span> に届きます（届く時間は相手が決めるよ）`;
+  el.innerHTML = `<span class="hl">${dateStr}</span> に届きます（届く時間はあいてが決めるよ）`;
 }
 
 // ===== フレンドに手紙を送信 =====
@@ -5238,7 +5345,7 @@ async function sendFriendLetter() {
   if (!selectedFriendUid) { showToast('送る相手を選んでね'); return; }
 
   const letter = document.getElementById('friend-letter-input').value.trim();
-  if (!letter) { showToast('ひとこと、なんでもいいよ。'); return; }
+  if (!letter) { showToast('白紙は届けられないんだ。ひとことだけでも。'); return; }
 
   // 届く日=あした（日付のみ、時間は受け手が決める）
   const deliverDate = new Date();
@@ -5280,7 +5387,7 @@ async function sendSheetFriendLetter() {
   if (!sheetRecipientUid) { showToast('送る相手を選んでね'); return; }
 
   const letter = document.getElementById('sheet-letter-input').value.trim();
-  if (!letter) { showToast('ひとこと、なんでもいいよ。'); return; }
+  if (!letter) { showToast('白紙は届けられないんだ。ひとことだけでも。'); return; }
 
   const monthVal = parseInt(document.getElementById('sheet-alarm-month').value);
   const dayVal = parseInt(document.getElementById('sheet-alarm-day').value);
@@ -5564,7 +5671,7 @@ async function updateHomeFriendLetters() {
             <div class="inbox-item__icon inbox-item__icon--friend">${initial}</div>
             <div class="inbox-item__body">
               <div class="inbox-item__title">${fromName}からの手紙</div>
-              <div class="inbox-item__sub">届く時間をセットしよう</div>
+              <div class="inbox-item__sub">手紙が届いてる。何時に開ける？</div>
             </div>
             <span class="inbox-item__status" style="color:var(--color-primary);">時間をセット</span>
           </div>
@@ -5576,7 +5683,7 @@ async function updateHomeFriendLetters() {
             <div class="inbox-item__icon inbox-item__icon--friend">${initial}</div>
             <div class="inbox-item__body">
               <div class="inbox-item__title">${fromName}からの手紙</div>
-              <div class="inbox-item__sub">セットした時間にとどくよ</div>
+              <div class="inbox-item__sub">セットした時間に届けるね</div>
             </div>
             <span class="inbox-item__status">セット済み</span>
           </div>
