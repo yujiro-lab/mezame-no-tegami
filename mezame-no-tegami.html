@@ -6,14 +6,14 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="monipo">
-<meta name="theme-color" content="#0F0F1E" media="(prefers-color-scheme: dark)">
-<meta name="theme-color" content="#F7F7FA" media="(prefers-color-scheme: light)">
-<meta name="description" content="夜、自分に手紙を書く。朝、アラームで届く。monipo — 手紙で起きる目覚ましアプリ。">
+<meta name="theme-color" content="#110A24" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#FFF5EB" media="(prefers-color-scheme: light)">
+<meta name="description" content="夜、自分に手紙を書く。朝、届く。monipo — 手紙で起きるポストのアプリ。">
 <title>monipo</title>
 <!-- 手紙フォント (非同期読み込み) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kurenaido&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@300;400;500;700&family=Klee+One:wght@400;600&family=Zen+Kurenaido&display=swap" media="print" onload="this.media='all'">
 <!-- Firebase SDK (compat版) -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -24,67 +24,72 @@
    ============================================================ */
 /* --- Design Tokens --- */
 :root {
-  /* 色彩: 余白のある静かな色相 — 原研哉 × 谷尻誠 */
-  --color-primary:          #5B6ABF;
-  --color-primary-light:    #7B88D3;
-  --color-primary-dark:     #424F9A;
-  --color-secondary:        #D4A574;
-  --color-secondary-light:  #E8C8A8;
-  --color-secondary-dark:   #B8886A;
-  --color-accent:           #C96B6B;
-  --color-accent-light:     #DDA0A0;
+  /* monipo Brand v4 — Core Palette: Night/Twilight/Dawn/Sunrise/Cream */
+  --color-night:            #110A24;
+  --color-twilight:         #2D1B69;
+  --color-dawn:             #6B3FA0;
+  --color-sunrise:          #E8A87C;
+  --color-cream:            #FFF5EB;
+
+  --color-primary:          #6B3FA0;
+  --color-primary-light:    #8B5FC0;
+  --color-primary-dark:     #4D2D80;
+  --color-secondary:        #E8A87C;
+  --color-secondary-light:  #F0C4A0;
+  --color-secondary-dark:   #C88A60;
+  --color-accent:           #E8A87C;
+  --color-accent-light:     #F0C4A0;
   --color-success:          #5CB888;
-  --color-warning:          #D4A574;
+  --color-warning:          #E8A87C;
   --color-error:            #C95B68;
 
-  --color-text-primary:     #1A1A2E;
-  --color-text-secondary:   #5C5C72;
-  --color-text-tertiary:    #8E8E9F;
-  --color-text-inverse:     #FFFFFF;
-  --color-text-link:        #5B6ABF;
+  --color-text-primary:     #110A24;
+  --color-text-secondary:   #3D2A5C;
+  --color-text-tertiary:    #7B6899;
+  --color-text-inverse:     #FFF5EB;
+  --color-text-link:        #6B3FA0;
 
-  --color-bg-primary:       #FAFAF9;
-  --color-bg-secondary:     #F5F4F2;
-  --color-bg-tertiary:      #EEEDEA;
-  --color-bg-elevated:      #FFFFFF;
+  --color-bg-primary:       #FFF5EB;
+  --color-bg-secondary:     #F7EDE0;
+  --color-bg-tertiary:      #EDE3D6;
+  --color-bg-elevated:      #FFFAF5;
 
-  --color-border-primary:   #E5E4E0;
-  --color-border-secondary: #F0EFED;
-  --color-border-focus:     #5B6ABF;
+  --color-border-primary:   #E0D4C4;
+  --color-border-secondary: #EDE3D6;
+  --color-border-focus:     #6B3FA0;
 
-  --color-paper:            #FAF6EE;
-  --color-paper-line:       #E5DDD0;
-  --color-paper-shadow:     rgba(139, 120, 90, 0.06);
+  --color-paper:            #FFF5EB;
+  --color-paper-line:       #E0D4C4;
+  --color-paper-shadow:     rgba(100, 60, 30, 0.06);
 
-  --night-bg-deep:          #0D0D1A;
-  --night-bg-mid:           #161630;
-  --night-bg-surface:       #1E1E3A;
-  --night-bg-elevated:      #28284A;
-  --night-text-primary:     #EAEAF5;
-  --night-text-secondary:   rgba(234, 234, 245, 0.72);
-  --night-text-tertiary:    rgba(234, 234, 245, 0.52);
-  --night-border:           rgba(255, 255, 255, 0.08);
-  --night-accent:           #E8B84D;
-  --night-accent-glow:      rgba(232, 184, 77, 0.15);
-  --night-gradient:         linear-gradient(175deg, #0D0D1A 0%, #161630 40%, #221838 70%, #2D1E40 100%);
+  --night-bg-deep:          #110A24;
+  --night-bg-mid:           #1A1040;
+  --night-bg-surface:       #221550;
+  --night-bg-elevated:      #2D1B69;
+  --night-text-primary:     #FFF5EB;
+  --night-text-secondary:   rgba(255, 245, 235, 0.72);
+  --night-text-tertiary:    rgba(255, 245, 235, 0.50);
+  --night-border:           rgba(255, 245, 235, 0.10);
+  --night-accent:           #E8A87C;
+  --night-accent-glow:      rgba(232, 168, 124, 0.15);
+  --night-gradient:         linear-gradient(175deg, #110A24 0%, #1A1040 40%, #221550 70%, #2D1B69 100%);
 
-  /* グラデーション背景上の3段階テキスト階層 (カーネマン) */
-  --gradient-text-primary:   rgba(255, 255, 255, 0.93);
-  --gradient-text-secondary: rgba(255, 255, 255, 0.72);
-  --gradient-text-tertiary:  rgba(255, 255, 255, 0.50);
+  --gradient-text-primary:   rgba(255, 245, 235, 0.93);
+  --gradient-text-secondary: rgba(255, 245, 235, 0.72);
+  --gradient-text-tertiary:  rgba(255, 245, 235, 0.50);
 
-  --morning-sky-top:        #B8C4D4;
-  --morning-sky-mid:        #D4CCBE;
-  --morning-horizon:        #E2D8CC;
-  --morning-glow:           #EDE6DC;
-  --morning-text-primary:   #2E2A26;
-  --morning-text-secondary: rgba(46, 42, 38, 0.60);
-  --morning-gradient:       linear-gradient(180deg, #B8C4D4 0%, #D4CCBE 45%, #E2D8CC 75%, #EDE6DC 100%);
+  --morning-sky-top:        #C4A8B8;
+  --morning-sky-mid:        #E0C8B8;
+  --morning-horizon:        #F0DED0;
+  --morning-glow:           #FFF5EB;
+  --morning-text-primary:   #110A24;
+  --morning-text-secondary: rgba(17, 10, 36, 0.60);
+  --morning-gradient:       linear-gradient(180deg, #C4A8B8 0%, #E0C8B8 45%, #F0DED0 75%, #FFF5EB 100%);
   --morning-success:        #5CB888;
 
-  /* UIはOSネイティブフォントで軽量化、手紙だけ書体 */
-  --font-sans:              -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
-  --font-letter:            'Zen Kurenaido', 'Hiragino Mincho ProN', 'Noto Serif JP', serif;
+  /* Typography — Brand v4: 丸ゴシック(本文) + 手書き風(手紙) */
+  --font-sans:              'Zen Maru Gothic', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
+  --font-letter:            'Klee One', 'Zen Kurenaido', 'Hiragino Mincho ProN', serif;
 
   /* Typography: Perfect Fourth (1.333) — 明確なメリハリ */
   --text-hero:              3.5rem;    /* 56px  感情的ヒーロー */
@@ -265,7 +270,7 @@ body {
   z-index: var(--z-header);
   height: calc(var(--header-height) + var(--safe-area-top));
   padding-top: var(--safe-area-top);
-  background-color: rgba(250, 250, 249, 0.85);
+  background-color: rgba(255, 245, 235, 0.85);
   -webkit-backdrop-filter: blur(0px);
   backdrop-filter: blur(0px);
   display: flex;
@@ -304,7 +309,7 @@ body {
 .header__action--right { right: 0; }
 
 .header--night {
-  background-color: rgba(15, 15, 30, 0.85);
+  background-color: rgba(17, 10, 36, 0.85);
   border-bottom: none;
 }
 .header--night .header__title { color: var(--night-text-primary); }
@@ -321,7 +326,7 @@ body {
   z-index: var(--z-header);
   height: calc(var(--tab-bar-height) + var(--safe-area-bottom));
   padding-bottom: var(--safe-area-bottom);
-  background-color: rgba(250, 250, 249, 0.85);
+  background-color: rgba(255, 245, 235, 0.85);
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
   border-top: none;
@@ -384,7 +389,7 @@ body {
 .btn-primary {
   background-color: var(--color-primary);
   color: var(--color-text-inverse);
-  box-shadow: 0 2px 8px rgba(91, 106, 191, 0.3);
+  box-shadow: 0 2px 8px rgba(107, 63, 160, 0.3);
 }
 .btn-primary:active:not(:disabled) {
   background-color: var(--color-primary-dark);
@@ -392,7 +397,7 @@ body {
 .btn-accent {
   background-color: var(--color-accent);
   color: var(--color-text-inverse);
-  box-shadow: 0 2px 8px rgba(224, 107, 120, 0.3);
+  box-shadow: 0 2px 8px rgba(232, 168, 124, 0.3);
 }
 .btn-secondary {
   background-color: var(--color-bg-tertiary);
@@ -412,7 +417,7 @@ body {
   border-radius: var(--radius-full);
 }
 .btn-night-primary:active {
-  background: #D4A040;
+  background: #C88A60;
   transform: scale(0.98);
   transition: all var(--duration-fast) var(--ease-out);
 }
@@ -422,9 +427,9 @@ body {
   border: 1px solid var(--night-border);
 }
 .btn-morning-primary {
-  background-color: var(--morning-success);
-  color: var(--color-text-inverse);
-  box-shadow: 0 2px 8px rgba(92, 184, 136, 0.3);
+  background-color: var(--color-dawn);
+  color: var(--color-cream);
+  box-shadow: 0 2px 8px rgba(107, 63, 160, 0.3);
 }
 .btn-morning-secondary {
   background-color: rgba(255, 255, 255, 0.75);
@@ -457,7 +462,7 @@ body {
   top: 0;
   left: var(--space-8); right: var(--space-8);
   height: 2px;
-  background: linear-gradient(90deg, transparent 0%, var(--color-secondary-light) 30%, var(--color-secondary) 50%, var(--color-secondary-light) 70%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, var(--color-sunrise) 30%, var(--color-dawn) 50%, var(--color-sunrise) 70%, transparent 100%);
   opacity: 0.7;
   border-radius: 0 0 2px 2px;
 }
@@ -728,7 +733,7 @@ body {
   height: 60%;
   top: -15%;
   left: -20%;
-  background: radial-gradient(ellipse, rgba(200, 210, 235, 0.8) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(200, 168, 184, 0.8) 0%, transparent 70%);
   animation: blobDrift1 18s ease-in-out infinite alternate;
 }
 .morning-blob--2 {
@@ -736,7 +741,7 @@ body {
   height: 70%;
   bottom: -10%;
   right: -15%;
-  background: radial-gradient(ellipse, rgba(230, 215, 190, 0.7) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(232, 168, 124, 0.7) 0%, transparent 70%);
   animation: blobDrift2 22s ease-in-out infinite alternate;
 }
 .morning-blob--3 {
@@ -744,7 +749,7 @@ body {
   height: 50%;
   top: 30%;
   left: 10%;
-  background: radial-gradient(ellipse, rgba(215, 200, 225, 0.6) 0%, transparent 65%);
+  background: radial-gradient(ellipse, rgba(200, 180, 222, 0.6) 0%, transparent 65%);
   animation: blobDrift3 15s ease-in-out infinite alternate;
 }
 .morning-blob--4 {
@@ -752,7 +757,7 @@ body {
   height: 45%;
   top: 10%;
   right: -5%;
-  background: radial-gradient(ellipse, rgba(240, 230, 210, 0.5) 0%, transparent 60%);
+  background: radial-gradient(ellipse, rgba(255, 245, 235, 0.5) 0%, transparent 60%);
   animation: blobDrift4 20s ease-in-out infinite alternate;
 }
 @keyframes blobDrift1 {
@@ -810,15 +815,15 @@ body {
 /* --- Screen Themes --- */
 .screen--night { background: var(--night-gradient); color: var(--night-text-primary); }
 .screen--morning {
-  background: #A0A8B8;
+  background: #C4A8B8;
   color: var(--morning-text-primary);
   overflow-x: hidden;
   animation: dawnBase 20s var(--ease-emotional) forwards;
 }
 @keyframes dawnBase {
-  0%   { background: #A0A8B8; }
-  50%  { background: #C4BEB4; }
-  100% { background: #DDD8D0; }
+  0%   { background: #C4A8B8; }
+  50%  { background: #E0C8B8; }
+  100% { background: #FFF5EB; }
 }
 .screen--day { background-color: var(--color-bg-secondary); color: var(--color-text-primary); }
 
@@ -828,11 +833,11 @@ body {
   transition: background 2s var(--ease-in-out);
   z-index: 0;
 }
-.home-bg--night { background: linear-gradient(175deg, #0D0D1A 0%, #161630 30%, #221838 60%, #2D1E40 85%, #352248 100%); }
-.home-bg--dawn  { background: linear-gradient(175deg, #161630 0%, #352050 20%, #7A5A70 45%, #C08A68 70%, #E8BF90 100%); }
-.home-bg--morning { background: linear-gradient(175deg, #8BA4C8 0%, #B0C0D8 30%, #E0D0C0 60%, #F0E8E0 100%); }
-.home-bg--daytime { background: linear-gradient(175deg, #78A8D8 0%, #98BDE0 30%, #C0D8E8 60%, #E0ECF2 100%); }
-.home-bg--evening { background: linear-gradient(175deg, #2D1E40 0%, #784858 25%, #C08060 50%, #E8BF90 75%, #F0D8C0 100%); }
+.home-bg--night { background: linear-gradient(175deg, #110A24 0%, #1A1040 30%, #221550 60%, #2D1B69 85%, #2D1B69 100%); }
+.home-bg--dawn  { background: linear-gradient(175deg, #1A1040 0%, #2D1B69 20%, #6B3FA0 45%, #C88A68 70%, #E8A87C 100%); }
+.home-bg--morning { background: linear-gradient(175deg, #8B7AA0 0%, #C4A8B8 30%, #E0C8B8 60%, #FFF5EB 100%); }
+.home-bg--daytime { background: linear-gradient(175deg, #6B5A90 0%, #9888B0 30%, #C8B8D0 60%, #EDE3D6 100%); }
+.home-bg--evening { background: linear-gradient(175deg, #2D1B69 0%, #6B3FA0 25%, #C88A68 50%, #E8A87C 75%, #F0DED0 100%); }
 
 /* --- Stars --- */
 .stars {
@@ -1013,13 +1018,13 @@ body {
   background: rgba(255, 255, 255, 0.08);
 }
 .inbox-item__icon--friend {
-  background: rgba(91, 106, 191, 0.15);
+  background: rgba(107, 63, 160, 0.15);
 }
 .inbox-item__icon--self.inbox-item__icon--light {
   background: rgba(0, 0, 0, 0.06);
 }
 .inbox-item__icon--friend.inbox-item__icon--light {
-  background: rgba(91, 106, 191, 0.1);
+  background: rgba(107, 63, 160, 0.1);
 }
 
 /* テキストエリア（中央） */
@@ -1064,11 +1069,11 @@ body {
   font-weight: var(--weight-medium);
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-full);
-  background: rgba(245, 196, 105, 0.15);
-  color: #D4A040;
+  background: rgba(232, 168, 124, 0.15);
+  color: var(--color-sunrise);
 }
 .inbox-item__status--light {
-  background: rgba(91, 106, 191, 0.1);
+  background: rgba(107, 63, 160, 0.1);
   color: var(--color-primary);
 }
 
@@ -1151,19 +1156,19 @@ body {
   font-weight: var(--weight-medium);
   letter-spacing: var(--tracking-normal);
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(245, 196, 105, 0.3);
+  box-shadow: 0 4px 16px rgba(232, 168, 124, 0.3);
   transition:
     transform var(--duration-fast) var(--ease-spring),
     box-shadow var(--duration-normal) var(--ease-out);
 }
 .home-fab:active {
   transform: scale(0.95);
-  box-shadow: 0 2px 8px rgba(245, 196, 105, 0.2);
+  box-shadow: 0 2px 8px rgba(232, 168, 124, 0.2);
 }
 .home-fab--light {
   background: var(--color-primary);
-  color: #fff;
-  box-shadow: 0 4px 16px rgba(91, 106, 191, 0.3);
+  color: var(--color-cream);
+  box-shadow: 0 4px 16px rgba(107, 63, 160, 0.3);
 }
 .home-fab svg {
   width: 20px;
@@ -1669,7 +1674,7 @@ body {
   body {
     display: flex;
     justify-content: center;
-    background-color: #F0F0F5;
+    background-color: #110A24;
   }
   .app-shell {
     box-shadow: var(--shadow-xl);
@@ -2626,9 +2631,9 @@ body {
   <div class="screen screen--night" id="goodnight-screen" role="main" aria-label="おやすみなさい">
     <div class="stars" id="goodnight-stars"></div>
     <div class="goodnight-content animate-fade-in" style="position:relative;z-index:2;">
-      <div class="goodnight-text animate-soft-rise" id="goodnight-main">あずかった。</div>
+      <div class="goodnight-text animate-soft-rise" id="goodnight-main">…預かった。おやすみ</div>
       <div class="goodnight-sub animate-soft-rise" style="animation-delay:500ms;" id="goodnight-sub">ちゃんと届けるから。</div>
-      <div class="goodnight-sub animate-soft-rise" style="animation-delay:2500ms;margin-top:var(--space-6);opacity:0;" id="goodnight-extra">おやすみ。</div>
+      <div class="goodnight-sub animate-soft-rise" style="animation-delay:2500ms;margin-top:var(--space-6);opacity:0;" id="goodnight-extra">…おやすみ。</div>
     </div>
   </div>
 
@@ -2644,7 +2649,7 @@ body {
     <div class="alarm-screen-content" id="alarm-phase-letter">
       <div class="alarm-arrival animate-soft-rise">
         <div class="alarm-arrival__icon">📮</div>
-        <div class="alarm-arrival__text">手紙が届きました</div>
+        <div class="alarm-arrival__text">…手紙、きてたよ</div>
       </div>
       <div class="alarm-time-display animate-soft-rise" id="alarm-current-time" style="animation-delay:100ms;"></div>
       <div class="card-letter animate-soft-rise" id="alarm-letter-card" style="animation-delay:200ms;">
@@ -2686,8 +2691,8 @@ body {
     <!-- Phase 3: 完了 -->
     <div class="alarm-complete-phase" id="alarm-phase-complete" style="display:none;cursor:pointer;" onclick="if(currentScreen==='alarm-screen'){navigateTo('home');updateHomeLetterArea();}">
       <div class="alarm-complete-icon">💌</div>
-      <div class="alarm-complete-main">お返事ありがとう。</div>
-      <div class="alarm-complete-sub">きょうが、はじまったよ。</div>
+      <div class="alarm-complete-main">…ん。返事、読んだよ</div>
+      <div class="alarm-complete-sub">…きょうが、はじまったよ</div>
     </div>
   </div>
 
@@ -2891,7 +2896,7 @@ body {
     </div>
     <div class="sheet__goodnight" id="sheet-goodnight">
       <div class="sheet__goodnight-icon">📮</div>
-      <div class="sheet__goodnight-main">あずかった。</div>
+      <div class="sheet__goodnight-main">…預かった。おやすみ</div>
       <div class="sheet__goodnight-sub" id="sheet-goodnight-sub">あしたの朝届けるね。</div>
     </div>
   </div>
@@ -3107,7 +3112,7 @@ function renderOnboardingStep(step) {
   } else if (step === 2) {
     el.innerHTML = `
       <div class="onboarding-text animate-fade-in" style="font-size:1.6rem;">monipo</div>
-      <div class="onboarding-desc animate-fade-in" style="animation-delay:300ms;">目覚ましアプリです。いちおう。</div>
+      <div class="onboarding-desc animate-fade-in" style="animation-delay:300ms;">…ポストのアプリです。いちおう。</div>
       <button class="btn btn-night-primary animate-soft-rise" style="animation-delay:600ms;" onclick="renderOnboardingStep(3)">つぎへ</button>
     `;
   } else if (step === 3) {
@@ -3534,11 +3539,11 @@ function setAlarm() {
   const letter = document.getElementById('letter-input').value.trim();
 
   if (isNaN(hour) || isNaN(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
-    showToast('時刻を正しく入れてね');
+    showToast('…時刻、正しく入れてね');
     return;
   }
   if (!letter) {
-    showToast('白紙は届けられないんだ。ひとことだけでも。');
+    showToast('…白紙は届けられないんだ。ひとことだけでも');
     return;
   }
 
@@ -3629,13 +3634,13 @@ function getFutureAlarms() {
 }
 
 function deleteAlarm(alarmId) {
-  if (!confirm('この手紙を削除しますか？')) return;
+  if (!confirm('…この手紙、消す？')) return;
   let alarms = loadAlarms();
   alarms = alarms.filter(a => a.id !== alarmId);
   saveAlarms(alarms);
   updateHomeLetterArea();
   updateHomeEmptyState();
-  showToast('手紙を削除しました');
+  showToast('…消したよ');
 }
 
 function openWriteSheet(alarmId) {
@@ -3768,7 +3773,7 @@ function closeWriteSheet() {
   const textarea = document.getElementById('sheet-letter-input');
 
   if (textarea.value.trim() && !sheet.classList.contains('goodnight-expand')) {
-    if (!confirm('書きかけの手紙があるよ。閉じていい？')) return;
+    if (!confirm('…書きかけの手紙があるよ。閉じていい？')) return;
   }
 
   sheet.classList.remove('open', 'expanded', 'goodnight-expand');
@@ -3802,15 +3807,15 @@ function setAlarmFromSheet() {
   const letter = textarea.value.trim();
 
   if (isNaN(monthVal) || isNaN(dayVal) || monthVal < 1 || monthVal > 12 || dayVal < 1 || dayVal > 31) {
-    showToast('日付を正しく入れてね');
+    showToast('…日付、正しく入れてね');
     return;
   }
   if (isNaN(hour) || isNaN(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
-    showToast('時刻を正しく入れてね');
+    showToast('…時刻、正しく入れてね');
     return;
   }
   if (!letter) {
-    showToast('白紙は届けられないんだ。ひとことだけでも。');
+    showToast('…白紙は届けられないんだ。ひとことだけでも');
     return;
   }
 
@@ -4054,7 +4059,7 @@ function checkStreakRecovery() {
     const lastShown = localStorage.getItem('mezame_recovery_shown');
     const today = new Date().toDateString();
     if (lastShown !== today) {
-      showToast('おかえり。またはじめよう。');
+      showToast('…おかえり。またはじめよう');
       localStorage.setItem('mezame_recovery_shown', today);
     }
   }
@@ -4402,7 +4407,7 @@ if ('speechSynthesis' in window) {
 function snooze() {
   stopAlarmSound();
   navigateTo('home');
-  showToast('5分後にまたとどけるよ');
+  showToast('…5分後にまたとどけるよ');
   const until = Date.now() + 5 * 60 * 1000;
   localStorage.setItem('mezame_snooze', String(until));
   setTimeout(() => {
@@ -4523,7 +4528,7 @@ function dismissAlarmReadOnly() {
   saveAlarms(alarms);
 
   navigateTo('home');
-  showToast('おはよ。');
+  showToast('…おはよ');
   updateStreak();
   updateTodayQuote();
   updateHomeLetterArea();
@@ -4792,7 +4797,7 @@ function toggleTTS() {
 function exportData() {
   const history = JSON.parse(localStorage.getItem('mezame_history') || '[]');
   if (history.length === 0) {
-    showToast('まだ手紙がないよ');
+    showToast('…まだ手紙がないよ');
     return;
   }
 
@@ -4816,12 +4821,12 @@ function exportData() {
   a.download = `mezame-no-tegami-${new Date().toISOString().slice(0,10)}.txt`;
   a.click();
   URL.revokeObjectURL(url);
-  showToast('手紙をまとめたよ');
+  showToast('…手紙、まとめたよ');
 }
 
 function deleteAllData() {
-  if (!confirm('ぜんぶの手紙がなくなるけど、いい？')) return;
-  if (!confirm('もとに戻せないけど、本当にいい？')) return;
+  if (!confirm('…ぜんぶの手紙がなくなるけど、いい？')) return;
+  if (!confirm('…もとに戻せないけど、ほんとにいい？')) return;
 
   localStorage.removeItem('mezame_history');
   localStorage.removeItem('mezame_alarm');
@@ -4831,7 +4836,7 @@ function deleteAllData() {
   updateHomeLetterArea();
   updateStreak();
   updateTodayQuote();
-  showToast('なくなったよ。');
+  showToast('…なくなったよ');
 }
 
 // ===== ユーティリティ =====
@@ -4902,7 +4907,7 @@ window.logout = async function() {
     incomingLetters = [];
     updateAuthUI();
     updateFriendBadge();
-    showToast('ログアウトしたよ');
+    showToast('…ログアウトしたよ');
     console.log('ログアウト完了');
   } catch (e) {
     console.error('Logout error:', e);
@@ -5093,7 +5098,7 @@ async function handleAuth() {
       await loadPendingRequests();
       updateAuthUI();
       updateFriendBadge();
-      showToast('おかえり！');
+      showToast('…おかえり');
     } else {
       const name = document.getElementById('auth-name').value.trim();
       console.log('[Auth] handleAuth: registering...', name);
@@ -5116,7 +5121,7 @@ async function handleAuth() {
       userProfile = { displayName: name, friendCode: friendCode };
       updateAuthUI();
       updateFriendBadge();
-      showToast('ようこそ！');
+      showToast('…よろしくね');
     }
     navigateTo('settings-screen');
   } catch (e) {
@@ -5130,18 +5135,18 @@ async function handleAuth() {
 
 // ===== ログアウト =====
 async function handleLogout() {
-  if (!confirm('ログアウトしますか？')) return;
+  if (!confirm('…ログアウトする？')) return;
   try {
     console.log('[Auth] handleLogout: signing out...');
     await auth.signOut();
     console.log('[Auth] handleLogout: signed out');
-    showToast('ログアウトしたよ');
+    showToast('…ログアウトしたよ');
     writeTarget = 'self';
     selectedFriendUid = null;
     selectedFriendName = null;
   } catch (e) {
     console.error('handleLogout error:', e);
-    showToast('ログアウトに失敗したよ。もう一度試してね');
+    showToast('…うまくいかなかったよ。もう一度試してね');
   }
 }
 
@@ -5273,7 +5278,7 @@ function updateSettingsAccount() {
 function copyFriendCode() {
   if (!userProfile) return;
   navigator.clipboard.writeText(userProfile.friendCode).then(() => {
-    showToast('コピーしたよ');
+    showToast('…コピーしたよ');
   }).catch(() => {
     showToast(userProfile.friendCode);
   });
@@ -5326,23 +5331,23 @@ async function loadPendingRequests() {
 
 // ===== フレンド申請送信 =====
 async function sendFriendRequest(friendCode) {
-  if (!currentUser || !userProfile) { showToast('ログインしてね'); return; }
+  if (!currentUser || !userProfile) { showToast('…ログインしてね'); return; }
   friendCode = friendCode.trim().toUpperCase();
-  if (!friendCode || friendCode.length < 4) { showToast('コードを入力してね'); return; }
+  if (!friendCode || friendCode.length < 4) { showToast('…コード、入力してね'); return; }
 
   try {
     // コードからユーザーを検索
     const q = db.collection('users').where('friendCode', '==', friendCode);
     const snap = await q.get();
-    if (snap.empty) { showToast('そのコードの人は見つからなかったよ'); return; }
+    if (snap.empty) { showToast('…そのコード、見つからなかったよ'); return; }
     const targetDoc = snap.docs[0];
     const targetUid = targetDoc.id;
 
-    if (targetUid === currentUser.uid) { showToast('自分には送れないよ'); return; }
+    if (targetUid === currentUser.uid) { showToast('…自分には送れないよ'); return; }
 
     // 既にフレンドか確認
     const isFriend = friendsList.some(f => f.uid === targetUid);
-    if (isFriend) { showToast('もうともだちだよ'); return; }
+    if (isFriend) { showToast('…もうともだちだよ'); return; }
 
     // 既に申請済みか確認
     const existQ = db.collection('friendRequests')
@@ -5350,7 +5355,7 @@ async function sendFriendRequest(friendCode) {
       .where('toUid', '==', targetUid)
       .where('status', '==', 'pending');
     const existSnap = await existQ.get();
-    if (!existSnap.empty) { showToast('もう申請してるよ'); return; }
+    if (!existSnap.empty) { showToast('…もう申請してるよ'); return; }
 
     // 相手からの申請があればそのまま承認
     const reverseQ = db.collection('friendRequests')
@@ -5373,11 +5378,11 @@ async function sendFriendRequest(friendCode) {
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    showToast('申請、届けてきた。');
+    showToast('…申請、届けてきた');
     renderFriendsScreen();
   } catch (e) {
     console.error('sendFriendRequest error:', e);
-    showToast('エラーが起きたよ。もう一度試してね');
+    showToast('…エラーが起きたよ。もう一度試してね');
   }
 }
 
@@ -5396,13 +5401,13 @@ async function acceptFriendRequest(requestId, fromUid) {
       status: 'accepted',
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    showToast('つながった。手紙、送れるよ。');
+    showToast('…つながった。手紙、送れるよ');
     await loadFriends();
     await loadPendingRequests();
     renderFriendsScreen();
   } catch (e) {
     console.error('acceptFriendRequest error:', e);
-    showToast('エラーが起きたよ');
+    showToast('…エラーが起きたよ');
   }
 }
 
@@ -5413,11 +5418,11 @@ async function rejectFriendRequest(requestId) {
       status: 'rejected',
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    showToast('申請をお断りしたよ');
+    showToast('…お断りしたよ');
     await loadPendingRequests();
     renderFriendsScreen();
   } catch (e) {
-    showToast('エラーが起きたよ');
+    showToast('…エラーが起きたよ');
   }
 }
 
@@ -5584,11 +5589,11 @@ function updateFriendDeliveryDate() {
 
 // ===== フレンドに手紙を送信 =====
 async function sendFriendLetter() {
-  if (!currentUser || !userProfile) { showToast('ログインしてね'); return; }
-  if (!selectedFriendUid) { showToast('送る相手を選んでね'); return; }
+  if (!currentUser || !userProfile) { showToast('…ログインしてね'); return; }
+  if (!selectedFriendUid) { showToast('…送る相手、選んでね'); return; }
 
   const letter = document.getElementById('friend-letter-input').value.trim();
-  if (!letter) { showToast('白紙は届けられないんだ。ひとことだけでも。'); return; }
+  if (!letter) { showToast('…白紙は届けられないんだ。ひとことだけでも'); return; }
 
   // 届く日=あした（日付のみ、時間は受け手が決める）
   const deliverDate = new Date();
@@ -5611,7 +5616,7 @@ async function sendFriendLetter() {
     });
 
     document.getElementById('friend-letter-input').value = '';
-    showToast(`${selectedFriendName}に手紙をあずけたよ`);
+    showToast(`${selectedFriendName}に…手紙、あずけたよ`);
 
     // おやすみなさい画面へ
     navigateTo('goodnight-screen');
@@ -5620,23 +5625,23 @@ async function sendFriendLetter() {
     }, 5000);
   } catch (e) {
     console.error('sendFriendLetter error:', e);
-    showToast('手紙を送れなかったよ。もう一度試してね');
+    showToast('…送れなかったよ。もう一度試してね');
   }
 }
 
 // ===== シートからフレンドに手紙を送信 =====
 async function sendSheetFriendLetter() {
-  if (!currentUser || !userProfile) { showToast('ログインしてね'); return; }
-  if (!sheetRecipientUid) { showToast('送る相手を選んでね'); return; }
+  if (!currentUser || !userProfile) { showToast('…ログインしてね'); return; }
+  if (!sheetRecipientUid) { showToast('…送る相手、選んでね'); return; }
 
   const letter = document.getElementById('sheet-letter-input').value.trim();
-  if (!letter) { showToast('白紙は届けられないんだ。ひとことだけでも。'); return; }
+  if (!letter) { showToast('…白紙は届けられないんだ。ひとことだけでも'); return; }
 
   const monthVal = parseInt(document.getElementById('sheet-alarm-month').value);
   const dayVal = parseInt(document.getElementById('sheet-alarm-day').value);
 
   if (isNaN(monthVal) || isNaN(dayVal) || monthVal < 1 || monthVal > 12 || dayVal < 1 || dayVal > 31) {
-    showToast('日付を正しく入れてね'); return;
+    showToast('…日付、正しく入れてね'); return;
   }
 
   const now = new Date();
@@ -5661,11 +5666,11 @@ async function sendSheetFriendLetter() {
       createdAt: firebase.firestore.Timestamp.now()
     });
 
-    showToast(`${sheetRecipientName}に手紙をあずけたよ`);
+    showToast(`${sheetRecipientName}に…手紙、あずけたよ`);
     startSheetGoodnight();
   } catch (e) {
     console.error('sendSheetFriendLetter error:', e);
-    showToast('送信に失敗しました。もう一度お試しください');
+    showToast('…送れなかったよ。もう一度試してね');
   }
 }
 
@@ -5705,7 +5710,7 @@ async function confirmFriendAlarmSetup() {
   if (isNaN(monthVal) || isNaN(dayVal) || isNaN(hour) || isNaN(minute) ||
       monthVal < 1 || monthVal > 12 || dayVal < 1 || dayVal > 31 ||
       hour < 0 || hour > 23 || minute < 0 || minute > 59) {
-    showToast('日時を正しく入れてね');
+    showToast('…日時、正しく入れてね');
     return;
   }
 
@@ -5721,7 +5726,7 @@ async function confirmFriendAlarmSetup() {
     if (todayCheck.getTime() === nowDate.getTime() && (hour > now.getHours() || (hour === now.getHours() && minute > now.getMinutes()))) {
       // OK: 今日のまだ来てない時間
     } else if (targetDate <= now) {
-      showToast('未来の時刻を設定してね');
+      showToast('…未来の時刻にしてね');
       return;
     }
   }
@@ -5761,7 +5766,7 @@ async function confirmFriendAlarmSetup() {
     console.warn('Failed to update alarmSet:', e);
   }
 
-  showToast(`${pendingFriendAlarmLetter.fromName}の手紙、セットしたよ`);
+  showToast(`${pendingFriendAlarmLetter.fromName}の手紙…セットしたよ`);
   closeFriendAlarmSetup();
 
   // ホーム画面を更新
