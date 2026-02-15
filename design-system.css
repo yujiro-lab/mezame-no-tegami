@@ -16,78 +16,97 @@
 
 :root {
   /* --------------------------------------------------------
-     1-A. COLOR PALETTE
+     1-A. COLOR PALETTE — Brand v5 (2026 Quiet Luxury)
      -------------------------------------------------------- */
 
-  /* --- Semantic Colors (通常モード: ホーム、記録画面) --- */
-  --color-primary:          #5B6ABF;   /* 落ち着いた藤紫。夜と朝の中間色 */
-  --color-primary-light:    #7B88D3;
-  --color-primary-dark:     #424F9A;
-  --color-secondary:        #E8A87C;   /* 暖かみのあるペールオレンジ */
-  --color-secondary-light:  #F0C4A8;
-  --color-secondary-dark:   #D4906A;
-  --color-accent:           #E06B78;   /* ローズ。CTAやバッジ用 */
-  --color-accent-light:     #EDA0A8;
+  /* --- Core Palette: Night/Twilight/Dawn/Sunrise/Cream --- */
+  --color-night:            #0E0B1A;
+  --color-twilight:         #2A2245;
+  --color-dawn:             #6B5A8A;
+  --color-sunrise:          #E4B08A;
+  --color-cream:            #FAF6F1;
+
+  /* --- Semantic Colors --- */
+  --color-primary:          #6B5A8A;
+  --color-primary-light:    #877AA0;
+  --color-primary-dark:     #524570;
+  --color-secondary:        #E4B08A;
+  --color-secondary-light:  #EECAA8;
+  --color-secondary-dark:   #C8966E;
+  --color-accent:           #E4B08A;
+  --color-accent-light:     #EECAA8;
   --color-success:          #5CB888;
-  --color-warning:          #E8A87C;
-  --color-error:            #D95B68;
+  --color-warning:          #E4B08A;
+  --color-error:            #C96068;
 
   /* --- Text --- */
-  --color-text-primary:     #1A1A2E;   /* ほぼ黒。高コントラスト */
-  --color-text-secondary:   #6B7280;   /* グレー。補助テキスト */
-  --color-text-tertiary:    #9CA3AF;   /* 薄グレー。ヒント、キャプション */
-  --color-text-inverse:     #FFFFFF;
-  --color-text-link:        #5B6ABF;
+  --color-text-primary:     #1A1520;
+  --color-text-secondary:   #5C546A;
+  --color-text-tertiary:    #9890A2;
+  --color-text-inverse:     #FAF6F1;
+  --color-text-link:        #6B5A85;
 
   /* --- Background --- */
-  --color-bg-primary:       #FFFFFF;
-  --color-bg-secondary:     #F7F7FA;   /* みてね風の薄いグレー背景 */
-  --color-bg-tertiary:      #EEEFF4;
-  --color-bg-elevated:      #FFFFFF;   /* カードやモーダル */
+  --color-bg-primary:       #FAF6F1;
+  --color-bg-secondary:     #F4F0EB;
+  --color-bg-tertiary:      #ECE8E3;
+  --color-bg-elevated:      #FEFCF9;
 
   /* --- Border --- */
-  --color-border-primary:   #E5E7EB;
-  --color-border-secondary: #F0F0F5;
-  --color-border-focus:     #5B6ABF;
+  --color-border-primary:   #E2DDD6;
+  --color-border-secondary: #EDEAE5;
+  --color-border-focus:     #6B5A85;
 
   /* --- Paper (手紙の紙の色) --- */
-  --color-paper:            #FDF8F0;
-  --color-paper-line:       #E8DFD0;
-  --color-paper-shadow:     rgba(139, 120, 90, 0.08);
+  --color-paper:            #FBF7F2;
+  --color-paper-line:       #DDD7CF;
+  --color-paper-shadow:     rgba(90, 70, 50, 0.05);
 
-  /* --- Night Mode (夜モード: 手紙を書く画面) --- */
-  --night-bg-deep:          #0F0F1E;
-  --night-bg-mid:           #1A1A35;
-  --night-bg-surface:       #252545;
-  --night-bg-elevated:      #2F2F55;
-  --night-text-primary:     #EAEAF5;
-  --night-text-secondary:   rgba(234, 234, 245, 0.65);
-  --night-text-tertiary:    rgba(234, 234, 245, 0.4);
-  --night-border:           rgba(255, 255, 255, 0.1);
-  --night-accent:           #F5C469;   /* 暖かい金色。夜の中の希望 */
-  --night-accent-glow:      rgba(245, 196, 105, 0.2);
-  --night-gradient:         linear-gradient(170deg, #0F0F1E 0%, #1A1A35 35%, #2A1D42 65%, #3D2548 100%);
+  /* --- Night Mode --- */
+  --night-bg-deep:          #0E0B1A;
+  --night-bg-mid:           #1A1530;
+  --night-bg-surface:       #23203A;
+  --night-bg-elevated:      #2A2245;
+  --night-text-primary:     #FAF6F1;
+  --night-text-secondary:   rgba(250, 246, 241, 0.72);
+  --night-text-tertiary:    rgba(250, 246, 241, 0.45);
+  --night-border:           rgba(250, 246, 241, 0.08);
+  --night-accent:           #E4B08A;
+  --night-accent-glow:      rgba(228, 176, 138, 0.12);
+  --night-gradient:         linear-gradient(175deg, #0E0B1A 0%, #1A1530 40%, #23203A 70%, #2A2245 100%);
 
-  /* --- Morning Mode (朝モード: アラーム画面) --- */
-  --morning-sky-top:        #89A4CF;
-  --morning-sky-mid:        #C8A882;
-  --morning-horizon:        #E8C5A0;
-  --morning-glow:           #F5DFC5;
-  --morning-text-primary:   #2C2416;
-  --morning-text-secondary: rgba(44, 36, 22, 0.6);
-  --morning-gradient:       linear-gradient(170deg, #89A4CF 0%, #C8A882 40%, #E8C5A0 70%, #F5DFC5 100%);
+  /* --- Morning Mode --- */
+  --morning-sky-top:        #B8AEBE;
+  --morning-sky-mid:        #DDD0C4;
+  --morning-horizon:        #EDE4D8;
+  --morning-glow:           #FAF6F1;
+  --morning-text-primary:   #1A1520;
+  --morning-text-secondary: rgba(26, 21, 32, 0.55);
+  --morning-gradient:       linear-gradient(180deg, #B8AEBE 0%, #DDD0C4 45%, #EDE4D8 75%, #FAF6F1 100%);
   --morning-success:        #5CB888;
+
+  /* --- Glass Surfaces (Crystal Interface 2026) --- */
+  --glass-dark-bg:                 rgba(14, 11, 26, 0.65);
+  --glass-dark-border:             rgba(250, 246, 241, 0.06);
+  --glass-dark-blur:               16px;
+  --glass-light-bg:                rgba(250, 246, 241, 0.72);
+  --glass-light-border:            rgba(26, 21, 32, 0.04);
+  --glass-light-blur:              20px;
+  --glass-elevated-bg:             rgba(250, 246, 241, 0.85);
+  --glass-elevated-border:         rgba(26, 21, 32, 0.06);
+  --glass-elevated-blur:           24px;
+  --glass-night-elevated-bg:       rgba(42, 34, 69, 0.70);
+  --glass-night-elevated-border:   rgba(250, 246, 241, 0.08);
+  --glass-night-elevated-blur:     16px;
 
 
   /* --------------------------------------------------------
      1-B. TYPOGRAPHY SCALE
      -------------------------------------------------------- */
 
-  /* Font Family */
-  --font-sans:              'Zen Maru Gothic', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN',
-                            'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-letter:            'Zen Kurenaido', 'Zen Maru Gothic', 'Hiragino Mincho ProN',
-                            'Noto Serif JP', serif;
+  /* Font Family — Brand v5 */
+  --font-sans:              'Zen Maru Gothic', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
+  --font-letter:            'Klee One', 'Zen Kurenaido', 'Hiragino Mincho ProN', serif;
 
   /* Font Sizes (Major Third scale: 1.25 ratio) */
   --text-display:           2.441rem;  /* 39px  - 時計表示 */
@@ -114,7 +133,7 @@
   --tracking-tight:         -0.01em;
   --tracking-normal:        0.02em;
   --tracking-wide:          0.08em;
-  --tracking-wider:         0.12em;
+  --tracking-wider:         0.10em;
 
 
   /* --------------------------------------------------------
@@ -139,10 +158,10 @@
      1-D. BORDER RADIUS
      -------------------------------------------------------- */
 
-  --radius-sm:    8px;    /* ボタン(小)、バッジ */
-  --radius-md:    12px;   /* 入力フィールド */
-  --radius-lg:    16px;   /* カード */
-  --radius-xl:    20px;   /* モーダル */
+  --radius-sm:    10px;   /* ボタン(小)、バッジ */
+  --radius-md:    14px;   /* 入力フィールド */
+  --radius-lg:    20px;   /* カード */
+  --radius-xl:    28px;   /* モーダル */
   --radius-full:  9999px; /* ピル型ボタン */
 
 
@@ -150,22 +169,24 @@
      1-E. SHADOWS
      -------------------------------------------------------- */
 
-  --shadow-xs:    0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-sm:    0 1px 3px rgba(0, 0, 0, 0.06),
-                  0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md:    0 4px 6px rgba(0, 0, 0, 0.04),
-                  0 2px 4px rgba(0, 0, 0, 0.03);
-  --shadow-lg:    0 8px 24px rgba(0, 0, 0, 0.06),
-                  0 4px 8px rgba(0, 0, 0, 0.04);
-  --shadow-xl:    0 16px 48px rgba(0, 0, 0, 0.08),
-                  0 8px 16px rgba(0, 0, 0, 0.04);
+  /* 影: ブランドカラー影 — Quiet Luxury */
+  --shadow-xs:    0 1px 2px rgba(90, 70, 50, 0.04);
+  --shadow-sm:    0 2px 4px rgba(90, 70, 50, 0.04),
+                  0 1px 2px rgba(90, 70, 50, 0.02);
+  --shadow-md:    0 4px 12px rgba(90, 70, 50, 0.05),
+                  0 2px 4px rgba(90, 70, 50, 0.03);
+  --shadow-lg:    0 8px 28px rgba(90, 70, 50, 0.06),
+                  0 4px 8px rgba(90, 70, 50, 0.03);
+  --shadow-xl:    0 20px 56px rgba(90, 70, 50, 0.07),
+                  0 6px 16px rgba(90, 70, 50, 0.04);
 
-  /* 夜モード用シャドウ */
-  --shadow-night: 0 8px 32px rgba(0, 0, 0, 0.4);
+  /* 夜モード用シャドウ (パープル) */
+  --shadow-night: 0 8px 32px rgba(14, 11, 26, 0.50),
+                  0 2px 8px rgba(107, 90, 138, 0.08);
 
   /* 手紙カード用シャドウ */
-  --shadow-paper: 0 2px 8px rgba(139, 120, 90, 0.1),
-                  0 1px 3px rgba(139, 120, 90, 0.06);
+  --shadow-paper: 0 2px 12px rgba(90, 70, 50, 0.05),
+                  0 0 1px rgba(90, 70, 50, 0.06);
 
 
   /* --------------------------------------------------------
@@ -232,7 +253,7 @@ html {
 body {
   font-family: var(--font-sans);
   font-size: var(--text-body);
-  font-weight: var(--weight-regular);
+  font-weight: var(--weight-light);
   line-height: var(--leading-normal);
   letter-spacing: var(--tracking-normal);
   color: var(--color-text-primary);
