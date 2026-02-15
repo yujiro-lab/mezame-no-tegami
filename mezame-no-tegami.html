@@ -933,7 +933,12 @@ body {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+.home-header__time-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
 }
 .home-header__mascot {
   display: block;
@@ -989,14 +994,13 @@ body {
   font-weight: var(--weight-regular);
   color: rgba(255, 255, 255, 0.5);
   letter-spacing: 0.04em;
-  margin-bottom: var(--space-1);
 }
 .home-header__date--light {
   color: var(--color-text-secondary);
 }
 .home-header__clock {
   font-family: var(--font-sans);
-  font-size: var(--text-hero);
+  font-size: 2.5rem;
   font-weight: var(--weight-light);
   color: rgba(255, 255, 255, 0.9);
   letter-spacing: -0.02em;
@@ -1649,7 +1653,10 @@ body {
     font-size: var(--text-caption);
   }
   .home-header__clock {
-    font-size: 2.75rem;
+    font-size: 2rem;
+  }
+  .home-header__time-row {
+    gap: var(--space-2);
   }
   .inbox-item {
     padding: var(--space-3) var(--space-4);
@@ -2617,8 +2624,10 @@ body {
             <p class="home-header__greeting" id="home-greeting"></p>
           </div>
         </div>
-        <div class="home-header__date" id="date-display"></div>
-        <div class="home-header__clock" id="clock">00:00</div>
+        <div class="home-header__time-row">
+          <div class="home-header__clock" id="clock">00:00</div>
+          <div class="home-header__date" id="date-display"></div>
+        </div>
       </div>
       <!-- 受信ボックス形式のリスト -->
       <div class="inbox" id="home-letter-area"></div>
