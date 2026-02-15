@@ -931,14 +931,14 @@ body {
 /* --- ホームヘッダー: マスコット吹き出し＋日付＋時刻 --- */
 .home-header__mascot-row {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: var(--space-3);
   margin-bottom: var(--space-4);
 }
 .home-header__mascot {
   display: block;
-  width: 80px;
-  height: 80px;
+  width: 96px;
+  height: 96px;
   object-fit: contain;
   flex-shrink: 0;
 }
@@ -953,7 +953,8 @@ body {
   content: '';
   position: absolute;
   left: -6px;
-  bottom: 12px;
+  top: 50%;
+  transform: translateY(-50%);
   width: 0;
   height: 0;
   border-top: 6px solid transparent;
@@ -1626,8 +1627,8 @@ body {
     padding: var(--space-4) var(--space-4) var(--space-3);
   }
   .home-header__mascot {
-    width: 64px;
-    height: 64px;
+    width: 76px;
+    height: 76px;
   }
   .home-header__mascot-row {
     gap: var(--space-2);
