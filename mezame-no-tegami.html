@@ -4087,7 +4087,7 @@ function updateHomeLetterArea() {
         <div class="inbox-item">
           <div class="inbox-item__icon inbox-item__icon--friend">${initial}</div>
           <div class="inbox-item__body">
-            <div class="inbox-item__title">${dateStr} ${h}:${m} に届く</div>
+            <div class="inbox-item__title">${dateStr} ${h}:${m}</div>
             <div class="inbox-item__sub">${preview}</div>
           </div>
           <span class="inbox-item__status">予約中</span>
@@ -4101,7 +4101,7 @@ function updateHomeLetterArea() {
         <div class="inbox-item">
           <div class="inbox-item__icon inbox-item__icon--self" onclick="openWriteSheet(${alarm.id})">${getUserIcon()}</div>
           <div class="inbox-item__body" onclick="openWriteSheet(${alarm.id})">
-            <div class="inbox-item__title">${dateStr} ${h}:${m} に届く</div>
+            <div class="inbox-item__title">${dateStr} ${h}:${m}</div>
             <div class="inbox-item__sub">${preview || '預かり中'}</div>
           </div>
           <span class="inbox-item__status">預かり中</span>
