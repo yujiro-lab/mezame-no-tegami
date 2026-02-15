@@ -4061,18 +4061,10 @@ function updateHomeLetterArea() {
 
   el.innerHTML = html;
 
-  // 空状態の表示切替
+  // 空状態（モニポくん吹き出しがあるので非表示）
   if (emptyEl) {
-    if (!hasItems) {
-      emptyEl.classList.add('active');
-      emptyEl.innerHTML = `
-        <div class="inbox-empty__icon">${getUserIcon()}</div>
-        <div class="inbox-empty__text">今夜、なにか書いとく？<br>あしたの朝届けるよ。</div>
-      `;
-    } else {
-      emptyEl.classList.remove('active');
-      emptyEl.innerHTML = '';
-    }
+    emptyEl.classList.remove('active');
+    emptyEl.innerHTML = '';
   }
 }
 
