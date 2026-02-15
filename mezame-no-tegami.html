@@ -4087,10 +4087,10 @@ function updateHomeLetterArea() {
         <div class="inbox-item">
           <div class="inbox-item__icon inbox-item__icon--friend">${initial}</div>
           <div class="inbox-item__body">
-            <div class="inbox-item__title">${dateStr} ${h}:${m} にとどく</div>
+            <div class="inbox-item__title">${dateStr} ${h}:${m} に届く</div>
             <div class="inbox-item__sub">${preview}</div>
           </div>
-          <span class="inbox-item__status">セット済み</span>
+          <span class="inbox-item__status">予約中</span>
           <button class="inbox-item__delete" onclick="deleteAlarm(${alarm.id})" aria-label="削除">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
           </button>
@@ -4101,10 +4101,10 @@ function updateHomeLetterArea() {
         <div class="inbox-item">
           <div class="inbox-item__icon inbox-item__icon--self" onclick="openWriteSheet(${alarm.id})">${getUserIcon()}</div>
           <div class="inbox-item__body" onclick="openWriteSheet(${alarm.id})">
-            <div class="inbox-item__title">${dateStr} ${h}:${m} にとどく</div>
-            <div class="inbox-item__sub">${preview || 'あずかってるよ'}</div>
+            <div class="inbox-item__title">${dateStr} ${h}:${m} に届く</div>
+            <div class="inbox-item__sub">${preview || '預かり中'}</div>
           </div>
-          <span class="inbox-item__status">あずかってるよ</span>
+          <span class="inbox-item__status">預かり中</span>
           <button class="inbox-item__delete" onclick="deleteAlarm(${alarm.id})" aria-label="削除">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
           </button>
@@ -6051,7 +6051,7 @@ async function updateHomeFriendLetters() {
               <div class="inbox-item__title">${fromName}からの手紙</div>
               <div class="inbox-item__sub">セットした時間に届けるね</div>
             </div>
-            <span class="inbox-item__status">セット済み</span>
+            <span class="inbox-item__status">予約中</span>
           </div>
         `;
       } else {
