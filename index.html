@@ -985,7 +985,8 @@ body {
   padding: var(--space-3) var(--space-4);
   max-width: 200px;
 }
-.home-header__bubble::before {
+.home-header__bubble::before,
+.home-header__bubble::after {
   content: '';
   position: absolute;
   left: -6px;
@@ -995,7 +996,11 @@ body {
   height: 0;
   border-top: 6px solid transparent;
   border-bottom: 6px solid transparent;
-  border-right: 6px solid var(--glass-night-elevated-bg);
+  border-right: 6px solid var(--glass-night-elevated-border);
+}
+.home-header__bubble::after {
+  left: -5px;
+  border-right-color: var(--glass-night-elevated-bg);
 }
 .home-header__bubble--light {
   background: var(--glass-elevated-bg);
@@ -1004,6 +1009,9 @@ body {
   border: 1px solid var(--glass-elevated-border);
 }
 .home-header__bubble--light::before {
+  border-right-color: var(--glass-elevated-border);
+}
+.home-header__bubble--light::after {
   border-right-color: var(--glass-elevated-bg);
 }
 .home-header__greeting {
@@ -1151,8 +1159,9 @@ body {
 }
 .waiting-card__delete {
   position: absolute;
-  top: 16px;
+  top: 50%;
   right: 16px;
+  transform: translateY(-50%);
   width: 32px;
   height: 32px;
   display: flex;
@@ -2279,9 +2288,9 @@ body {
 /* --- Calendar Picker --- */
 .cal-picker {
   display: none;
-  border-top: 1px solid var(--color-border-secondary);
   background-color: var(--color-bg-elevated);
   padding: var(--space-3) var(--space-4) var(--space-4);
+  border-bottom: 1px solid var(--color-border-secondary);
 }
 .cal-picker.open { display: block; }
 .cal-picker__nav {
@@ -2623,7 +2632,8 @@ body {
 .assist-bar__keyword {
   flex: 1;
   min-width: 0;
-  padding: var(--space-2) var(--space-3);
+  height: 36px;
+  padding: 0 var(--space-3);
   border: 1px solid var(--color-border-primary);
   border-radius: var(--radius-md);
   background: var(--color-bg-elevated);
@@ -2638,13 +2648,14 @@ body {
 
 .assist-bar__tone {
   flex-shrink: 0;
-  padding: var(--space-2) var(--space-3);
+  height: 36px;
+  padding: 0 var(--space-3);
   border: 1px solid var(--color-border-primary);
   border-radius: var(--radius-full);
   background: var(--color-bg-elevated);
   color: var(--color-text-secondary);
   font-family: var(--font-sans);
-  font-size: var(--text-caption);
+  font-size: var(--text-body-sm);
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
@@ -2746,11 +2757,13 @@ body {
   }
   .assist-bar__keyword {
     font-size: var(--text-caption);
-    padding: var(--space-2);
+    height: 32px;
+    padding: 0 var(--space-2);
   }
   .assist-bar__tone {
-    padding: var(--space-1) var(--space-2);
-    font-size: 0.7rem;
+    height: 32px;
+    padding: 0 var(--space-2);
+    font-size: var(--text-caption);
   }
   .assist-bar__gen {
     width: 32px; height: 32px;
