@@ -1306,6 +1306,12 @@ body {
   padding: var(--space-8);
   text-align: center;
 }
+.goodnight-mascot {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  margin-bottom: var(--space-5);
+}
 .goodnight-text {
   font-size: var(--text-h1);
   color: var(--night-text-primary);
@@ -1404,7 +1410,9 @@ body {
   text-align: center;
 }
 .alarm-complete-icon {
-  font-size: 3rem;
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
   margin-bottom: var(--space-5);
   animation: postDrop 600ms var(--ease-spring) both;
 }
@@ -2601,7 +2609,7 @@ body {
       <div class="home-header" id="home-header">
         <div class="home-header__mascot-row">
           <img class="home-header__mascot" id="home-mascot"
-               src="monipo_brandguide/assets/monipo_character_nobg.png"
+               src="monipo_brandguide/assets/Icon Concept_ Simplified Square_nobg.png"
                alt="monipo" onerror="this.style.display='none'">
           <div class="home-header__bubble" id="home-bubble">
             <p class="home-header__greeting" id="home-greeting"></p>
@@ -2678,6 +2686,7 @@ body {
   <div class="screen screen--night" id="goodnight-screen" role="main" aria-label="おやすみなさい">
     <div class="stars" id="goodnight-stars"></div>
     <div class="goodnight-content animate-fade-in" style="position:relative;z-index:2;">
+      <img class="goodnight-mascot animate-soft-rise" src="monipo_brandguide/assets/monipo_character_nobg.png" alt="monipo" onerror="this.style.display='none'">
       <div class="goodnight-text animate-soft-rise" id="goodnight-main">…預かった。おやすみ</div>
       <div class="goodnight-sub animate-soft-rise" style="animation-delay:500ms;" id="goodnight-sub">ちゃんと届けるから。</div>
       <div class="goodnight-sub animate-soft-rise" style="animation-delay:2500ms;margin-top:var(--space-6);opacity:0;" id="goodnight-extra">…おやすみ。</div>
@@ -2737,7 +2746,7 @@ body {
     </div>
     <!-- Phase 3: 完了 -->
     <div class="alarm-complete-phase" id="alarm-phase-complete" style="display:none;cursor:pointer;" onclick="if(currentScreen==='alarm-screen'){navigateTo('home');updateHomeLetterArea();}">
-      <div class="alarm-complete-icon">💌</div>
+      <img class="alarm-complete-icon" src="monipo_brandguide/assets/monipo_character_nobg.png" alt="monipo" onerror="this.textContent='💌'">
       <div class="alarm-complete-main">…ん。返事、読んだよ</div>
       <div class="alarm-complete-sub">…きょうが、はじまったよ</div>
     </div>
