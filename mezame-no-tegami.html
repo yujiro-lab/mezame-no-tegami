@@ -945,17 +945,6 @@ body {
 .home-header__brand-name--light {
   color: var(--color-text-secondary);
 }
-.home-header__postmsg {
-  font-family: var(--font-sans);
-  font-size: var(--text-body-sm);
-  font-weight: var(--weight-regular);
-  color: rgba(255, 255, 255, 0.45);
-  margin-top: var(--space-2);
-  line-height: 1.5;
-}
-.home-header__postmsg--light {
-  color: var(--color-text-tertiary);
-}
 .home-header {
   padding: var(--space-6) var(--space-5) var(--space-4);
   text-align: left;
@@ -2446,6 +2435,10 @@ body {
   justify-content: center;
   transition: all var(--duration-fast) ease;
 }
+.assist-bar__gen.ready {
+  background: var(--color-primary);
+  color: #fff;
+}
 .assist-bar__gen:active { transform: scale(0.9); }
 .assist-bar__gen.loading {
   pointer-events: none;
@@ -2564,7 +2557,6 @@ body {
         </div>
         <div class="home-header__date" id="date-display"></div>
         <div class="home-header__clock" id="clock">00:00</div>
-        <div class="home-header__postmsg" id="home-postmsg"></div>
       </div>
       <!-- 受信ボックス形式のリスト -->
       <div class="inbox" id="home-letter-area"></div>
@@ -3034,7 +3026,6 @@ function init() {
   loadSettings();
   updateHomeLetterArea();
   updateStreak();
-  updateMonipoMessage();
   updateTodayQuote();
   navigateTo('home');
 
@@ -3170,7 +3161,6 @@ function navigateTo(id) {
 
   // 画面固有の更新
   if (id === 'home') {
-    updateMonipoMessage();
     updateTodayQuote();
     updateHomeLetterArea();
     updateStreak();
@@ -3394,8 +3384,6 @@ function updateHomeBackground(hour) {
   if (dateEl) dateEl.classList.toggle('home-header__date--light', lightTime);
   const brandEl = document.getElementById('brand-name');
   if (brandEl) brandEl.classList.toggle('home-header__brand-name--light', lightTime);
-  const postmsgEl = document.getElementById('home-postmsg');
-  if (postmsgEl) postmsgEl.classList.toggle('home-header__postmsg--light', lightTime);
 
   // FABのライトモード
   const fab = document.getElementById('home-fab');
@@ -3467,60 +3455,6 @@ function updateHomeEmptyState() {
 }
 
 // ===== きょうのひとこと =====
-// ===== モニポくんメッセージ（時間帯挨拶 + 日替わり） =====
-const monipoMessages = [
-  '…きょうのぼくの調子？ ねむい。いつもとおなじ。',
-  '…ポストのなかに手紙がたまると ちょっとくすぐったいんだ。',
-  'きのう夢を見たよ。手紙に足が生えて自分で届けにいく夢。…ぼくいらないじゃん。',
-  '…夜に書いた手紙って なんであんなに正直なんだろうね。',
-  '書くことがないって言う人いるけど、「書くことがない」って書けばいいんだよ。…たぶん。',
-  '…カエルがポストに住んでるの、やっぱり変だよね。あんまり気にしないで。',
-  '…スマホの画面が暗くなると ぼくも寝てるんだよ。しらなかったでしょ。',
-  '…届けられなかった手紙なんてないよ。届けなかっただけで。',
-  'ぼくの趣味？ …届けること。しかないかも。',
-  '…ぼく、ほかのアプリの通知が来るたびにドキッとするんだ。',
-];
-
-function updateMonipoMessage() {
-  const el = document.getElementById('home-postmsg');
-  if (!el) return;
-
-  const now = new Date();
-  const hour = now.getHours();
-  let greeting = '';
-
-  // 時間帯別挨拶（手紙がある場合）
-  const alarms = loadAlarms();
-  const hasAlarm = alarms.length > 0;
-
-  if (hasAlarm) {
-    if (hour >= 5 && hour < 7) greeting = '……はやいね。届けもの、あるよ。';
-    else if (hour >= 7 && hour < 9) greeting = 'おはよ。ゆうべのきみから届きもの。';
-    else if (hour >= 9 && hour < 11) greeting = 'あ、起きた？手紙あるよ。';
-    else if (hour >= 11 && hour < 19) greeting = 'おそよう。手紙、ずっとここにいたよ。';
-    else greeting = '……まだ夜じゃん。でも手紙はあるよ。';
-  }
-
-  // 日替わりメッセージ（手紙なし or 追加表示）
-  const seed = now.getFullYear() * 10000 + (now.getMonth()+1) * 100 + now.getDate();
-  const msg = monipoMessages[seed % monipoMessages.length];
-
-  // 久しぶりの復帰チェック
-  const history = JSON.parse(localStorage.getItem('mezame_history') || '[]');
-  const streak = getStreak();
-  let returnMsg = '';
-  if (history.length > 0 && streak === 0) {
-    returnMsg = '……おかえり。ぼく、ずっとここにいたよ。';
-  }
-
-  if (returnMsg) {
-    el.textContent = returnMsg;
-  } else if (greeting) {
-    el.textContent = greeting;
-  } else {
-    el.textContent = msg;
-  }
-}
 
 function updateTodayQuote() {
   const el = document.getElementById('today-quote');
@@ -3979,6 +3913,15 @@ document.addEventListener('DOMContentLoaded', () => {
   if (sheetTextarea && sheetCta) {
     sheetTextarea.addEventListener('input', () => {
       sheetCta.classList.toggle('sheet__cta--ready', sheetTextarea.value.trim().length > 0);
+    });
+  }
+
+  // ✨ボタン: キーワード入力で紫に
+  const assistKeyword = document.getElementById('assist-keyword');
+  const assistGenBtn = document.getElementById('assist-gen-btn');
+  if (assistKeyword && assistGenBtn) {
+    assistKeyword.addEventListener('input', () => {
+      assistGenBtn.classList.toggle('ready', assistKeyword.value.trim().length > 0);
     });
   }
 });
