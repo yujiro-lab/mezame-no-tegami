@@ -1025,22 +1025,22 @@ body {
 /* --- セクション見出し --- */
 .home-section-heading {
   font-family: var(--font-sans);
-  font-size: 0.6875rem;
+  font-size: var(--text-caption);
   font-weight: var(--weight-regular);
-  color: rgba(250, 246, 241, 0.3);
-  letter-spacing: 0.1em;
+  color: rgba(250, 246, 241, 0.55);
+  letter-spacing: 0.06em;
   padding: var(--space-6) var(--space-5) var(--space-3);
 }
 .home-section-heading--light {
-  color: var(--color-text-tertiary);
+  color: var(--color-text-secondary);
 }
-/* 届いた手紙セクション — さらに控えめ */
+/* 届いた手紙セクション — 控えめ */
 .home-section-heading--secondary {
   padding-top: var(--space-8);
-  color: rgba(250, 246, 241, 0.2);
+  color: rgba(250, 246, 241, 0.42);
 }
 .home-section-heading--secondary.home-section-heading--light {
-  color: rgba(26, 21, 32, 0.3);
+  color: var(--color-text-tertiary);
 }
 
 /* --- 待ってる手紙（ヒーロー） --- */
@@ -1053,17 +1053,19 @@ body {
 .waiting-card {
   position: relative;
   display: flex;
-  align-items: stretch;
-  padding: var(--space-6) var(--space-6) var(--space-5);
-  background: var(--glass-night-elevated-bg);
-  -webkit-backdrop-filter: blur(24px);
-  backdrop-filter: blur(24px);
+  align-items: center;
+  gap: var(--space-4);
+  padding: 24px;
+  background: rgba(42, 34, 69, 0.50);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  backdrop-filter: blur(16px) saturate(1.2);
   border: 1px solid var(--glass-night-elevated-border);
-  border-left: 3px solid var(--color-sunrise);
+  border-left: 2px solid var(--color-sunrise);
   border-radius: var(--radius-lg);
   cursor: pointer;
   transition: transform var(--duration-fast) var(--ease-spring);
-  box-shadow: 0 4px 20px rgba(228, 176, 138, 0.06);
+  box-shadow: 0 4px 20px rgba(228, 176, 138, 0.06),
+              inset 0 1px 0 rgba(250, 246, 241, 0.06);
 }
 .waiting-card:active {
   transform: scale(0.98);
@@ -1073,8 +1075,9 @@ body {
   -webkit-backdrop-filter: blur(var(--glass-elevated-blur));
   backdrop-filter: blur(var(--glass-elevated-blur));
   border-color: var(--glass-elevated-border);
-  border-left: 3px solid var(--color-primary);
-  box-shadow: 0 4px 20px rgba(107, 90, 138, 0.06);
+  border-left: 2px solid var(--color-primary);
+  box-shadow: 0 4px 20px rgba(107, 90, 138, 0.06),
+              inset 0 1px 0 rgba(26, 21, 32, 0.04);
 }
 /* フレンドカード — dawn アクセント */
 .waiting-card--friend {
@@ -1083,22 +1086,29 @@ body {
 .waiting-card--friend.waiting-card--light {
   border-left-color: var(--color-dawn);
 }
-.waiting-card__friend-badge {
+/* アイコン（自分 or フレンド） */
+.waiting-card__icon {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  font-size: var(--text-h3);
+  background: rgba(228, 176, 138, 0.10);
+}
+.waiting-card__icon--friend {
+  border-radius: 50%;
+  background: rgba(107, 90, 138, 0.15);
   font-size: var(--text-body);
   font-weight: var(--weight-medium);
-  background: rgba(107, 90, 138, 0.15);
   color: rgba(250, 246, 241, 0.8);
-  margin-right: var(--space-4);
-  align-self: center;
 }
-.waiting-card__friend-badge--light {
+.waiting-card__icon--light {
+  background: rgba(107, 90, 138, 0.06);
+}
+.waiting-card__icon--friend.waiting-card__icon--light {
   background: rgba(107, 90, 138, 0.10);
   color: var(--color-primary);
 }
@@ -1108,34 +1118,35 @@ body {
   display: flex;
   flex-direction: column;
 }
+.waiting-card__date {
+  font-family: var(--font-sans);
+  font-size: var(--text-body-sm);
+  color: rgba(250, 246, 241, 0.55);
+  letter-spacing: var(--tracking-normal);
+  line-height: 1.2;
+}
+.waiting-card__date--light {
+  color: var(--color-text-secondary);
+}
 .waiting-card__time {
   font-family: var(--font-sans);
   font-size: 2.25rem;
   font-weight: var(--weight-bold);
   color: rgba(250, 246, 241, 0.95);
-  letter-spacing: -0.03em;
-  line-height: 1;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
   font-variant-numeric: tabular-nums;
+  margin-top: 4px;
 }
 .waiting-card__time--light {
   color: var(--color-text-primary);
 }
-.waiting-card__date {
-  font-family: var(--font-sans);
-  font-size: var(--text-body-sm);
-  color: rgba(250, 246, 241, 0.5);
-  letter-spacing: var(--tracking-normal);
-  margin-top: 6px;
-}
-.waiting-card__date--light {
-  color: var(--color-text-secondary);
-}
 .waiting-card__sub {
   font-family: var(--font-letter);
   font-size: var(--text-caption);
-  color: rgba(250, 246, 241, 0.3);
+  color: rgba(250, 246, 241, 0.50);
   letter-spacing: var(--tracking-normal);
-  line-height: var(--leading-normal);
+  line-height: 1.6;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1155,7 +1166,7 @@ body {
   justify-content: center;
   border: none;
   background: none;
-  color: rgba(250, 246, 241, 0.25);
+  color: rgba(250, 246, 241, 0.35);
   border-radius: var(--radius-full);
   cursor: pointer;
   transition: color var(--duration-fast) var(--ease-out),
@@ -1163,11 +1174,11 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 .waiting-card__delete:active {
-  color: rgba(250, 246, 241, 0.6);
+  color: rgba(250, 246, 241, 0.7);
   background: rgba(201, 91, 104, 0.15);
 }
 .waiting-card__delete--light {
-  color: rgba(26, 21, 32, 0.2);
+  color: rgba(26, 21, 32, 0.25);
 }
 .waiting-card__delete--light:active {
   color: var(--color-text-secondary);
@@ -1185,8 +1196,8 @@ body {
   display: flex;
   align-items: baseline;
   gap: var(--space-3);
-  padding: var(--space-2) 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(250, 246, 241, 0.05);
   text-align: left;
 }
 .inbox-item:last-child {
@@ -1200,11 +1211,11 @@ body {
 .inbox-item__date {
   flex-shrink: 0;
   font-family: var(--font-sans);
-  font-size: 0.6875rem;
+  font-size: var(--text-caption);
   font-weight: var(--weight-regular);
-  color: rgba(250, 246, 241, 0.3);
+  color: rgba(250, 246, 241, 0.50);
   letter-spacing: 0.04em;
-  min-width: 4.5em;
+  min-width: 3.5em;
   font-variant-numeric: tabular-nums;
 }
 .inbox-item__date--light {
@@ -1215,8 +1226,8 @@ body {
   flex: 1;
   min-width: 0;
   font-family: var(--font-letter);
-  font-size: var(--text-caption);
-  color: rgba(250, 246, 241, 0.4);
+  font-size: var(--text-body-sm);
+  color: rgba(250, 246, 241, 0.60);
   letter-spacing: var(--tracking-normal);
   white-space: nowrap;
   overflow: hidden;
@@ -1241,7 +1252,7 @@ body {
 .inbox-empty__text {
   font-family: var(--font-letter);
   font-size: var(--text-body-sm);
-  color: rgba(255, 255, 255, 0.25);
+  color: rgba(250, 246, 241, 0.40);
   line-height: var(--leading-relaxed);
 }
 .inbox-empty__text--light {
@@ -1735,15 +1746,14 @@ body {
     font-size: 0.625rem;
   }
   .waiting-card {
-    padding: var(--space-5) var(--space-5) var(--space-4);
+    padding: 20px 20px 16px;
   }
   .waiting-card__time {
     font-size: 1.75rem;
   }
-  .waiting-card__friend-badge {
+  .waiting-card__icon {
     width: 36px;
     height: 36px;
-    margin-right: var(--space-3);
   }
   .home-waiting-list {
     padding: 0 var(--space-4);
@@ -3568,8 +3578,8 @@ function updateHomeBackground(hour) {
     waitingList.querySelectorAll('.waiting-card').forEach(c => {
       c.classList.toggle('waiting-card--light', lightTime);
     });
-    waitingList.querySelectorAll('.waiting-card__friend-badge').forEach(b => {
-      b.classList.toggle('waiting-card__friend-badge--light', lightTime);
+    waitingList.querySelectorAll('.waiting-card__icon').forEach(ic => {
+      ic.classList.toggle('waiting-card__icon--light', lightTime);
     });
     waitingList.querySelectorAll('.waiting-card__time').forEach(t => {
       t.classList.toggle('waiting-card__time--light', lightTime);
@@ -4138,12 +4148,15 @@ function updateHomeLetterArea() {
       : (alarm.letter ? alarm.letter.substring(0, 24) + (alarm.letter.length > 24 ? '…' : '') : '');
     const friendClass = isFriend ? ' waiting-card--friend' : '';
 
+    const iconClass = isFriend ? 'waiting-card__icon--friend' : '';
+    const iconContent = isFriend ? initial : getUserIcon();
+
     waitingHtml += `
       <div class="waiting-card${friendClass}" ${!isFriend ? `onclick="openWriteSheet(${alarm.id})"` : ''}>
-        ${isFriend ? `<div class="waiting-card__friend-badge">${initial}</div>` : ''}
+        <div class="waiting-card__icon ${iconClass}">${iconContent}</div>
         <div class="waiting-card__body">
-          <div class="waiting-card__time">${h}:${m}</div>
           <div class="waiting-card__date">${dateStr}</div>
+          <div class="waiting-card__time">${h}:${m}</div>
           ${preview ? `<div class="waiting-card__sub">${preview}</div>` : ''}
         </div>
         <button class="waiting-card__delete" onclick="event.stopPropagation();deleteAlarm(${alarm.id})" aria-label="削除">
@@ -6104,7 +6117,7 @@ async function updateHomeFriendLetters() {
           const initial = escapeHtml((d.fromName || '?')[0]);
           const friendCardHtml = `
             <div class="waiting-card waiting-card--friend inbox-item--friend" onclick="setupFriendLetterAlarm('${docId}', '${escapedName}', ${deliverMs})">
-              <div class="waiting-card__friend-badge">${initial}</div>
+              <div class="waiting-card__icon waiting-card__icon--friend">${initial}</div>
               <div class="waiting-card__body">
                 <div class="waiting-card__time" style="font-size:var(--text-h3);">${fromName}</div>
                 <div class="waiting-card__date">…何時に開ける？</div>
