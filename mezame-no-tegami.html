@@ -889,22 +889,22 @@ body {
   width: 2px; height: 2px;
   background: white;
   border-radius: 50%;
-  box-shadow: 0 0 6px 1px rgba(255,255,255,0.6);
+  box-shadow: 0 0 4px 1px rgba(255,255,255,0.5);
   animation: shootingStar 1s ease-in forwards;
 }
 @keyframes shootingStar {
-  0%   { transform: translate(0, 0) scale(1); opacity: 1; }
-  70%  { opacity: 0.8; }
-  100% { transform: translate(120px, 80px) scale(0.2); opacity: 0; }
+  0%   { transform: translate(0, 0); opacity: 1; }
+  60%  { opacity: 0.7; }
+  100% { transform: translate(120px, 80px); opacity: 0; }
 }
 .shooting-star::after {
   content: '';
   position: absolute;
   width: 40px; height: 1px;
-  background: linear-gradient(270deg, rgba(255,255,255,0.5), transparent);
-  top: 0; right: 2px;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.4));
+  top: 50%; right: 100%;
   transform-origin: right center;
-  transform: rotate(-33deg);
+  transform: translateY(-50%) rotate(-33.7deg);
 }
 
 /* --- Clock --- */
@@ -1008,9 +1008,9 @@ body {
 }
 .home-header__greeting {
   font-family: var(--font-letter);
-  font-size: var(--text-body);
+  font-size: 1.0625rem;
   font-weight: var(--weight-regular);
-  color: rgba(250, 246, 241, 0.85);
+  color: rgba(250, 246, 241, 0.88);
   letter-spacing: 0.03em;
   line-height: var(--leading-normal);
   margin: 0;
@@ -1025,9 +1025,9 @@ body {
 /* --- セクション見出し --- */
 .home-section-heading {
   font-family: var(--font-sans);
-  font-size: var(--text-body-sm);
+  font-size: 0.9375rem;
   font-weight: var(--weight-medium);
-  color: rgba(250, 246, 241, 0.70);
+  color: rgba(250, 246, 241, 0.72);
   letter-spacing: 0.04em;
   padding: var(--space-6) var(--space-5) var(--space-3);
 }
@@ -1051,7 +1051,7 @@ body {
   padding: 0 var(--space-5);
 }
 .home-waiting-list .waiting-card + .waiting-card {
-  border-top: none;
+  border-top: 1px solid rgba(250, 246, 241, 0.06);
   margin-top: -1px;
 }
 .home-waiting-list .waiting-card:first-child {
@@ -1095,12 +1095,13 @@ body {
 .waiting-card--friend.waiting-card--light {
   border-left-color: var(--color-dawn);
 }
-/* 送り主ラベル */
+/* 送り主ラベル（カード内メタ情報） */
 .waiting-card__from {
   font-family: var(--font-sans);
-  font-size: var(--text-body-sm);
-  color: rgba(250, 246, 241, 0.65);
-  letter-spacing: 0.02em;
+  font-size: 0.75rem;
+  color: rgba(250, 246, 241, 0.45);
+  letter-spacing: 0.03em;
+  margin-top: 2px;
 }
 .waiting-card__from--light {
   color: var(--color-text-secondary);
@@ -1113,11 +1114,10 @@ body {
 }
 .waiting-card__date {
   font-family: var(--font-sans);
-  font-size: var(--text-body-sm);
-  color: rgba(250, 246, 241, 0.70);
+  font-size: 0.9375rem;
+  color: rgba(250, 246, 241, 0.72);
   letter-spacing: var(--tracking-normal);
   line-height: 1.2;
-  margin-top: 2px;
 }
 .waiting-card__date--light {
   color: var(--color-text-secondary);
@@ -1205,11 +1205,11 @@ body {
 .inbox-item__date {
   flex-shrink: 0;
   font-family: var(--font-sans);
-  font-size: var(--text-caption);
+  font-size: 0.75rem;
   font-weight: var(--weight-regular);
   color: rgba(250, 246, 241, 0.50);
   letter-spacing: 0.04em;
-  min-width: 3.5em;
+  min-width: 3em;
   font-variant-numeric: tabular-nums;
 }
 .inbox-item__date--light {
@@ -1220,8 +1220,8 @@ body {
   flex: 1;
   min-width: 0;
   font-family: var(--font-letter);
-  font-size: var(--text-body-sm);
-  color: rgba(250, 246, 241, 0.60);
+  font-size: 0.75rem;
+  color: rgba(250, 246, 241, 0.55);
   letter-spacing: var(--tracking-normal);
   white-space: nowrap;
   overflow: hidden;
@@ -2276,6 +2276,84 @@ body {
   background-color: var(--color-bg-secondary);
 }
 
+/* --- Calendar Picker --- */
+.cal-picker {
+  display: none;
+  border-top: 1px solid var(--color-border-secondary);
+  background-color: var(--color-bg-elevated);
+  padding: var(--space-3) var(--space-4) var(--space-4);
+}
+.cal-picker.open { display: block; }
+.cal-picker__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+.cal-picker__month {
+  font-family: var(--font-sans);
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-primary);
+}
+.cal-picker__arrow {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  border: none; background: none;
+  color: var(--color-primary);
+  font-size: var(--text-body);
+  cursor: pointer;
+  border-radius: var(--radius-full);
+  -webkit-tap-highlight-color: transparent;
+}
+.cal-picker__arrow:active { background: var(--color-bg-tertiary); }
+.cal-picker__weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  margin-bottom: var(--space-1);
+}
+.cal-picker__weekday {
+  font-size: 0.6875rem;
+  color: var(--color-text-tertiary);
+  padding: var(--space-1) 0;
+}
+.cal-picker__days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  text-align: center;
+}
+.cal-picker__day {
+  width: 36px; height: 36px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: center;
+  border: none; background: none;
+  font-family: var(--font-sans);
+  font-size: var(--text-body-sm);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  border-radius: var(--radius-full);
+  -webkit-tap-highlight-color: transparent;
+}
+.cal-picker__day:active { background: var(--color-bg-tertiary); }
+.cal-picker__day--today {
+  color: var(--color-primary);
+  font-weight: var(--weight-medium);
+}
+.cal-picker__day--selected {
+  background: var(--color-primary);
+  color: var(--color-cream);
+  font-weight: var(--weight-medium);
+}
+.cal-picker__day--disabled {
+  color: var(--color-text-tertiary);
+  opacity: 0.4;
+  pointer-events: none;
+}
+.cal-picker__day--empty {
+  pointer-events: none;
+}
+
 /* --- Message textarea field --- */
 .sheet__field--textarea {
   display: block;
@@ -2988,15 +3066,16 @@ body {
         <div class="sheet__section">
           <div class="sheet__section-title">設定日時</div>
           <div class="sheet__field-group">
-            <div class="sheet__field">
+            <div class="sheet__field sheet__field--tap" onclick="toggleCalPicker()">
               <span class="sheet__field-label">日付</span>
               <div class="sheet__field-value">
-                <input type="text" inputmode="numeric" class="sheet__field-input" id="sheet-alarm-month" maxlength="2" placeholder="2" aria-label="月">
-                <span class="sheet__field-sep">月</span>
-                <input type="text" inputmode="numeric" class="sheet__field-input" id="sheet-alarm-day" maxlength="2" placeholder="12" aria-label="日">
-                <span class="sheet__field-sep">日</span>
+                <span class="sheet__field-static" id="sheet-date-display">2月12日</span>
+                <span class="sheet__field-arrow">&#x25BC;</span>
               </div>
             </div>
+            <div class="cal-picker" id="cal-picker"></div>
+            <input type="hidden" id="sheet-alarm-month">
+            <input type="hidden" id="sheet-alarm-day">
             <div class="sheet__field" id="sheet-time-field">
               <span class="sheet__field-label">時刻</span>
               <div class="sheet__field-value">
@@ -3071,15 +3150,16 @@ body {
           <div class="sheet__section-title" id="friend-alarm-title" style="font-size:1.1rem;">手紙が届いてるよ</div>
           <p style="color:var(--color-text-tertiary);font-size:0.85rem;margin:0 0 var(--space-4);">届けたい時間をえらんでね。アラームで届くよ。</p>
           <div class="sheet__field-group">
-            <div class="sheet__field">
+            <div class="sheet__field sheet__field--tap" onclick="toggleFriendCalPicker()">
               <span class="sheet__field-label">日付</span>
               <div class="sheet__field-value">
-                <input type="text" inputmode="numeric" class="sheet__field-input" id="friend-setup-month" maxlength="2" aria-label="月">
-                <span class="sheet__field-sep">月</span>
-                <input type="text" inputmode="numeric" class="sheet__field-input" id="friend-setup-day" maxlength="2" aria-label="日">
-                <span class="sheet__field-sep">日</span>
+                <span class="sheet__field-static" id="friend-date-display">2月12日</span>
+                <span class="sheet__field-arrow">&#x25BC;</span>
               </div>
             </div>
+            <div class="cal-picker" id="friend-cal-picker"></div>
+            <input type="hidden" id="friend-setup-month">
+            <input type="hidden" id="friend-setup-day">
             <div class="sheet__field">
               <span class="sheet__field-label">時刻</span>
               <div class="sheet__field-value">
@@ -3822,6 +3902,96 @@ function deleteAlarm(alarmId) {
   showToast('…消したよ');
 }
 
+// ===== カレンダーピッカー（共通） =====
+const calState = {
+  main:   { selectedDate: null, viewMonth: null, viewYear: null, elId: 'cal-picker', monthId: 'sheet-alarm-month', dayId: 'sheet-alarm-day', displayId: 'sheet-date-display', onSelect: () => updateSheetDeliveryDate() },
+  friend: { selectedDate: null, viewMonth: null, viewYear: null, elId: 'friend-cal-picker', monthId: 'friend-setup-month', dayId: 'friend-setup-day', displayId: 'friend-date-display', onSelect: null }
+};
+
+function toggleCalPicker()       { _calToggle('main'); }
+function toggleFriendCalPicker() { _calToggle('friend'); }
+
+function _calToggle(key) {
+  const s = calState[key];
+  const el = document.getElementById(s.elId);
+  if (!el) return;
+  const isOpen = el.classList.toggle('open');
+  if (isOpen) _calRender(key);
+}
+
+function _calRender(key) {
+  const s = calState[key];
+  const el = document.getElementById(s.elId);
+  if (!el) return;
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  if (s.viewMonth === null) {
+    s.viewMonth = s.selectedDate ? s.selectedDate.getMonth() : today.getMonth();
+    s.viewYear  = s.selectedDate ? s.selectedDate.getFullYear() : today.getFullYear();
+  }
+
+  const daysInMonth = new Date(s.viewYear, s.viewMonth + 1, 0).getDate();
+  const firstDow = new Date(s.viewYear, s.viewMonth, 1).getDay();
+  const weekdays = ['日','月','火','水','木','金','土'];
+  const monthLabel = `${s.viewYear}年${s.viewMonth + 1}月`;
+
+  let html = `<div class="cal-picker__nav">
+    <button class="cal-picker__arrow" onclick="event.stopPropagation();_calPrev('${key}')">‹</button>
+    <span class="cal-picker__month">${monthLabel}</span>
+    <button class="cal-picker__arrow" onclick="event.stopPropagation();_calNext('${key}')">›</button>
+  </div>`;
+  html += '<div class="cal-picker__weekdays">';
+  weekdays.forEach(w => { html += `<span class="cal-picker__weekday">${w}</span>`; });
+  html += '</div><div class="cal-picker__days">';
+
+  for (let i = 0; i < firstDow; i++) {
+    html += '<span class="cal-picker__day cal-picker__day--empty"></span>';
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(s.viewYear, s.viewMonth, d);
+    date.setHours(0,0,0,0);
+    const isPast = date < today;
+    const isToday = date.getTime() === today.getTime();
+    const isSelected = s.selectedDate && date.getTime() === s.selectedDate.getTime();
+    let cls = 'cal-picker__day';
+    if (isPast) cls += ' cal-picker__day--disabled';
+    else if (isSelected) cls += ' cal-picker__day--selected';
+    else if (isToday) cls += ' cal-picker__day--today';
+    html += `<button class="${cls}" onclick="event.stopPropagation();_calSelect('${key}',${d})">${d}</button>`;
+  }
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+function _calPrev(key) {
+  const s = calState[key];
+  s.viewMonth--;
+  if (s.viewMonth < 0) { s.viewMonth = 11; s.viewYear--; }
+  _calRender(key);
+}
+function _calNext(key) {
+  const s = calState[key];
+  s.viewMonth++;
+  if (s.viewMonth > 11) { s.viewMonth = 0; s.viewYear++; }
+  _calRender(key);
+}
+function _calSelect(key, day) {
+  const s = calState[key];
+  s.selectedDate = new Date(s.viewYear, s.viewMonth, day);
+  document.getElementById(s.monthId).value = String(s.viewMonth + 1);
+  document.getElementById(s.dayId).value = String(day);
+  const display = document.getElementById(s.displayId);
+  if (display) display.textContent = `${s.viewMonth + 1}月${day}日`;
+  document.getElementById(s.elId).classList.remove('open');
+  if (s.onSelect) s.onSelect();
+}
+
+// Legacy aliases for inline calPrev/calNext/calSelectDay (main calendar)
+function renderCalPicker() { _calRender('main'); }
+function calPrev() { _calPrev('main'); }
+function calNext() { _calNext('main'); }
+function calSelectDay(day) { _calSelect('main', day); }
+
 function openWriteSheet(alarmId) {
   const sheet = document.getElementById('write-sheet');
   const overlay = document.getElementById('sheet-overlay');
@@ -3850,14 +4020,23 @@ function openWriteSheet(alarmId) {
   const hints = isNight ? nightPrompts : (hour < 10 ? morningPrompts : dailyPrompts);
   document.getElementById('sheet-letter-input').placeholder = hints[(seed * 3) % hints.length];
 
+  // Close calendar if open
+  const calEl = document.getElementById('cal-picker');
+  if (calEl) calEl.classList.remove('open');
+  const cs = calState.main;
+
   // Pre-fill if editing existing alarm
   if (alarmId) {
     const alarms = loadAlarms();
     const alarm = alarms.find(a => a.id === alarmId);
     if (alarm) {
       const t = new Date(alarm.targetDate);
+      cs.selectedDate = new Date(t.getFullYear(), t.getMonth(), t.getDate());
+      cs.viewMonth = t.getMonth();
+      cs.viewYear = t.getFullYear();
       document.getElementById('sheet-alarm-month').value = String(t.getMonth() + 1);
       document.getElementById('sheet-alarm-day').value = String(t.getDate());
+      document.getElementById('sheet-date-display').textContent = `${t.getMonth()+1}月${t.getDate()}日`;
       document.getElementById('sheet-alarm-hour').value = String(alarm.hour).padStart(2, '0');
       document.getElementById('sheet-alarm-minute').value = String(alarm.minute).padStart(2, '0');
       document.getElementById('sheet-letter-input').value = alarm.letter || '';
@@ -3865,8 +4044,12 @@ function openWriteSheet(alarmId) {
     }
   } else {
     // New letter: default date/time
+    cs.selectedDate = new Date(defaultDate.getFullYear(), defaultDate.getMonth(), defaultDate.getDate());
+    cs.viewMonth = defaultDate.getMonth();
+    cs.viewYear = defaultDate.getFullYear();
     document.getElementById('sheet-alarm-month').value = String(defaultDate.getMonth() + 1);
     document.getElementById('sheet-alarm-day').value = String(defaultDate.getDate());
+    document.getElementById('sheet-date-display').textContent = `${defaultDate.getMonth()+1}月${defaultDate.getDate()}日`;
     document.getElementById('sheet-alarm-hour').value = '07';
     document.getElementById('sheet-alarm-minute').value = '00';
     document.getElementById('sheet-letter-input').value = '';
@@ -4140,11 +4323,10 @@ function updateHomeLetterArea() {
 
     waitingHtml += `
       <div class="waiting-card${friendClass}" ${!isFriend ? `onclick="openWriteSheet(${alarm.id})"` : ''}>
-        <div class="waiting-card__from">${senderLabel}</div>
         <div class="waiting-card__body">
           <div class="waiting-card__date">${dateStr}</div>
           <div class="waiting-card__time">${h}:${m}</div>
-          ${preview && !isFriend ? `<div class="waiting-card__sub">${preview}</div>` : ''}
+          <div class="waiting-card__from">${senderLabel}</div>
         </div>
         <button class="waiting-card__delete" onclick="event.stopPropagation();deleteAlarm(${alarm.id})" aria-label="削除">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
@@ -5857,10 +6039,21 @@ function setupFriendLetterAlarm(letterId, fromName, deliverDateMs) {
   const defaultDate = pendingFriendAlarmLetter.minDate <= now ? now : pendingFriendAlarmLetter.minDate;
 
   document.getElementById('friend-alarm-title').textContent = `${fromName}からの手紙が届いてるよ`;
+
+  // Initialize friend calendar state
+  const fs = calState.friend;
+  fs.selectedDate = new Date(defaultDate.getFullYear(), defaultDate.getMonth(), defaultDate.getDate());
+  fs.viewMonth = defaultDate.getMonth();
+  fs.viewYear = defaultDate.getFullYear();
   document.getElementById('friend-setup-month').value = String(defaultDate.getMonth() + 1);
   document.getElementById('friend-setup-day').value = String(defaultDate.getDate());
+  document.getElementById('friend-date-display').textContent = `${defaultDate.getMonth()+1}月${defaultDate.getDate()}日`;
   document.getElementById('friend-setup-hour').value = '07';
   document.getElementById('friend-setup-minute').value = '00';
+
+  // Close calendar if open
+  const calEl = document.getElementById('friend-cal-picker');
+  if (calEl) calEl.classList.remove('open');
 
   document.getElementById('friend-alarm-overlay').classList.add('active');
   document.getElementById('friend-alarm-sheet').classList.add('open');
@@ -6091,9 +6284,9 @@ async function updateHomeFriendLetters() {
         if (waitingList) {
           const friendCardHtml = `
             <div class="waiting-card waiting-card--friend inbox-item--friend" onclick="setupFriendLetterAlarm('${docId}', '${escapedName}', ${deliverMs})">
-              <div class="waiting-card__from">${fromName}からの手紙</div>
               <div class="waiting-card__body">
                 <div class="waiting-card__date">…何時に開ける？</div>
+                <div class="waiting-card__from">${fromName}からの手紙</div>
               </div>
             </div>
           `;
