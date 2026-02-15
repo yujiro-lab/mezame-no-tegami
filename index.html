@@ -960,18 +960,13 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
-/* --- ホームヘッダー: マスコット吹き出し＋日付＋時刻 --- */
+/* --- ホームヘッダー: マスコット吹き出し --- */
 .home-header__mascot-row {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
   align-items: center;
   gap: var(--space-3);
-  margin-bottom: var(--space-3);
-}
-.home-header__time-row {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-3);
+  margin-bottom: 0;
 }
 .home-header__mascot {
   display: block;
@@ -993,14 +988,14 @@ body {
 .home-header__bubble::before {
   content: '';
   position: absolute;
-  right: -6px;
+  left: -6px;
   top: 50%;
   transform: translateY(-50%);
   width: 0;
   height: 0;
   border-top: 6px solid transparent;
   border-bottom: 6px solid transparent;
-  border-left: 6px solid var(--glass-night-elevated-bg);
+  border-right: 6px solid var(--glass-night-elevated-bg);
 }
 .home-header__bubble--light {
   background: var(--glass-elevated-bg);
@@ -1009,7 +1004,7 @@ body {
   border: 1px solid var(--glass-elevated-border);
 }
 .home-header__bubble--light::before {
-  border-left-color: var(--glass-elevated-bg);
+  border-right-color: var(--glass-elevated-bg);
 }
 .home-header__greeting {
   font-family: var(--font-letter);
@@ -1027,30 +1022,156 @@ body {
   padding: var(--space-6) var(--space-5) var(--space-4);
   text-align: left;
 }
-.home-header__date {
+/* --- セクション見出し --- */
+.home-section-heading {
   font-family: var(--font-sans);
-  font-size: var(--text-body-sm);
+  font-size: var(--text-caption);
   font-weight: var(--weight-regular);
-  color: rgba(255, 255, 255, 0.5);
-  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.08em;
+  padding: var(--space-5) var(--space-5) var(--space-2);
+  text-transform: uppercase;
 }
-.home-header__date--light {
-  color: var(--color-text-secondary);
-}
-.home-header__clock {
-  font-family: var(--font-sans);
-  font-size: 3rem;
-  font-weight: var(--weight-light);
-  color: rgba(255, 255, 255, 0.9);
-  letter-spacing: -0.02em;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-.home-header__clock--light {
-  color: var(--color-text-primary);
+.home-section-heading--light {
+  color: var(--color-text-tertiary);
 }
 
-/* --- 受信ボックスリスト --- */
+/* --- 待ってる手紙（高優先度カード） --- */
+.home-waiting-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 0 var(--space-4);
+}
+.waiting-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-5);
+  background: var(--glass-night-elevated-bg);
+  -webkit-backdrop-filter: blur(var(--glass-night-elevated-blur));
+  backdrop-filter: blur(var(--glass-night-elevated-blur));
+  border: 1px solid var(--glass-night-elevated-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-spring);
+}
+.waiting-card:active {
+  transform: scale(0.98);
+}
+.waiting-card--light {
+  background: var(--glass-elevated-bg);
+  -webkit-backdrop-filter: blur(var(--glass-elevated-blur));
+  backdrop-filter: blur(var(--glass-elevated-blur));
+  border: 1px solid var(--glass-elevated-border);
+}
+.waiting-card__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: var(--text-h3);
+  background: rgba(228, 176, 138, 0.12);
+}
+.waiting-card__icon--friend {
+  background: rgba(107, 90, 138, 0.15);
+}
+.waiting-card__icon--light {
+  background: rgba(107, 90, 138, 0.08);
+}
+.waiting-card__icon--friend.waiting-card__icon--light {
+  background: rgba(107, 90, 138, 0.10);
+}
+.waiting-card__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.waiting-card__time {
+  font-family: var(--font-sans);
+  font-size: var(--text-h3);
+  font-weight: var(--weight-medium);
+  color: var(--night-text-primary);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.waiting-card__time--light {
+  color: var(--color-text-primary);
+}
+.waiting-card__date {
+  font-family: var(--font-sans);
+  font-size: var(--text-body-sm);
+  color: var(--night-text-secondary);
+  letter-spacing: var(--tracking-normal);
+}
+.waiting-card__date--light {
+  color: var(--color-text-secondary);
+}
+.waiting-card__sub {
+  font-family: var(--font-sans);
+  font-size: var(--text-caption);
+  color: var(--night-text-tertiary);
+  letter-spacing: var(--tracking-normal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+.waiting-card__sub--light {
+  color: var(--color-text-tertiary);
+}
+.waiting-card__status {
+  flex-shrink: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-medium);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  background: rgba(228, 176, 138, 0.15);
+  color: var(--color-sunrise);
+}
+.waiting-card__status--light {
+  background: rgba(107, 90, 138, 0.1);
+  color: var(--color-primary);
+}
+.waiting-card__delete {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: var(--night-text-tertiary);
+  font-size: var(--text-caption);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity var(--duration-fast) var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+.waiting-card__delete:active {
+  opacity: 1;
+  background: rgba(201, 91, 104, 0.15);
+}
+.waiting-card__delete--light {
+  color: var(--color-text-tertiary);
+}
+.waiting-card__delete--light:active {
+  background: rgba(201, 91, 104, 0.1);
+}
+
+/* --- 受信ボックスリスト（届いた手紙） --- */
 .inbox {
   display: flex;
   flex-direction: column;
@@ -1678,12 +1799,11 @@ body {
     padding: var(--space-4) var(--space-4) var(--space-3);
   }
   .home-header__mascot {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
   }
   .home-header__mascot-row {
     gap: var(--space-2);
-    margin-bottom: var(--space-3);
   }
   .home-header__bubble {
     padding: var(--space-2) var(--space-3);
@@ -1691,10 +1811,23 @@ body {
   .home-header__greeting {
     font-size: var(--text-caption);
   }
-  .home-header__clock {
-    font-size: 2.25rem;
+  .home-section-heading {
+    padding: var(--space-4) var(--space-4) var(--space-1);
+    font-size: 0.6875rem;
   }
-  .home-header__time-row {
+  .waiting-card {
+    padding: var(--space-4);
+    gap: var(--space-3);
+  }
+  .waiting-card__icon {
+    width: 42px;
+    height: 42px;
+  }
+  .waiting-card__time {
+    font-size: var(--text-body);
+  }
+  .home-waiting-list {
+    padding: 0 var(--space-3);
     gap: var(--space-2);
   }
   .inbox-item {
@@ -1702,8 +1835,8 @@ body {
     gap: var(--space-3);
   }
   .inbox-item__icon {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
     font-size: var(--text-body);
   }
   .inbox-item__title {
@@ -2669,13 +2802,19 @@ body {
             <p class="home-header__greeting" id="home-greeting"></p>
           </div>
         </div>
-        <div class="home-header__time-row">
-          <div class="home-header__clock" id="clock">00:00</div>
-          <div class="home-header__date" id="date-display"></div>
-        </div>
       </div>
-      <!-- 受信ボックス形式のリスト -->
-      <div class="inbox" id="home-letter-area"></div>
+      <!-- 待ってる手紙 -->
+      <div id="home-waiting-section" style="display:none;">
+        <div class="home-section-heading" id="home-waiting-heading">待ってる手紙</div>
+        <div class="home-waiting-list" id="home-waiting-list"></div>
+      </div>
+      <!-- 届いた手紙 -->
+      <div id="home-delivered-section" style="display:none;">
+        <div class="home-section-heading" id="home-delivered-heading">届いた手紙</div>
+        <div class="inbox" id="home-delivered-list"></div>
+      </div>
+      <!-- 旧ID互換（他のJSから参照） -->
+      <div class="inbox" id="home-letter-area" style="display:none;"></div>
       <!-- 空状態（中央寄せ） -->
       <div class="inbox-empty" id="home-empty-state"></div>
     </div>
@@ -3441,13 +3580,6 @@ function getMonipoGreeting(hour) {
 // ===== 時計・背景更新 =====
 function updateClock() {
   const now = new Date();
-  const h = String(now.getHours()).padStart(2, '0');
-  const m = String(now.getMinutes()).padStart(2, '0');
-  document.getElementById('clock').textContent = `${h}:${m}`;
-
-  const days = ['日', '月', '火', '水', '木', '金', '土'];
-  document.getElementById('date-display').textContent =
-    `${now.getMonth()+1}月${now.getDate()}日 ${days[now.getDay()]}曜日`;
 
   const greetingEl = document.getElementById('home-greeting');
   if (greetingEl) greetingEl.textContent = getMonipoGreeting(now.getHours());
@@ -3476,7 +3608,6 @@ function updateClock() {
 function updateHomeBackground(hour) {
   const bg = document.getElementById('home-bg');
   const stars = document.getElementById('stars');
-  const letterArea = document.getElementById('home-letter-area');
 
   bg.className = 'home-bg';
 
@@ -3507,10 +3638,6 @@ function updateHomeBackground(hour) {
   const lightTime = isMorning || isDaytime;
 
   // ヘッダーのライトモード
-  const clockEl = document.getElementById('clock');
-  const dateEl = document.getElementById('date-display');
-  if (clockEl) clockEl.classList.toggle('home-header__clock--light', lightTime);
-  if (dateEl) dateEl.classList.toggle('home-header__date--light', lightTime);
   const bubbleEl = document.getElementById('home-bubble');
   if (bubbleEl) bubbleEl.classList.toggle('home-header__bubble--light', lightTime);
   const greetingEl = document.getElementById('home-greeting');
@@ -3520,28 +3647,57 @@ function updateHomeBackground(hour) {
   const fab = document.getElementById('home-fab');
   if (fab) fab.classList.toggle('home-fab--light', lightTime);
 
-  // 受信ボックスアイテムのライトモード
-  if (letterArea) {
-    letterArea.querySelectorAll('.inbox-item').forEach(item => {
+  // セクション見出しのライトモード
+  document.querySelectorAll('.home-section-heading').forEach(h => {
+    h.classList.toggle('home-section-heading--light', lightTime);
+  });
+
+  // 待ってる手紙カードのライトモード
+  const waitingList = document.getElementById('home-waiting-list');
+  if (waitingList) {
+    waitingList.querySelectorAll('.waiting-card').forEach(c => {
+      c.classList.toggle('waiting-card--light', lightTime);
+    });
+    waitingList.querySelectorAll('.waiting-card__icon').forEach(ic => {
+      ic.classList.toggle('waiting-card__icon--light', lightTime);
+    });
+    waitingList.querySelectorAll('.waiting-card__time').forEach(t => {
+      t.classList.toggle('waiting-card__time--light', lightTime);
+    });
+    waitingList.querySelectorAll('.waiting-card__date').forEach(d => {
+      d.classList.toggle('waiting-card__date--light', lightTime);
+    });
+    waitingList.querySelectorAll('.waiting-card__sub').forEach(s => {
+      s.classList.toggle('waiting-card__sub--light', lightTime);
+    });
+    waitingList.querySelectorAll('.waiting-card__status').forEach(s => {
+      s.classList.toggle('waiting-card__status--light', lightTime);
+    });
+    waitingList.querySelectorAll('.waiting-card__delete').forEach(d => {
+      d.classList.toggle('waiting-card__delete--light', lightTime);
+    });
+  }
+
+  // 届いた手紙リストのライトモード
+  const deliveredList = document.getElementById('home-delivered-list');
+  if (deliveredList) {
+    deliveredList.querySelectorAll('.inbox-item').forEach(item => {
       item.classList.toggle('inbox-item--light', lightTime);
     });
-    letterArea.querySelectorAll('.inbox-item__icon--self').forEach(ic => {
+    deliveredList.querySelectorAll('.inbox-item__icon--self').forEach(ic => {
       ic.classList.toggle('inbox-item__icon--light', lightTime);
     });
-    letterArea.querySelectorAll('.inbox-item__icon--friend').forEach(ic => {
+    deliveredList.querySelectorAll('.inbox-item__icon--friend').forEach(ic => {
       ic.classList.toggle('inbox-item__icon--light', lightTime);
     });
-    letterArea.querySelectorAll('.inbox-item__title').forEach(t => {
+    deliveredList.querySelectorAll('.inbox-item__title').forEach(t => {
       t.classList.toggle('inbox-item__title--light', lightTime);
     });
-    letterArea.querySelectorAll('.inbox-item__sub').forEach(s => {
+    deliveredList.querySelectorAll('.inbox-item__sub').forEach(s => {
       s.classList.toggle('inbox-item__sub--light', lightTime);
     });
-    letterArea.querySelectorAll('.inbox-item__status').forEach(s => {
+    deliveredList.querySelectorAll('.inbox-item__status').forEach(s => {
       s.classList.toggle('inbox-item__status--light', lightTime);
-    });
-    letterArea.querySelectorAll('.inbox-item__delete').forEach(d => {
-      d.classList.toggle('inbox-item__delete--light', lightTime);
     });
   }
 
@@ -4057,18 +4213,19 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// ===== ホーム: 手紙エリア（CTA / 予約済みカード） =====
+// ===== ホーム: 手紙エリア（待ってる手紙 / 届いた手紙） =====
 function updateHomeLetterArea() {
-  const el = document.getElementById('home-letter-area');
+  const waitingSection = document.getElementById('home-waiting-section');
+  const waitingList = document.getElementById('home-waiting-list');
+  const deliveredSection = document.getElementById('home-delivered-section');
+  const deliveredList = document.getElementById('home-delivered-list');
   const emptyEl = document.getElementById('home-empty-state');
-  if (!el) return;
+  if (!waitingList || !deliveredList) return;
 
+  // --- 待ってる手紙（未来のアラーム） ---
   const futureAlarms = getFutureAlarms();
-  const hasItems = futureAlarms.length > 0;
+  let waitingHtml = '';
 
-  let html = '';
-
-  // 受信ボックス形式で予約済み手紙を表示
   futureAlarms.forEach(alarm => {
     const t = new Date(alarm.targetDate);
     const days = ['日', '月', '火', '水', '木', '金', '土'];
@@ -4080,45 +4237,65 @@ function updateHomeLetterArea() {
     const initial = isFriend ? escapeHtml((alarm.friendFromName || '?')[0]) : null;
     const preview = isFriend
       ? `${fromName}からの手紙`
-      : (alarm.letter ? alarm.letter.substring(0, 40) + (alarm.letter.length > 40 ? '…' : '') : '');
+      : (alarm.letter ? alarm.letter.substring(0, 30) + (alarm.letter.length > 30 ? '…' : '') : '');
+    const iconClass = isFriend ? 'waiting-card__icon--friend' : '';
 
-    if (isFriend) {
-      html += `
-        <div class="inbox-item">
-          <div class="inbox-item__icon inbox-item__icon--friend">${initial}</div>
-          <div class="inbox-item__body">
-            <div class="inbox-item__title">${dateStr} ${h}:${m}</div>
-            <div class="inbox-item__sub">${preview}</div>
-          </div>
-          <span class="inbox-item__status">予約中</span>
-          <button class="inbox-item__delete" onclick="deleteAlarm(${alarm.id})" aria-label="削除">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-          </button>
+    waitingHtml += `
+      <div class="waiting-card" ${!isFriend ? `onclick="openWriteSheet(${alarm.id})"` : ''}>
+        <div class="waiting-card__icon ${iconClass}">${isFriend ? initial : getUserIcon()}</div>
+        <div class="waiting-card__body">
+          <div class="waiting-card__time">${h}:${m}</div>
+          <div class="waiting-card__date">${dateStr}</div>
+          ${preview ? `<div class="waiting-card__sub">${preview}</div>` : ''}
         </div>
-      `;
-    } else {
-      html += `
-        <div class="inbox-item">
-          <div class="inbox-item__icon inbox-item__icon--self" onclick="openWriteSheet(${alarm.id})">${getUserIcon()}</div>
-          <div class="inbox-item__body" onclick="openWriteSheet(${alarm.id})">
-            <div class="inbox-item__title">${dateStr} ${h}:${m}</div>
-            <div class="inbox-item__sub">${preview || '預かり中'}</div>
-          </div>
-          <span class="inbox-item__status">預かり中</span>
-          <button class="inbox-item__delete" onclick="deleteAlarm(${alarm.id})" aria-label="削除">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-          </button>
-        </div>
-      `;
-    }
+        <span class="waiting-card__status">${isFriend ? '予約中' : '預かり中'}</span>
+        <button class="waiting-card__delete" onclick="event.stopPropagation();deleteAlarm(${alarm.id})" aria-label="削除">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    `;
   });
 
-  el.innerHTML = html;
+  waitingList.innerHTML = waitingHtml;
+  if (waitingSection) waitingSection.style.display = futureAlarms.length > 0 ? '' : 'none';
 
-  // 空状態（モニポくん吹き出しがあるので非表示）
+  // --- 届いた手紙（履歴から直近のもの） ---
+  const history = JSON.parse(localStorage.getItem('mezame_history') || '[]');
+  const recentDelivered = history.slice(0, 5); // 直近5件
+  let deliveredHtml = '';
+
+  recentDelivered.forEach(item => {
+    const d = new Date(item.replyDate || item.letterDate);
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
+    const dateStr = `${d.getMonth()+1}/${d.getDate()}（${days[d.getDay()]}）`;
+    const preview = item.letter ? item.letter.substring(0, 30) + (item.letter.length > 30 ? '…' : '') : '';
+
+    deliveredHtml += `
+      <div class="inbox-item">
+        <div class="inbox-item__icon inbox-item__icon--self">${getUserIcon()}</div>
+        <div class="inbox-item__body">
+          <div class="inbox-item__title">${dateStr}</div>
+          <div class="inbox-item__sub">${escapeHtml(preview)}</div>
+        </div>
+      </div>
+    `;
+  });
+
+  deliveredList.innerHTML = deliveredHtml;
+  if (deliveredSection) deliveredSection.style.display = recentDelivered.length > 0 ? '' : 'none';
+
+  // 空状態
   if (emptyEl) {
-    emptyEl.classList.remove('active');
-    emptyEl.innerHTML = '';
+    if (futureAlarms.length === 0 && recentDelivered.length === 0) {
+      emptyEl.classList.add('active');
+      emptyEl.innerHTML = `
+        <div class="inbox-empty__icon">📮</div>
+        <p class="inbox-empty__text">…まだ手紙がないよ。<br>書いてみない？</p>
+      `;
+    } else {
+      emptyEl.classList.remove('active');
+      emptyEl.innerHTML = '';
+    }
   }
 }
 
@@ -6006,8 +6183,9 @@ async function markFriendLettersRead() {
 
 // ===== ホーム画面のフレンド手紙通知 =====
 async function updateHomeFriendLetters() {
-  const inbox = document.getElementById('home-letter-area');
-  if (!inbox || !currentUser) return;
+  const deliveredList = document.getElementById('home-delivered-list');
+  const deliveredSection = document.getElementById('home-delivered-section');
+  if (!deliveredList || !currentUser) return;
 
   try {
     const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
@@ -6017,10 +6195,9 @@ async function updateHomeFriendLetters() {
       .where('read', '==', false);
 
     const snap = await q.get();
-    let friendHtml = '';
+    let friendDeliveredHtml = '';
     snap.forEach(doc => {
       const d = doc.data();
-      // deliverDate（新形式）またはdeliverAt（旧形式）で判定
       const deliverDate = d.deliverDate ? d.deliverDate.toDate() : (d.deliverAt ? d.deliverAt.toDate() : null);
       if (!deliverDate || deliverDate > todayEnd) return;
 
@@ -6031,38 +6208,27 @@ async function updateHomeFriendLetters() {
       const deliverMs = deliverDate.getTime();
 
       if (d.alarmSet === false) {
-        // アラーム未設定 → タップでアラーム設定を開く（内容は見えない）
-        friendHtml += `
+        friendDeliveredHtml += `
           <div class="inbox-item inbox-item--friend" onclick="setupFriendLetterAlarm('${docId}', '${escapedName}', ${deliverMs})">
             <div class="inbox-item__icon inbox-item__icon--friend">${initial}</div>
             <div class="inbox-item__body">
               <div class="inbox-item__title">${fromName}からの手紙</div>
-              <div class="inbox-item__sub">手紙が届いてる。何時に開ける？</div>
+              <div class="inbox-item__sub">…何時に開ける？</div>
             </div>
             <span class="inbox-item__status" style="color:var(--color-primary);">時間をセット</span>
           </div>
         `;
       } else if (d.alarmSet === true) {
-        // アラーム設定済み → 待機中表示（内容は見えない）
-        friendHtml += `
-          <div class="inbox-item inbox-item--friend">
-            <div class="inbox-item__icon inbox-item__icon--friend">${initial}</div>
-            <div class="inbox-item__body">
-              <div class="inbox-item__title">${fromName}からの手紙</div>
-              <div class="inbox-item__sub">セットした時間に届けるね</div>
-            </div>
-            <span class="inbox-item__status">予約中</span>
-          </div>
-        `;
+        // alarmSet済み → 待ってる手紙として既にupdateHomeLetterAreaで表示
+        return;
       } else {
-        // 旧形式（alarmSetフィールドなし）→ 従来通り表示
         const preview = d.letter ? escapeHtml(d.letter.substring(0, 30)) + (d.letter.length > 30 ? '…' : '') : '';
-        friendHtml += `
+        friendDeliveredHtml += `
           <div class="inbox-item inbox-item--friend">
             <div class="inbox-item__icon inbox-item__icon--friend">${initial}</div>
             <div class="inbox-item__body">
               <div class="inbox-item__title">${fromName}からの手紙</div>
-              <div class="inbox-item__sub">${preview || '手紙が届いています'}</div>
+              <div class="inbox-item__sub">${preview || '…手紙が届いてるよ'}</div>
             </div>
             <span class="inbox-item__status">未読</span>
           </div>
@@ -6071,9 +6237,10 @@ async function updateHomeFriendLetters() {
     });
 
     // 既存のフレンド手紙アイテムを削除してから追加（重複防止）
-    inbox.querySelectorAll('.inbox-item--friend').forEach(el => el.remove());
-    if (friendHtml) {
-      inbox.insertAdjacentHTML('beforeend', friendHtml);
+    deliveredList.querySelectorAll('.inbox-item--friend').forEach(el => el.remove());
+    if (friendDeliveredHtml) {
+      deliveredList.insertAdjacentHTML('beforeend', friendDeliveredHtml);
+      if (deliveredSection) deliveredSection.style.display = '';
       const emptyEl = document.getElementById('home-empty-state');
       if (emptyEl) { emptyEl.classList.remove('active'); emptyEl.innerHTML = ''; }
     }
