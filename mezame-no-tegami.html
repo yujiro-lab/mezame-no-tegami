@@ -1157,36 +1157,6 @@ body {
 .waiting-card__sub--light {
   color: var(--color-text-tertiary);
 }
-.waiting-card__delete {
-  position: absolute;
-  top: 50%;
-  right: 16px;
-  transform: translateY(-50%);
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: none;
-  color: rgba(250, 246, 241, 0.45);
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  transition: color var(--duration-fast) var(--ease-out),
-              background-color var(--duration-fast) var(--ease-out);
-  -webkit-tap-highlight-color: transparent;
-}
-.waiting-card__delete:active {
-  color: rgba(250, 246, 241, 0.8);
-  background: rgba(201, 91, 104, 0.15);
-}
-.waiting-card__delete--light {
-  color: rgba(26, 21, 32, 0.35);
-}
-.waiting-card__delete--light:active {
-  color: var(--color-text-secondary);
-  background: rgba(201, 91, 104, 0.1);
-}
 
 /* --- 届いた手紙（セカンダリリスト） --- */
 .inbox {
@@ -2458,6 +2428,23 @@ body {
   transform: scale(0.98);
 }
 .sheet__cta:disabled { opacity: 0.25; cursor: not-allowed; }
+.sheet__delete-btn {
+  display: block;
+  width: 100%;
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  background: none;
+  border: none;
+  color: var(--color-error);
+  font-family: var(--font-sans);
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-regular);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.sheet__delete-btn:active {
+  opacity: 0.6;
+}
 
 /* --- Confirmation phase (in-sheet) --- */
 .sheet__goodnight {
@@ -3144,6 +3131,7 @@ body {
       </div>
       <div class="sheet__cta-area">
         <button class="sheet__cta" id="sheet-send-btn" onclick="setAlarmFromSheet()">設定する</button>
+        <button class="sheet__delete-btn" id="sheet-delete-btn" onclick="deleteAlarmFromSheet()" style="display:none;">この手紙を削除</button>
       </div>
     </div>
     <div class="sheet__goodnight" id="sheet-goodnight">
@@ -3672,9 +3660,6 @@ function updateHomeBackground(hour) {
     waitingList.querySelectorAll('.waiting-card__sub').forEach(s => {
       s.classList.toggle('waiting-card__sub--light', lightTime);
     });
-    waitingList.querySelectorAll('.waiting-card__delete').forEach(d => {
-      d.classList.toggle('waiting-card__delete--light', lightTime);
-    });
   }
 
   // 届いた手紙リストのライトモード
@@ -3915,6 +3900,18 @@ function deleteAlarm(alarmId) {
   showToast('…消したよ');
 }
 
+function deleteAlarmFromSheet() {
+  if (!editingAlarmId) return;
+  if (!confirm('…この手紙、消す？')) return;
+  let alarms = loadAlarms();
+  alarms = alarms.filter(a => a.id !== editingAlarmId);
+  saveAlarms(alarms);
+  closeWriteSheet();
+  updateHomeLetterArea();
+  updateHomeEmptyState();
+  showToast('…消したよ');
+}
+
 // ===== カレンダーピッカー（共通） =====
 const calState = {
   main:   { selectedDate: null, viewMonth: null, viewYear: null, elId: 'cal-picker', monthId: 'sheet-alarm-month', dayId: 'sheet-alarm-day', displayId: 'sheet-date-display', onSelect: () => updateSheetDeliveryDate() },
@@ -4074,6 +4071,10 @@ function openWriteSheet(alarmId) {
   const ctaBtn = document.getElementById('sheet-send-btn');
   const letterVal = document.getElementById('sheet-letter-input').value.trim();
   if (ctaBtn) ctaBtn.classList.toggle('sheet__cta--ready', letterVal.length > 0);
+
+  // Show delete button only when editing
+  const deleteBtn = document.getElementById('sheet-delete-btn');
+  if (deleteBtn) deleteBtn.style.display = alarmId ? '' : 'none';
 
   // Reset recipient to self
   sheetRecipientUid = null;
@@ -4341,9 +4342,6 @@ function updateHomeLetterArea() {
           <div class="waiting-card__time">${h}:${m}</div>
           <div class="waiting-card__from">${senderLabel}</div>
         </div>
-        <button class="waiting-card__delete" onclick="event.stopPropagation();deleteAlarm(${alarm.id})" aria-label="削除">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-        </button>
       </div>
     `;
   });
