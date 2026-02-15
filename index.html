@@ -2392,6 +2392,109 @@ body {
   animation: gentleFloat 3s ease-in-out infinite;
 }
 
+/* --- Assist (モニポくんの下書き) inline --- */
+.assist-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.assist-bar__keyword {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-md);
+  background: rgba(255,255,255,0.04);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-body-sm);
+  outline: none;
+  box-sizing: border-box;
+}
+.assist-bar__keyword::placeholder { color: var(--color-text-tertiary); }
+.assist-bar__keyword:focus { border-color: rgba(255,255,255,0.25); }
+
+.assist-bar__tone {
+  flex-shrink: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-tertiary);
+  font-family: var(--font-sans);
+  font-size: var(--text-caption);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.assist-bar__tone:focus { border-color: rgba(255,255,255,0.25); outline: none; }
+
+.assist-bar__gen {
+  flex-shrink: 0;
+  width: 36px; height: 36px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: rgba(255,255,255,0.1);
+  color: var(--color-text-primary);
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--duration-fast) ease;
+}
+.assist-bar__gen:active { transform: scale(0.9); }
+.assist-bar__gen.loading {
+  pointer-events: none;
+  animation: assistSpin 1s linear infinite;
+}
+
+.assist-toolbar {
+  display: none;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  animation: assistFadeIn 200ms ease both;
+}
+.assist-toolbar.visible { display: flex; }
+.assist-toolbar__btn {
+  background: none;
+  border: none;
+  color: var(--color-text-tertiary);
+  font-family: var(--font-sans);
+  font-size: var(--text-caption);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  transition: all var(--duration-fast) ease;
+}
+.assist-toolbar__btn:active { opacity: 0.6; }
+.assist-toolbar__btn--undo { color: var(--color-text-secondary); }
+
+.assist__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: var(--text-caption);
+  color: var(--color-text-tertiary);
+  opacity: 0.6;
+}
+
+@keyframes assistFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes assistSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* --- Sheet SE responsive --- */
 @media (max-width: 380px) {
   .sheet { height: 90vh; }
@@ -2436,7 +2539,7 @@ body {
     <div class="home-bg home-bg--night" id="home-bg"></div>
     <div class="stars" id="stars"></div>
     <div class="home-content" id="home-content">
-      <!-- ヘッダー: ブランド＋日付＋時刻＋ポストくん -->
+      <!-- ヘッダー: ブランド＋日付＋時刻＋モニポくん -->
       <div class="home-header" id="home-header">
         <div class="home-header__brand">
           <img class="home-header__brand-icon" src="画像/Generated_image.png" alt="monipo" onerror="this.style.display='none'">
@@ -2751,8 +2854,24 @@ body {
         <div class="sheet__section">
           <div class="sheet__section-title">メッセージ</div>
           <div class="sheet__field-group">
-            <div class="sheet__field sheet__field--textarea">
+            <!-- モニポくんの下書き: インラインバー -->
+            <div class="assist-bar" id="assist-bar">
+              <input type="text" class="assist-bar__keyword" id="assist-keyword" placeholder="キーワード（例: おつかれ、あした）" aria-label="キーワード">
+              <select class="assist-bar__tone" id="assist-tone" aria-label="きぶん">
+                <option value="normal">ふつう</option>
+                <option value="gentle">やさしめ</option>
+                <option value="funny">おもしろ</option>
+                <option value="honest">ぶっちゃけ</option>
+              </select>
+              <button class="assist-bar__gen" id="assist-gen-btn" onclick="generateAssistLetter()" aria-label="モニポくんに書いてもらう" title="✨ モニポくんに書いてもらう">✨</button>
+            </div>
+            <div class="sheet__field sheet__field--textarea" id="sheet-textarea-field">
               <textarea class="sheet__textarea" id="sheet-letter-input" placeholder="あしたの朝の自分に、ひとこと。" aria-label="手紙の内容"></textarea>
+            </div>
+            <!-- 生成後ツールバー -->
+            <div class="assist-toolbar" id="assist-toolbar">
+              <button class="assist-toolbar__btn" onclick="generateAssistLetter()" title="もういっかい">✨ もういっかい</button>
+              <button class="assist-toolbar__btn assist-toolbar__btn--undo" id="assist-undo-btn" onclick="undoAssist()">↩ もとに戻す</button>
             </div>
           </div>
         </div>
@@ -2898,7 +3017,7 @@ function init() {
   loadSettings();
   updateHomeLetterArea();
   updateStreak();
-  updatePostkunMessage();
+  updateMonipoMessage();
   updateTodayQuote();
   navigateTo('home');
 
@@ -3034,7 +3153,7 @@ function navigateTo(id) {
 
   // 画面固有の更新
   if (id === 'home') {
-    updatePostkunMessage();
+    updateMonipoMessage();
     updateTodayQuote();
     updateHomeLetterArea();
     updateStreak();
@@ -3331,21 +3450,21 @@ function updateHomeEmptyState() {
 }
 
 // ===== きょうのひとこと =====
-// ===== ポストくんメッセージ（時間帯挨拶 + 日替わり） =====
-const postkunMessages = [
-  'きょうのぼくの調子？ ……ねむい。いつもとおなじ。',
-  'ぼくのなかに手紙がたまると ちょっとくすぐったいんだ。',
-  'きのう夢を見たよ。手紙に足が生えて自分で届けにいく夢。……ぼくいらないじゃん。',
-  '夜に書いた手紙って なんであんなに正直なんだろうね。',
-  '書くことがないって言う人いるけど、「書くことがない」って書けばいいんだよ。',
-  'ポストがしゃべるのって やっぱり変だよね？ ……あんまり気にしないで。',
-  'スマホの画面が暗くなると ぼくも寝てるんだよ。しらなかったでしょ。',
-  '届けられなかった手紙なんてないよ。届けなかっただけで。',
-  'ぼくの趣味？ ……届けること。しかないかも。',
-  'ぼく、ほかのアプリの通知が来るたびにドキッとするんだ。',
+// ===== モニポくんメッセージ（時間帯挨拶 + 日替わり） =====
+const monipoMessages = [
+  '…きょうのぼくの調子？ ねむい。いつもとおなじ。',
+  '…ポストのなかに手紙がたまると ちょっとくすぐったいんだ。',
+  'きのう夢を見たよ。手紙に足が生えて自分で届けにいく夢。…ぼくいらないじゃん。',
+  '…夜に書いた手紙って なんであんなに正直なんだろうね。',
+  '書くことがないって言う人いるけど、「書くことがない」って書けばいいんだよ。…たぶん。',
+  '…カエルがポストに住んでるの、やっぱり変だよね。あんまり気にしないで。',
+  '…スマホの画面が暗くなると ぼくも寝てるんだよ。しらなかったでしょ。',
+  '…届けられなかった手紙なんてないよ。届けなかっただけで。',
+  'ぼくの趣味？ …届けること。しかないかも。',
+  '…ぼく、ほかのアプリの通知が来るたびにドキッとするんだ。',
 ];
 
-function updatePostkunMessage() {
+function updateMonipoMessage() {
   const el = document.getElementById('home-postmsg');
   if (!el) return;
 
@@ -3367,7 +3486,7 @@ function updatePostkunMessage() {
 
   // 日替わりメッセージ（手紙なし or 追加表示）
   const seed = now.getFullYear() * 10000 + (now.getMonth()+1) * 100 + now.getDate();
-  const msg = postkunMessages[seed % postkunMessages.length];
+  const msg = monipoMessages[seed % monipoMessages.length];
 
   // 久しぶりの復帰チェック
   const history = JSON.parse(localStorage.getItem('mezame_history') || '[]');
@@ -3580,6 +3699,8 @@ function openWriteSheet(alarmId) {
   sheet.classList.remove('goodnight-expand', 'expanded');
   overlay.classList.remove('goodnight');
   editingAlarmId = alarmId || null;
+  resetAssist();
+  document.getElementById('sheet-letter-input').dataset.assistGenerated = '';
 
   const today = new Date();
   const seed = today.getFullYear() * 10000 + (today.getMonth()+1) * 100 + today.getDate();
@@ -3605,6 +3726,7 @@ function openWriteSheet(alarmId) {
       document.getElementById('sheet-alarm-hour').value = String(alarm.hour).padStart(2, '0');
       document.getElementById('sheet-alarm-minute').value = String(alarm.minute).padStart(2, '0');
       document.getElementById('sheet-letter-input').value = alarm.letter || '';
+      document.getElementById('sheet-letter-input').dataset.assistGenerated = alarm.assistGenerated ? 'true' : '';
     }
   } else {
     // New letter: default date/time
@@ -3679,6 +3801,10 @@ function selectSheetRecipient(uid, name) {
   const dateNote = document.getElementById('sheet-friend-date-note');
   if (timeField) timeField.style.display = uid ? 'none' : '';
   if (dateNote) dateNote.style.display = uid ? '' : 'none';
+  // フレンド宛ならアシストバーを隠す
+  const assistBar = document.getElementById('assist-bar');
+  if (assistBar) assistBar.style.display = uid ? 'none' : '';
+  if (uid) resetAssist();
   // Close picker
   const picker = document.getElementById('sheet-friend-picker');
   if (picker) picker.classList.remove('open');
@@ -3699,9 +3825,11 @@ function closeWriteSheet() {
   sheetOpen = false;
   editingAlarmId = null;
   if (sheetGoodnightTimer) { clearTimeout(sheetGoodnightTimer); sheetGoodnightTimer = null; }
+  resetAssist();
 
   setTimeout(() => {
     textarea.value = '';
+    textarea.dataset.assistGenerated = '';
     document.getElementById('sheet-content').classList.remove('fading');
     const gn = document.getElementById('sheet-goodnight');
     gn.classList.remove('active');
@@ -3715,11 +3843,12 @@ function setAlarmFromSheet() {
     return;
   }
 
+  const textarea = document.getElementById('sheet-letter-input');
   const monthVal = parseInt(document.getElementById('sheet-alarm-month').value);
   const dayVal = parseInt(document.getElementById('sheet-alarm-day').value);
   const hour = parseInt(document.getElementById('sheet-alarm-hour').value);
   const minute = parseInt(document.getElementById('sheet-alarm-minute').value);
-  const letter = document.getElementById('sheet-letter-input').value.trim();
+  const letter = textarea.value.trim();
 
   if (isNaN(monthVal) || isNaN(dayVal) || monthVal < 1 || monthVal > 12 || dayVal < 1 || dayVal > 31) {
     showToast('日付を正しく入れてね');
@@ -3751,6 +3880,9 @@ function setAlarmFromSheet() {
     setDate: now.toISOString(),
     targetDate: target.toISOString()
   };
+  if (textarea.dataset.assistGenerated === 'true') {
+    alarmEntry.assistGenerated = true;
+  }
 
   let alarms = loadAlarms();
   if (editingAlarmId) {
@@ -3794,7 +3926,10 @@ function finishSheetGoodnight() {
     const gn = document.getElementById('sheet-goodnight');
     gn.classList.remove('active');
     sheet.classList.remove('expanded');
-    document.getElementById('sheet-letter-input').value = '';
+    const textarea = document.getElementById('sheet-letter-input');
+    textarea.value = '';
+    textarea.dataset.assistGenerated = '';
+    resetAssist();
 
     updateHomeLetterArea();
     updateStreak();
@@ -3926,7 +4061,7 @@ function getStreakMessage(streak) {
   if (streak === 3) return '3日つづいた。たいしたもんだ。';
   if (streak === 7) return '1週間。もう習慣じゃん。';
   if (streak === 14) return '2週間。ここでやめたらもったいないかもね。';
-  if (streak === 30) return '30日。ポストくん感動してる。たぶん。';
+  if (streak === 30) return '30日。モニポくん感動してる。たぶん。';
   if (streak === 50) return '50日。もう手紙なしの朝には戻れないかもよ？';
   if (streak === 100) return '100日！ もう離れられないよ。';
   if (streak === 365) return '1年。きみは伝説になった。';
@@ -4369,13 +4504,15 @@ function dismissAlarm() {
   } else {
     // 自分への手紙 → localStorageに保存
     const history = JSON.parse(localStorage.getItem('mezame_history') || '[]');
-    history.unshift({
+    const historyEntry = {
       letter: alarmData.letter,
       letterDate: alarmData.setDate,
       reply,
       replyDate: new Date().toISOString(),
       fromName: alarmData.recipientName || 'じぶん'
-    });
+    };
+    if (alarmData.assistGenerated) historyEntry.assistGenerated = true;
+    history.unshift(historyEntry);
     if (history.length > 100) history.length = 100;
     localStorage.setItem('mezame_history', JSON.stringify(history));
   }
@@ -4407,13 +4544,15 @@ function dismissAlarmReadOnly() {
   } else {
     // 自分への手紙 → localStorageに保存
     const history = JSON.parse(localStorage.getItem('mezame_history') || '[]');
-    history.unshift({
+    const readEntry = {
       letter: alarmData.letter,
       letterDate: alarmData.setDate,
       reply: '(読んだよ)',
       replyDate: new Date().toISOString(),
       fromName: alarmData.recipientName || 'じぶん'
-    });
+    };
+    if (alarmData.assistGenerated) readEntry.assistGenerated = true;
+    history.unshift(readEntry);
     if (history.length > 100) history.length = 100;
     localStorage.setItem('mezame_history', JSON.stringify(history));
   }
@@ -4503,7 +4642,7 @@ function renderHistory() {
           </div>
         </div>
         <div class="card-history__section">
-          <div class="card-history__section-label">${isSelf ? 'ゆうべのわたし' : escapeHtml(from) + 'から'}</div>
+          <div class="card-history__section-label">${isSelf ? 'ゆうべのわたし' : escapeHtml(from) + 'から'}${item.assistGenerated ? ' <span class="assist__badge">📮</span>' : ''}</div>
           <div class="card-history__section-text">${escapeHtml(item.letter)}</div>
         </div>
         <div class="card-history__section">
@@ -4525,6 +4664,143 @@ function renderHistory() {
     }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
     list.querySelectorAll('.card-history').forEach(card => observer.observe(card));
   });
+}
+
+// ===== モニポくんの下書き（Inline Assist） =====
+const GEMINI_API_KEY = 'GEMINI_KEY_REMOVED';
+let assistAbortController = null;
+let assistPrevText = ''; // undo用
+
+async function generateAssistLetter() {
+  const textarea = document.getElementById('sheet-letter-input');
+  const keyword = document.getElementById('assist-keyword').value.trim();
+  const tone = document.getElementById('assist-tone').value;
+  const genBtn = document.getElementById('assist-gen-btn');
+
+  // 現在のテキストをundo用に保存
+  assistPrevText = textarea.value;
+
+  const toneMap = {
+    normal: 'ふつうに、さらっと。日常的な語りかけ。',
+    gentle: 'やさしく。背中をそっと押すような、あたたかい感じ。',
+    funny: 'ちょっとおもしろく。くすっとなる感じで。',
+    honest: 'ストレートに、正直に。ごまかさない。'
+  };
+  const toneDesc = toneMap[tone] || toneMap.normal;
+  const keywordPart = keyword
+    ? `キーワード: ${keyword}\nこのキーワードをできるだけそのまま手紙に含めてください。`
+    : '特にキーワードなし。今日一日をねぎらう内容で。';
+
+  const prompt = `あなたは「monipo」というアプリの中にいるモニポくん（ポストに住むカエル）です。夜の自分が朝の自分に送る短い手紙を下書きしてください。
+
+ルール:
+- 2〜4行の短い手紙を1通だけ書いてください
+- 最後は必ず「おはよう。」で終えてください
+- 敬語は使わず、自分に語りかけるようなカジュアルな口調で
+- 過剰に感動的にならないでください。さらっと、でもあたたかく
+- 手紙の本文だけを返してください。余計な説明や引用符は不要です
+
+トーン: ${toneDesc}
+${keywordPart}`;
+
+  if (assistAbortController) assistAbortController.abort();
+  assistAbortController = new AbortController();
+
+  // ローディング状態
+  genBtn.classList.add('loading');
+  genBtn.textContent = '⏳';
+  textarea.value = '';
+  textarea.placeholder = '…モニポくんが書いてるよ';
+
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent?alt=sse&key=${GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.9, maxOutputTokens: 200 }
+        }),
+        signal: assistAbortController.signal
+      }
+    );
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error?.message || `API error: ${res.status}`);
+    }
+
+    // ストリーミング読み取り
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = '';
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      // SSEイベントをパース
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const jsonStr = line.slice(6).trim();
+          if (!jsonStr || jsonStr === '[DONE]') continue;
+          try {
+            const chunk = JSON.parse(jsonStr);
+            const text = chunk.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (text) {
+              fullText += text;
+              textarea.value = fullText;
+            }
+          } catch (parseErr) { /* skip malformed */ }
+        }
+      }
+    }
+
+    if (!fullText.trim()) throw new Error('empty');
+
+    textarea.dataset.assistGenerated = 'true';
+    textarea.dispatchEvent(new Event('input'));
+
+    // ツールバー表示
+    document.getElementById('assist-toolbar').classList.add('visible');
+
+  } catch (e) {
+    if (e.name === 'AbortError') return;
+    console.error('Assist generation error:', e);
+    textarea.value = assistPrevText; // 元に戻す
+    showToast('…うまく書けなかった。もう一回ためしてみて');
+  } finally {
+    assistAbortController = null;
+    genBtn.classList.remove('loading');
+    genBtn.textContent = '✨';
+    textarea.placeholder = 'あしたの朝の自分に、ひとこと。';
+  }
+}
+
+function undoAssist() {
+  const textarea = document.getElementById('sheet-letter-input');
+  textarea.value = assistPrevText;
+  textarea.dataset.assistGenerated = '';
+  textarea.dispatchEvent(new Event('input'));
+  document.getElementById('assist-toolbar').classList.remove('visible');
+}
+
+function resetAssist() {
+  if (assistAbortController) { assistAbortController.abort(); assistAbortController = null; }
+  assistPrevText = '';
+  const keyword = document.getElementById('assist-keyword');
+  if (keyword) keyword.value = '';
+  const tone = document.getElementById('assist-tone');
+  if (tone) tone.value = 'normal';
+  const toolbar = document.getElementById('assist-toolbar');
+  if (toolbar) toolbar.classList.remove('visible');
+  const genBtn = document.getElementById('assist-gen-btn');
+  if (genBtn) { genBtn.classList.remove('loading'); genBtn.textContent = '✨'; }
 }
 
 // ===== 設定 =====
