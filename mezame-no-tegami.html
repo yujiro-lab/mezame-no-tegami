@@ -1158,7 +1158,7 @@ body {
   color: var(--color-text-tertiary);
 }
 
-/* --- 届いた手紙（セカンダリリスト） --- */
+/* --- 届いた手紙（Gmail風リスト） --- */
 .inbox {
   display: flex;
   flex-direction: column;
@@ -1167,47 +1167,98 @@ body {
 }
 .inbox-item {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: var(--space-3);
-  padding: 10px 0;
-  border-bottom: 1px solid rgba(250, 246, 241, 0.05);
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(250, 246, 241, 0.06);
   text-align: left;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
 }
 .inbox-item:last-child {
   border-bottom: none;
 }
+.inbox-item:active {
+  opacity: 0.6;
+}
 .inbox-item--light {
-  border-bottom-color: rgba(0, 0, 0, 0.04);
+  border-bottom-color: rgba(0, 0, 0, 0.05);
 }
-
-/* 届いた手紙 — 日付ラベル */
-.inbox-item__date {
+/* アバター */
+.inbox-item__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
   flex-shrink: 0;
-  font-family: var(--font-sans);
-  font-size: 0.75rem;
-  font-weight: var(--weight-regular);
-  color: rgba(250, 246, 241, 0.50);
-  letter-spacing: 0.04em;
-  min-width: 3em;
-  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  background: rgba(107, 90, 138, 0.15);
+  color: var(--color-dawn);
+  overflow: hidden;
 }
-.inbox-item__date--light {
-  color: var(--color-text-tertiary);
+.inbox-item__avatar--light {
+  background: rgba(107, 90, 138, 0.10);
 }
-/* 届いた手紙 — プレビューテキスト */
-.inbox-item__preview {
+.inbox-item__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* コンテンツ本体 */
+.inbox-item__body {
   flex: 1;
   min-width: 0;
-  font-family: var(--font-letter);
-  font-size: 0.75rem;
-  color: rgba(250, 246, 241, 0.55);
-  letter-spacing: var(--tracking-normal);
+}
+/* 上段: 差出人 + 時刻 */
+.inbox-item__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: 2px;
+}
+.inbox-item__sender {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: var(--weight-medium);
+  color: rgba(250, 246, 241, 0.85);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.inbox-item__sender--light {
+  color: var(--color-text-primary);
+}
+.inbox-item__time {
+  flex-shrink: 0;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  color: rgba(250, 246, 241, 0.45);
+  font-variant-numeric: tabular-nums;
+}
+.inbox-item__time--light {
+  color: var(--color-text-tertiary);
+}
+/* 下段: プレビューテキスト */
+.inbox-item__preview {
+  font-family: var(--font-letter);
+  font-size: 0.8125rem;
+  color: rgba(250, 246, 241, 0.50);
+  letter-spacing: var(--tracking-normal);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 .inbox-item__preview--light {
   color: var(--color-text-secondary);
+}
+/* 旧互換用 (未使用だが安全に残す) */
+.inbox-item__date {
+  display: none;
 }
 
 /* --- 空状態 --- */
@@ -2757,6 +2808,381 @@ body {
     font-size: 1rem;
   }
 }
+
+/* ============================================================
+   モニポくんフレンド機能
+   ============================================================ */
+
+/* 待ってる手紙カード: モニポ */
+.waiting-card--monipo {
+  border-left-color: var(--color-dawn);
+}
+.waiting-card--monipo.waiting-card--light {
+  border-left-color: var(--color-dawn);
+}
+.waiting-card__monipo-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.waiting-card__monipo-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.waiting-card__monipo-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.monipo-schedule-badge {
+  display: inline-block;
+  margin-top: var(--space-1);
+  padding: 2px 8px;
+  background: rgba(107, 90, 138, 0.15);
+  border-radius: var(--radius-full);
+  font-size: var(--text-overline);
+  color: var(--color-dawn);
+  letter-spacing: 0.02em;
+}
+.monipo-schedule-badge--light {
+  background: rgba(107, 90, 138, 0.08);
+  color: var(--color-primary);
+}
+
+/* アラーム画面: モニポ手紙セクション */
+.monipo-alarm-section {
+  margin-top: var(--space-4);
+}
+.monipo-alarm-card {
+  background: var(--color-paper);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-paper);
+}
+.monipo-alarm-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+.monipo-alarm-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.monipo-alarm-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.monipo-alarm-from {
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-primary);
+}
+.monipo-alarm-body {
+  font-family: var(--font-letter);
+  font-size: var(--text-body);
+  color: var(--color-text-primary);
+  line-height: var(--leading-loose);
+  white-space: pre-wrap;
+}
+.monipo-reply-area {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px dashed var(--color-border-primary);
+}
+.monipo-reply-label {
+  font-size: var(--text-caption);
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-2);
+}
+.monipo-reply-input {
+  width: 100%;
+  min-height: 56px;
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  font-family: var(--font-letter);
+  font-size: var(--text-body-sm);
+  color: var(--color-text-primary);
+  background: white;
+  resize: none;
+  outline: none;
+  line-height: var(--leading-relaxed);
+}
+.monipo-reply-input::placeholder {
+  color: var(--color-text-tertiary);
+}
+.monipo-reply-input:focus {
+  border-color: var(--color-dawn);
+}
+.monipo-reply-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+/* ともだちリスト: モニポくん */
+.monipo-friend-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-3);
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-spring);
+}
+.monipo-friend-row:active {
+  transform: scale(0.98);
+}
+.monipo-friend-row__avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.monipo-friend-row__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.monipo-friend-row__info {
+  flex: 1;
+  min-width: 0;
+}
+.monipo-friend-row__name {
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-primary);
+}
+.monipo-friend-row__status {
+  font-size: var(--text-caption);
+  color: var(--color-text-tertiary);
+}
+
+/* モニポスケジュール設定シート */
+.monipo-settings-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: var(--z-overlay);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-normal) var(--ease-out);
+}
+.monipo-settings-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.monipo-settings-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  padding: var(--space-6) var(--space-5) calc(var(--safe-area-bottom) + var(--space-6));
+  z-index: var(--z-modal);
+  transform: translateY(100%);
+  transition: transform var(--duration-slow) var(--ease-spring);
+}
+.monipo-settings-overlay.open + .monipo-settings-panel,
+.monipo-settings-panel.open {
+  transform: translateY(0);
+}
+.monipo-settings-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+.monipo-settings-header img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.monipo-settings-title {
+  font-size: var(--text-h3);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-primary);
+}
+.monipo-settings-sub {
+  font-size: var(--text-caption);
+  color: var(--color-text-tertiary);
+}
+.monipo-schedule-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+}
+.monipo-schedule-chip {
+  padding: var(--space-2) var(--space-4);
+  border: 1.5px solid var(--color-border-primary);
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: var(--text-body-sm);
+  color: var(--color-text-secondary);
+  background: none;
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-out);
+}
+.monipo-schedule-chip:active {
+  transform: scale(0.95);
+}
+.monipo-schedule-chip.selected {
+  border-color: var(--color-dawn);
+  color: var(--color-dawn);
+  background: rgba(107, 90, 138, 0.08);
+}
+/* 曜日選択チップ */
+.monipo-day-chips {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  width: 100%;
+}
+.monipo-day-chip {
+  flex: 1;
+  padding: var(--space-2) 0;
+  border: 1.5px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: var(--text-body-sm);
+  color: var(--color-text-secondary);
+  background: none;
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-out);
+}
+.monipo-day-chip:active {
+  transform: scale(0.92);
+}
+.monipo-day-chip.selected {
+  border-color: var(--color-dawn);
+  color: var(--color-dawn);
+  background: rgba(107, 90, 138, 0.08);
+}
+.monipo-time-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) 0;
+  border-top: 1px solid var(--color-border-secondary);
+}
+.monipo-time-label {
+  font-size: var(--text-body);
+  color: var(--color-text-secondary);
+}
+.monipo-time-value {
+  font-size: var(--text-h2);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+/* 関係性インジケーター */
+.monipo-relationship {
+  margin-bottom: var(--space-5);
+}
+.monipo-relationship-bar {
+  display: flex;
+  gap: 3px;
+  margin-bottom: var(--space-1);
+}
+.monipo-relationship-dot {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-border-secondary);
+}
+.monipo-relationship-dot.filled {
+  background: var(--color-dawn);
+}
+.monipo-relationship-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.5625rem;
+  color: var(--color-text-tertiary);
+  letter-spacing: 0.02em;
+}
+.monipo-relationship-labels .current {
+  color: var(--color-dawn);
+  font-weight: var(--weight-medium);
+}
+/* やりとり履歴（設定パネル内） */
+.monipo-history-section {
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border-secondary);
+}
+.monipo-history-title {
+  font-size: var(--text-caption);
+  color: var(--color-text-tertiary);
+  letter-spacing: var(--tracking-wide);
+  margin-bottom: var(--space-3);
+}
+.monipo-history-item {
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border-secondary);
+}
+.monipo-history-item:last-child {
+  border-bottom: none;
+}
+.monipo-history-date {
+  font-size: var(--text-overline);
+  color: var(--color-text-tertiary);
+  margin-bottom: 2px;
+}
+.monipo-history-monipo {
+  font-size: var(--text-caption);
+  color: var(--color-dawn);
+  padding-left: var(--space-2);
+  border-left: 2px solid rgba(107, 90, 138, 0.2);
+  margin-bottom: 4px;
+}
+.monipo-history-user {
+  font-family: var(--font-letter);
+  font-size: var(--text-caption);
+  color: var(--color-text-secondary);
+  padding-left: var(--space-2);
+  border-left: 2px solid rgba(228, 176, 138, 0.2);
+}
+/* 届いた手紙リスト内のモニポアバター */
+.inbox-item__monipo-avatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.inbox-item__monipo-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* 友達招待の控えめ導線 */
+.monipo-invite-hint {
+  font-family: var(--font-letter);
+  font-size: var(--text-caption);
+  color: var(--color-text-tertiary);
+  text-align: center;
+  padding: var(--space-3);
+  margin-top: var(--space-2);
+  font-style: italic;
+}
 </style>
 </head>
 <body>
@@ -3175,6 +3601,29 @@ body {
       <div class="sheet__cta-area">
         <button class="sheet__cta sheet__cta--ready" onclick="confirmFriendAlarmSetup()">この時間にとどける</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ===== モニポくん設定パネル ===== -->
+  <div class="monipo-settings-overlay" id="monipo-overlay" onclick="closeMonipoSettings()"></div>
+  <div class="monipo-settings-panel" id="monipo-panel">
+    <div class="monipo-settings-header">
+      <img src="monipo_brandguide/assets/Icon Concept_ Simplified Square_nobg.png" alt="モニポ" onerror="this.style.display='none'">
+      <div>
+        <div class="monipo-settings-title">モニポ</div>
+        <div class="monipo-settings-sub">…ポストに住むカエル</div>
+      </div>
+    </div>
+    <div class="monipo-relationship" id="monipo-relationship"></div>
+    <div class="settings-section-title">手紙のスケジュール</div>
+    <div class="monipo-schedule-chips" id="monipo-schedule-chips"></div>
+    <div class="monipo-time-row">
+      <span class="monipo-time-label">届く時間</span>
+      <span class="monipo-time-value" id="monipo-time-display">07:30</span>
+    </div>
+    <div class="monipo-history-section" id="monipo-history-section"></div>
+    <div style="margin-top:var(--space-5);">
+      <button class="btn btn-primary btn--block" onclick="closeMonipoSettings()">とじる</button>
     </div>
   </div>
 
@@ -3668,8 +4117,14 @@ function updateHomeBackground(hour) {
     deliveredList.querySelectorAll('.inbox-item').forEach(item => {
       item.classList.toggle('inbox-item--light', lightTime);
     });
-    deliveredList.querySelectorAll('.inbox-item__date').forEach(d => {
-      d.classList.toggle('inbox-item__date--light', lightTime);
+    deliveredList.querySelectorAll('.inbox-item__avatar').forEach(a => {
+      a.classList.toggle('inbox-item__avatar--light', lightTime);
+    });
+    deliveredList.querySelectorAll('.inbox-item__sender').forEach(s => {
+      s.classList.toggle('inbox-item__sender--light', lightTime);
+    });
+    deliveredList.querySelectorAll('.inbox-item__time').forEach(t => {
+      t.classList.toggle('inbox-item__time--light', lightTime);
     });
     deliveredList.querySelectorAll('.inbox-item__preview').forEach(p => {
       p.classList.toggle('inbox-item__preview--light', lightTime);
@@ -4349,20 +4804,29 @@ function updateHomeLetterArea() {
   waitingList.innerHTML = waitingHtml;
   if (waitingSection) waitingSection.style.display = futureAlarms.length > 0 ? '' : 'none';
 
-  // --- 届いた手紙（履歴から直近） ---
+  // --- 届いた手紙（履歴から直近5件、Gmail風） ---
   const history = JSON.parse(localStorage.getItem('mezame_history') || '[]');
-  const recentDelivered = history.slice(0, 3);
+  const recentDelivered = history.slice(0, 5);
   let deliveredHtml = '';
+  const userIcon = getUserIcon();
 
   recentDelivered.forEach(item => {
     const d = new Date(item.replyDate || item.letterDate);
-    const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
-    const preview = item.letter ? item.letter.substring(0, 28) + (item.letter.length > 28 ? '…' : '') : '';
+    const timeStr = `${d.getMonth()+1}/${d.getDate()}`;
+    const preview = item.letter ? item.letter.substring(0, 50) : '';
+    const sender = item.fromName || 'じぶん';
+    const avatarContent = sender === 'じぶん' ? userIcon : escapeHtml(sender[0]);
 
     deliveredHtml += `
       <div class="inbox-item">
-        <span class="inbox-item__date">${dateStr}</span>
-        <span class="inbox-item__preview">${escapeHtml(preview)}</span>
+        <div class="inbox-item__avatar">${avatarContent}</div>
+        <div class="inbox-item__body">
+          <div class="inbox-item__row">
+            <span class="inbox-item__sender">${escapeHtml(sender)}</span>
+            <span class="inbox-item__time">${timeStr}</span>
+          </div>
+          <div class="inbox-item__preview">${escapeHtml(preview)}</div>
+        </div>
       </div>
     `;
   });
@@ -4880,6 +5344,16 @@ function dismissAlarm() {
 function dismissAlarmReadOnly() {
   stopAlarmSound();
 
+  // モニポ手紙の場合は専用処理（alarmDataを使わない）
+  if (_monipoAlarmActive) {
+    _monipoAlarmActive = false;
+    navigateTo('home');
+    showToast('…まあ、いいけどね');
+    return;
+  }
+
+  if (!alarmData) return;
+
   if (alarmData.friendLetterId) {
     // フレンド手紙 → Firestoreで既読に（返事なし）
     const letterContent = document.getElementById('letter-content').textContent;
@@ -5010,7 +5484,11 @@ function renderHistory() {
 }
 
 // ===== モニポくんの下書き（Inline Assist） =====
-const GEMINI_API_KEY = 'GEMINI_KEY_REMOVED';
+// Gemini APIキーはlocalStorageから取得（設定画面で入力）
+function getGeminiApiKey() {
+  return localStorage.getItem('mezame_gemini_key') || '';
+}
+const GEMINI_API_KEY = getGeminiApiKey();
 let assistAbortController = null;
 let assistPrevText = ''; // undo用
 
@@ -5629,6 +6107,10 @@ function updateSettingsAccount() {
       <div style="text-align:center;padding:var(--space-6);color:var(--color-text-secondary);font-size:var(--text-body-sm);">
         読み込み中...
       </div>
+      <div class="settings-item" style="border-radius: var(--radius-lg); border-bottom:none; cursor:pointer;" onclick="handleLogout()">
+        <span class="settings-item-label" style="color:var(--color-error);">ログアウト</span>
+        <span class="settings-item-value">&rsaquo;</span>
+      </div>
     `;
   } else {
     container.innerHTML = `
@@ -5818,7 +6300,7 @@ function renderFriendsScreen() {
     content.innerHTML = `
       <div class="card login-prompt-card">
         <div class="login-prompt-card__text">
-          ともだちに手紙を送るには<br>ログインしてね
+          ともだちに手紙を送るには<br>ログインしてね<br><span style="font-size:var(--text-caption);color:var(--color-text-tertiary);">モニポの手紙はログインなしでも届くよ</span>
         </div>
         <button class="btn btn-primary" onclick="navigateTo('auth-screen')">ログイン / 新規登録</button>
       </div>
@@ -6310,10 +6792,17 @@ async function updateHomeFriendLetters() {
         return;
       } else {
         const dateStr = `${deliverDate.getMonth()+1}/${deliverDate.getDate()}`;
+        const initial = (d.fromName || '?')[0];
         friendDeliveredHtml += `
           <div class="inbox-item inbox-item--friend">
-            <span class="inbox-item__date">${dateStr}</span>
-            <span class="inbox-item__preview">${fromName}からの手紙</span>
+            <div class="inbox-item__avatar">${escapeHtml(initial)}</div>
+            <div class="inbox-item__body">
+              <div class="inbox-item__row">
+                <span class="inbox-item__sender">${fromName}</span>
+                <span class="inbox-item__time">${dateStr}</span>
+              </div>
+              <div class="inbox-item__preview">${fromName}からの手紙</div>
+            </div>
           </div>
         `;
       }
@@ -6331,6 +6820,695 @@ async function updateHomeFriendLetters() {
     console.warn('updateHomeFriendLetters error:', e);
   }
 }
+
+// ============================================================
+// モニポくんフレンド機能
+// ============================================================
+
+// --- モニポ手紙テンプレート（Relationship Arc準拠） ---
+// phase判定は「モニポの手紙を受け取った日数」で行う（ブランドガイド通り）
+const monipoLetterPool = {
+  // Phase 1: 初対面（1-7通目）— 事務的、心を開いていない
+  phase1: [
+    '…ん。手紙、預かってるよ。\n…それだけ。',
+    '…おはよ。\n…僕はモニポ。ポストに住んでる。\n…まあ、よろしく。',
+    '…手紙きてたよ。読む？\n…っていうか、そのために起きたんでしょ。',
+    '…ん。届けにきた。\n…じゃあね。',
+    '…おはよ。\n…今日も手紙、預かっとくよ。',
+    '…ん。\n…手紙、ちゃんとあるよ。',
+    '…きのう書いたやつ、預かってるよ。\n…読む？',
+  ],
+  // Phase 2: 打ち解け（8-28通目）— 毒が出始める、ツッコミは信頼の証
+  phase2: [
+    '…まだ布団の中？\n…まあ、ポストの中も居心地いいから\n気持ちはわかるけど。',
+    '…またスヌーズ？\n…知ってた。',
+    '…ん。手紙きてたよ。\n…長いね。いや、いいんだけど。',
+    '…おはよ。\n…きのうの手紙、逆さまに読んでたかも。\n…冗談だよ。たぶん。',
+    '…ん。今日の手紙、悪くないじゃん。\n…って、別に褒めてないけど。',
+    '…おはよ。\n…きのうより早く起きたね。\n…僕はまだ眠いけど。',
+    '…ん。手紙届けにきた。\n…書くの上手くなったね。\n…いや、比較対象ないけど。',
+    '…まだ寝てるの？\n…まあ、僕も起きたくなかったけど。\n手紙あるからさ。',
+    '…ん。きのうの手紙、ちゃんと読んだよ。\n…全部ね。…長かったけど。',
+    '…おはよ。\n…今日は手紙、短いね。\n…たまにはそれもいいよ。',
+  ],
+  // Phase 3: 信頼（29-90通目）— ふと優しい瞬間が増える
+  phase3: [
+    '…ん。おはよ。\n…きのうの手紙、いいの書いたね。',
+    '…おはよ。\n…今日も手紙、ここにあるよ。\n…いつでも読んでね。',
+    '…ん。\n…最近、ちゃんと書いてくれるね。\n…まあ、嬉しいとかじゃないけど。',
+    '…おはよ。\n…きのうの手紙、読んでて\n…なんか、いい朝だなって。',
+    '…ん。手紙届けにきたよ。\n…毎朝これやるの、\n…悪くないかもね。',
+    '…おはよ。\n…返事くれたの、読んだよ。\n…ちゃんと。',
+    '…ん。\n…きょう、手紙多いね。\n…なんか、いい朝。',
+    '…おはよ。\n…きのう頑張ったみたいだね。\n…まあ、今日もぼちぼちね。',
+    '…ん。\n…手紙、ちゃんと届いてるよ。\n…僕がいる限り。',
+    '…おはよ。\n…最近の手紙、なんか変わった？\n…いい意味でね。',
+  ],
+  // Phase 4: 相棒（91通目〜）— 口数少なくても安心する存在
+  phase4: [
+    '…おはよ。',
+    '…ん。いつもの。',
+    '…おはよ。\n…今日もここにいるよ。',
+    '…ん。\n…きょうも、いい朝。',
+    '…おはよ。\n…読むよ。',
+    '…ん。\n…また明日ね。',
+    '…おはよ。\n…ここにいるよ。',
+    '…ん。手紙。\n…いつもありがとね。\n…って、言わないけど。',
+  ],
+  // コントラストの瞬間（稀に混ぜる）
+  contrast: [
+    '…いいの書いたね。',
+    '…今日は手紙、多いね。\n…なんか、いい朝。',
+    '…ちゃんと起きたね。\n…えらいじゃん。',
+  ],
+  // 手紙がない日の翌日（Flaw: 口数が減る）
+  afterNoReply: [
+    '…ん。\n…おはよ。',
+    '…おはよ。',
+    '…ん。',
+  ],
+};
+
+// 友達招待の示唆（2週間に1回程度、モニポが言いよどむ）
+const monipoInviteHints = [
+  '…ポスト、僕の手紙だけだったね。\n…まあ、いいんだけどね。',
+  '…他にも手紙来たら、朝もうちょっと楽しくなるかもね。\n…知らんけど。',
+  '…ポストの中、ちょっと広いんだよね。\n…手紙、もっと入るけど。…別にいいけど。',
+];
+
+// --- モニポ データ管理 ---
+function getMonipoState() {
+  const raw = localStorage.getItem('monipo_state');
+  if (raw) return JSON.parse(raw);
+  return {
+    schedule: 'daily',  // daily | weekdays | weekends
+    time: '07:30',
+    letterCount: 0,
+    letters: [],   // { date, content, read, replied }
+    replies: [],   // { date, text }
+    enabled: true,
+  };
+}
+
+function saveMonipoState(state) {
+  localStorage.setItem('monipo_state', JSON.stringify(state));
+}
+
+function getMonipoPhase(letterCount) {
+  if (letterCount <= 7) return 'phase1';
+  if (letterCount <= 28) return 'phase2';
+  if (letterCount <= 90) return 'phase3';
+  return 'phase4';
+}
+
+function getMonipoPhaseLabel(phase) {
+  const labels = { phase1: 'はじめまして', phase2: '打ち解け', phase3: '信頼', phase4: '相棒' };
+  return labels[phase] || 'はじめまして';
+}
+
+function getScheduleLabel(schedule) {
+  const labels = { daily: '毎日届く', weekdays: '平日だけ', weekends: '週末だけ', custom: '曜日指定', off: 'おやすみ中' };
+  return labels[schedule] || '毎日届く';
+}
+
+// モニポが今日手紙を届けるか判定
+function shouldMonipoDeliverToday(schedule, customDays) {
+  if (schedule === 'off') return false;
+  const day = new Date().getDay(); // 0=日, 6=土
+  if (schedule === 'daily') return true;
+  if (schedule === 'weekdays') return day >= 1 && day <= 5;
+  if (schedule === 'weekends') return day === 0 || day === 6;
+  if (schedule === 'custom') return Array.isArray(customDays) && customDays.includes(day);
+  return true;
+}
+
+// モニポの手紙を生成（日付ベースでデターミニスティック）
+function generateMonipoLetter(state) {
+  const today = new Date();
+  const dateKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+  // 今日の手紙が既に生成済みなら返す
+  const existing = state.letters.find(l => l.date === dateKey);
+  if (existing) return existing;
+
+  const phase = getMonipoPhase(state.letterCount);
+  const pool = monipoLetterPool[phase];
+
+  // 前回返信なしならafterNoReply
+  const lastLetter = state.letters[state.letters.length - 1];
+  const useNoReply = lastLetter && !lastLetter.replied && state.letterCount > 3;
+
+  // コントラストの瞬間（7%の確率、phase3以降）
+  const seed = today.getFullYear() * 10000 + (today.getMonth()+1) * 100 + today.getDate();
+  const useContrast = (seed % 14 === 0) && (phase === 'phase3' || phase === 'phase4');
+
+  let content;
+  if (useNoReply && monipoLetterPool.afterNoReply.length > 0) {
+    content = monipoLetterPool.afterNoReply[seed % monipoLetterPool.afterNoReply.length];
+  } else if (useContrast) {
+    content = monipoLetterPool.contrast[seed % monipoLetterPool.contrast.length];
+  } else {
+    content = pool[seed % pool.length];
+  }
+
+  // 友達招待ヒント（14日に1回、letterCount > 5の場合）
+  let inviteHint = null;
+  if (state.letterCount > 5 && seed % 14 === 3) {
+    inviteHint = monipoInviteHints[seed % monipoInviteHints.length];
+  }
+
+  const letter = {
+    date: dateKey,
+    content: content,
+    inviteHint: inviteHint,
+    read: false,
+    replied: false,
+  };
+
+  state.letters.push(letter);
+  state.letterCount++;
+  // 古い手紙を30件までに制限
+  if (state.letters.length > 30) {
+    state.letters = state.letters.slice(-30);
+  }
+  saveMonipoState(state);
+  return letter;
+}
+
+// モニポの今日の手紙を取得（なければ生成）
+function getMonipoTodayLetter() {
+  const state = getMonipoState();
+  if (!state.enabled) return null;
+  if (!shouldMonipoDeliverToday(state.schedule, state.customDays)) return null;
+  return generateMonipoLetter(state);
+}
+
+// モニポに返信
+function saveMonipoReply(text) {
+  const state = getMonipoState();
+  const today = new Date();
+  const dateKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+  // 今日の手紙をreplied=trueに
+  const todayLetter = state.letters.find(l => l.date === dateKey);
+  if (todayLetter) todayLetter.replied = true;
+
+  state.replies.push({ date: dateKey, text: text });
+  // 古い返信を20件までに制限
+  if (state.replies.length > 20) {
+    state.replies = state.replies.slice(-20);
+  }
+  saveMonipoState(state);
+}
+
+// --- ホーム画面にモニポカードを挿入 ---
+function injectMonipoHomeCards() {
+  const state = getMonipoState();
+  if (!state.enabled) return;
+
+  const waitingList = document.getElementById('home-waiting-list');
+  const waitingSection = document.getElementById('home-waiting-section');
+  const deliveredList = document.getElementById('home-delivered-list');
+  const deliveredSection = document.getElementById('home-delivered-section');
+
+  const now = new Date();
+  const hour = now.getHours();
+  const lightTime = (hour >= 7 && hour < 16);
+  const lightClass = lightTime ? ' waiting-card--light' : '';
+  const fromLightClass = lightTime ? ' waiting-card__from--light' : '';
+  const dateLightClass = lightTime ? ' waiting-card__date--light' : '';
+  const timeLightClass = lightTime ? ' waiting-card__time--light' : '';
+  const badgeLightClass = lightTime ? ' monipo-schedule-badge--light' : '';
+
+  // 今日のモニポ手紙を確認
+  const todayLetter = getMonipoTodayLetter();
+  if (!todayLetter) return;
+
+  const [h, m] = state.time.split(':');
+  const deliveryHour = parseInt(h);
+  const deliveryMinute = parseInt(m);
+  const isBeforeDelivery = (hour < deliveryHour) || (hour === deliveryHour && now.getMinutes() < deliveryMinute);
+
+  if (!todayLetter.read) {
+    // 未読 → 常に「待ってる手紙」に表示（時間前はロック、時間後はタップで読める）
+    const today = new Date();
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
+    const dateStr = `${today.getMonth()+1}/${today.getDate()}（${days[today.getDay()]}）`;
+    const lockLabel = isBeforeDelivery ? ' 🔒' : '';
+
+    const monipoCardHtml = `
+      <div class="waiting-card waiting-card--monipo${lightClass}" onclick="openMonipoLetter()">
+        <div class="waiting-card__monipo-row">
+          <div class="waiting-card__monipo-avatar">
+            <img src="monipo_brandguide/assets/Icon Concept_ Simplified Square_nobg.png" alt="モニポ" onerror="this.parentElement.textContent='🐸'">
+          </div>
+          <div class="waiting-card__body">
+            <div class="waiting-card__date${dateLightClass}">${dateStr}</div>
+            <div class="waiting-card__time${timeLightClass}">${h}:${m}${lockLabel}</div>
+            <div class="waiting-card__from${fromLightClass}">モニポからの手紙</div>
+            <div class="monipo-schedule-badge${badgeLightClass}">${getScheduleLabel(state.schedule)}</div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    if (waitingList) {
+      waitingList.insertAdjacentHTML('afterbegin', monipoCardHtml);
+      if (waitingSection) waitingSection.style.display = '';
+    }
+  } else {
+    // 既読 → 「届いた手紙」にGmail形式で追加（他の手紙と同じフォーマット）
+    const preview = todayLetter.content.substring(0, 50);
+
+    const deliveredHtml = `
+      <div class="inbox-item inbox-item--monipo" onclick="openMonipoLetter()">
+        <div class="inbox-item__avatar">
+          <img src="monipo_brandguide/assets/Icon Concept_ Simplified Square_nobg.png" alt="モニポ" onerror="this.parentElement.textContent='🐸'">
+        </div>
+        <div class="inbox-item__body">
+          <div class="inbox-item__row">
+            <span class="inbox-item__sender">モニポ</span>
+            <span class="inbox-item__time">${h}:${m}</span>
+          </div>
+          <div class="inbox-item__preview">${escapeHtml(preview)}</div>
+        </div>
+      </div>
+    `;
+
+    if (deliveredList) {
+      deliveredList.insertAdjacentHTML('afterbegin', deliveredHtml);
+      if (deliveredSection) deliveredSection.style.display = '';
+    }
+
+    // 空状態を解除
+    const emptyEl = document.getElementById('home-empty-state');
+    if (emptyEl) { emptyEl.classList.remove('active'); emptyEl.innerHTML = ''; }
+  }
+}
+
+// --- モニポの手紙を読む ---
+function openMonipoLetter() {
+  const state = getMonipoState();
+  const today = new Date();
+  const dateKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+  const letter = state.letters.find(l => l.date === dateKey);
+
+  if (!letter) {
+    showToast('…まだ届いてないよ');
+    return;
+  }
+
+  // 配達時間チェック
+  const [h, m] = state.time.split(':');
+  const now = new Date();
+  if (now.getHours() < parseInt(h) || (now.getHours() === parseInt(h) && now.getMinutes() < parseInt(m))) {
+    showToast('…まだ届く時間じゃないよ');
+    return;
+  }
+
+  // 既読にする
+  letter.read = true;
+  saveMonipoState(state);
+
+  // アラーム画面のモニポセクションに表示
+  showMonipoLetterInAlarm(letter, state);
+}
+
+var _monipoAlarmActive = false;
+
+function showMonipoLetterInAlarm(letter, state) {
+  _monipoAlarmActive = true;
+  // alarm-screenを使って表示（morningテーマ）
+  const phaseLetterEl = document.getElementById('alarm-phase-letter');
+  const phaseReply = document.getElementById('alarm-phase-reply');
+  const phaseComplete = document.getElementById('alarm-phase-complete');
+
+  phaseLetterEl.style.display = 'flex';
+  if (phaseReply) phaseReply.style.display = 'none';
+  if (phaseComplete) phaseComplete.style.display = 'none';
+
+  const now = new Date();
+  document.getElementById('alarm-current-time').textContent =
+    String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+
+  document.getElementById('letter-sent-date').textContent = 'モニポが書いてくれた手紙';
+  document.getElementById('letter-content').textContent = letter.content;
+
+  // タイムカプセル領域を非表示
+  const tcArea = document.getElementById('timecapsule-area');
+  if (tcArea) tcArea.innerHTML = '';
+
+  // フレンド手紙領域にモニポ返信UIを追加
+  const friendArea = document.getElementById('friend-letters-area');
+  if (friendArea) {
+    let inviteHintHtml = '';
+    if (letter.inviteHint) {
+      inviteHintHtml = `<div class="monipo-invite-hint">${escapeHtml(letter.inviteHint)}</div>`;
+    }
+
+    friendArea.innerHTML = `
+      <div class="monipo-alarm-section animate-soft-rise" style="animation-delay:300ms;">
+        <div class="monipo-reply-area" style="border-top:none;padding-top:0;">
+          <div class="monipo-reply-label">モニポに返事を書く（書かなくてもいいよ）</div>
+          <textarea class="monipo-reply-input" id="monipo-reply-input" placeholder="…なんか書く？"></textarea>
+          <div class="monipo-reply-actions">
+            <button class="btn btn--sm btn-ghost" onclick="skipMonipoReply()" style="color:var(--morning-text-secondary);">書かない</button>
+            <button class="btn btn--sm btn-morning-primary" onclick="sendMonipoReply()">返事を送る</button>
+          </div>
+        </div>
+        ${inviteHintHtml}
+      </div>
+    `;
+  }
+
+  // アラーム: 返事を書く・スヌーズボタンを非表示（モニポレターでは独自UIを使う）
+  const replyBtn = document.getElementById('alarm-reply-btn');
+  if (replyBtn) replyBtn.style.display = 'none';
+  // スヌーズもモニポ手紙では不要
+  const snoozeBtn = replyBtn && replyBtn.closest('#alarm-phase-letter') ?
+    replyBtn.closest('#alarm-phase-letter').querySelector('[onclick*="snooze"]') : null;
+  if (snoozeBtn) snoozeBtn.style.display = 'none';
+
+  // 「読んだよ」ボタンを表示
+  const readOnlyBtn = document.getElementById('read-only-btn');
+  if (readOnlyBtn) {
+    readOnlyBtn.style.opacity = '1';
+    readOnlyBtn.style.pointerEvents = 'auto';
+    readOnlyBtn.textContent = '読んだ。';
+  }
+
+  // 到着テキスト変更
+  const arrivalText = document.querySelector('.alarm-arrival__text');
+  if (arrivalText) arrivalText.textContent = '…モニポから手紙きてたよ';
+
+  navigateTo('alarm-screen');
+
+  // アラーム音は鳴らさない（モニポの手紙を直接開いた場合）
+  alarmPlaying = false;
+}
+
+function sendMonipoReply() {
+  _monipoAlarmActive = false;
+  const input = document.getElementById('monipo-reply-input');
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text) {
+    showToast('…なにか書いてね');
+    return;
+  }
+  saveMonipoReply(text);
+  showToast('…ん。読んだよ');
+
+  // 完了フェーズへ
+  document.getElementById('alarm-phase-letter').style.display = 'none';
+  const complete = document.getElementById('alarm-phase-complete');
+  complete.style.display = 'flex';
+  complete.querySelector('.alarm-complete-main').textContent = '…ん。返事、読んだよ';
+  complete.querySelector('.alarm-complete-sub').textContent = '…また明日ね';
+}
+
+function skipMonipoReply() {
+  _monipoAlarmActive = false;
+  showToast('…まあ、いいけどね');
+  navigateTo('home');
+  updateHomeLetterArea();
+}
+
+// --- 友達画面にモニポくんを挿入 ---
+function injectMonipoToFriends() {
+  const content = document.getElementById('friends-content');
+  if (!content) return;
+
+  const state = getMonipoState();
+  const phase = getMonipoPhase(state.letterCount);
+  const statusTexts = {
+    phase1: '…手紙、預かるよ',
+    phase2: '…まだ起きてるの？',
+    phase3: '…ポストの中にいるよ',
+    phase4: '…いつもここにいるよ',
+  };
+
+  const monipoHtml = `
+    <div class="monipo-friend-row" onclick="openMonipoSettings()">
+      <div class="monipo-friend-row__avatar">
+        <img src="monipo_brandguide/assets/Icon Concept_ Simplified Square_nobg.png" alt="モニポ" onerror="this.parentElement.textContent='🐸'">
+      </div>
+      <div class="monipo-friend-row__info">
+        <div class="monipo-friend-row__name">モニポ</div>
+        <div class="monipo-friend-row__status">${statusTexts[phase]}</div>
+      </div>
+      <span style="font-size:var(--text-caption);color:var(--color-text-tertiary);">${getScheduleLabel(state.schedule)}</span>
+    </div>
+  `;
+
+  // 一番最初に挿入（既存のフレンドリストの前に）
+  const firstSection = content.querySelector('.section-title, .friend-card, .login-prompt-card, .card');
+  if (firstSection) {
+    firstSection.insertAdjacentHTML('beforebegin', monipoHtml);
+  } else {
+    content.insertAdjacentHTML('afterbegin', monipoHtml);
+  }
+}
+
+// --- モニポ設定パネル ---
+function openMonipoSettings() {
+  const state = getMonipoState();
+  const phase = getMonipoPhase(state.letterCount);
+
+  // スケジュールチップ
+  const chips = document.getElementById('monipo-schedule-chips');
+  const scheduleOptions = [
+    { value: 'daily', label: '毎日' },
+    { value: 'weekdays', label: '平日だけ' },
+    { value: 'weekends', label: '週末だけ' },
+    { value: 'custom', label: '曜日えらぶ' },
+    { value: 'off', label: 'おやすみ' },
+  ];
+  const isCustom = state.schedule === 'custom';
+  const dayLabels = ['日','月','火','水','木','金','土'];
+  const customDays = state.customDays || [1,2,3,4,5]; // デフォルト平日
+
+  let chipsHtml = scheduleOptions.map(opt =>
+    `<button class="monipo-schedule-chip${state.schedule === opt.value ? ' selected' : ''}" onclick="setMonipoSchedule('${opt.value}')">${opt.label}</button>`
+  ).join('');
+
+  // 曜日指定の場合は曜日チップを追加表示
+  if (isCustom) {
+    chipsHtml += '<div class="monipo-day-chips">';
+    chipsHtml += dayLabels.map((label, i) =>
+      `<button class="monipo-day-chip${customDays.includes(i) ? ' selected' : ''}" onclick="toggleMonipoDay(${i})">${label}</button>`
+    ).join('');
+    chipsHtml += '</div>';
+  }
+  chips.innerHTML = chipsHtml;
+
+  // 時間表示
+  document.getElementById('monipo-time-display').textContent = state.time;
+
+  // 関係性バー
+  const phases = ['phase1', 'phase2', 'phase3', 'phase4'];
+  const currentIdx = phases.indexOf(phase);
+  const relEl = document.getElementById('monipo-relationship');
+  relEl.innerHTML = `
+    <div class="monipo-relationship-bar">
+      ${phases.map((p, i) => `<div class="monipo-relationship-dot${i <= currentIdx ? ' filled' : ''}"></div>`).join('')}
+    </div>
+    <div class="monipo-relationship-labels">
+      ${phases.map((p, i) => `<span${i === currentIdx ? ' class="current"' : ''}>${getMonipoPhaseLabel(p)}</span>`).join('')}
+    </div>
+  `;
+
+  // やりとり履歴
+  const historySection = document.getElementById('monipo-history-section');
+  const recentLetters = state.letters.slice(-5).reverse();
+  if (recentLetters.length > 0) {
+    let histHtml = '<div class="monipo-history-title">最近のやりとり</div>';
+    recentLetters.forEach(l => {
+      const d = new Date(l.date + 'T00:00:00');
+      const days = ['日','月','火','水','木','金','土'];
+      const dateStr = `${d.getMonth()+1}/${d.getDate()}（${days[d.getDay()]}）`;
+      const reply = state.replies.find(r => r.date === l.date);
+
+      histHtml += `<div class="monipo-history-item">
+        <div class="monipo-history-date">${dateStr}</div>
+        <div class="monipo-history-monipo">${escapeHtml(l.content.split('\n')[0])}</div>
+        ${reply ? `<div class="monipo-history-user">${escapeHtml(reply.text.substring(0, 40))}</div>` : ''}
+      </div>`;
+    });
+    historySection.innerHTML = histHtml;
+  } else {
+    historySection.innerHTML = '';
+  }
+
+  // パネル表示
+  document.getElementById('monipo-overlay').classList.add('open');
+  document.getElementById('monipo-panel').classList.add('open');
+}
+
+function closeMonipoSettings() {
+  document.getElementById('monipo-overlay').classList.remove('open');
+  document.getElementById('monipo-panel').classList.remove('open');
+}
+
+function setMonipoSchedule(schedule) {
+  const state = getMonipoState();
+  state.schedule = schedule;
+  if (schedule === 'off') {
+    state.enabled = false;
+  } else {
+    state.enabled = true;
+    if (schedule === 'custom' && !state.customDays) {
+      state.customDays = [1,2,3,4,5]; // デフォルト平日
+    }
+  }
+  saveMonipoState(state);
+
+  // 設定パネルのチップを再描画（曜日チップの表示切替のため）
+  openMonipoSettings();
+
+  const toastMap = {
+    daily: '…毎日届けるよ',
+    weekdays: '…平日だけね',
+    weekends: '…週末だけね',
+    custom: '…曜日をえらんでね',
+    off: '…おやすみするね',
+  };
+  showToast(toastMap[schedule] || '…わかった');
+}
+
+function toggleMonipoDay(dayIndex) {
+  const state = getMonipoState();
+  if (!state.customDays) state.customDays = [];
+  const idx = state.customDays.indexOf(dayIndex);
+  if (idx >= 0) {
+    state.customDays.splice(idx, 1);
+  } else {
+    state.customDays.push(dayIndex);
+    state.customDays.sort();
+  }
+  // 全部オフにしたら off に切替
+  if (state.customDays.length === 0) {
+    state.schedule = 'off';
+    state.enabled = false;
+  }
+  saveMonipoState(state);
+
+  // チップUI更新
+  document.querySelectorAll('.monipo-day-chip').forEach((c, i) => {
+    c.classList.toggle('selected', state.customDays.includes(i));
+  });
+
+  const dayLabels = ['日','月','火','水','木','金','土'];
+  const selectedLabels = state.customDays.map(d => dayLabels[d]).join('・');
+  showToast(`…${selectedLabels || 'なし'}`);
+}
+
+// --- アラーム画面にモニポ手紙を追加 ---
+function injectMonipoToAlarm() {
+  const state = getMonipoState();
+  if (!state.enabled) return;
+
+  const todayLetter = getMonipoTodayLetter();
+  if (!todayLetter || todayLetter.read) return;
+
+  // アラームで起きたとき、モニポの手紙も一緒に表示
+  const friendArea = document.getElementById('friend-letters-area');
+  if (!friendArea) return;
+
+  todayLetter.read = true;
+  saveMonipoState(state);
+
+  const preview = todayLetter.content;
+
+  let inviteHintHtml = '';
+  if (todayLetter.inviteHint) {
+    inviteHintHtml = `<div class="monipo-invite-hint">${escapeHtml(todayLetter.inviteHint)}</div>`;
+  }
+
+  friendArea.innerHTML += `
+    <div class="monipo-alarm-section animate-soft-rise" style="animation-delay:300ms;">
+      <div class="monipo-alarm-card">
+        <div class="monipo-alarm-header">
+          <div class="monipo-alarm-avatar">
+            <img src="monipo_brandguide/assets/Icon Concept_ Simplified Square_nobg.png" alt="モニポ" onerror="this.parentElement.textContent='🐸'">
+          </div>
+          <div class="monipo-alarm-from">モニポからも手紙きてたよ</div>
+        </div>
+        <div class="monipo-alarm-body">${escapeHtml(preview)}</div>
+        <div class="monipo-reply-area">
+          <div class="monipo-reply-label">モニポに返事（任意）</div>
+          <textarea class="monipo-reply-input" id="monipo-reply-input" placeholder="…なんか書く？"></textarea>
+          <div class="monipo-reply-actions">
+            <button class="btn btn--sm btn-morning-primary" onclick="sendMonipoReply()">返事を送る</button>
+          </div>
+        </div>
+      </div>
+      ${inviteHintHtml}
+    </div>
+  `;
+}
+
+// --- 既存関数をラップしてモニポ機能を統合 ---
+const _origUpdateHomeLetterArea = updateHomeLetterArea;
+updateHomeLetterArea = function() {
+  _origUpdateHomeLetterArea();
+  injectMonipoHomeCards();
+};
+
+const _origRenderFriendsScreen = renderFriendsScreen;
+renderFriendsScreen = function() {
+  _origRenderFriendsScreen();
+  injectMonipoToFriends();
+};
+
+const _origTriggerAlarm = triggerAlarm;
+triggerAlarm = function() {
+  _monipoAlarmActive = false;
+  // モニポ手紙で非表示にしたボタンを復元
+  const phaseLetterEl = document.getElementById('alarm-phase-letter');
+  if (phaseLetterEl) {
+    const snoozeBtn = phaseLetterEl.querySelector('[onclick*="snooze"]');
+    if (snoozeBtn) snoozeBtn.style.display = '';
+  }
+  const replyBtn = document.getElementById('alarm-reply-btn');
+  if (replyBtn) replyBtn.style.display = '';
+
+  _origTriggerAlarm();
+  // 自分への手紙のアラーム時にモニポの手紙も追加
+  if (alarmData && !alarmData.friendLetterId) {
+    injectMonipoToAlarm();
+  }
+};
+
+// --- モニポ初期化 ---
+function initMonipo() {
+  const state = getMonipoState();
+
+  // 初回: モニポを有効化
+  if (!localStorage.getItem('monipo_state')) {
+    const initialState = {
+      schedule: 'daily',
+      time: '07:30',
+      letterCount: 0,
+      letters: [],
+      replies: [],
+      enabled: true,
+    };
+    saveMonipoState(initialState);
+  }
+
+  // 今日の手紙を事前生成（ホーム表示用）
+  if (state.enabled && shouldMonipoDeliverToday(state.schedule, state.customDays)) {
+    generateMonipoLetter(state);
+  }
+}
+
+// init時にmonipo初期化を呼ぶ
+const _origInit = init;
+init = function() {
+  _origInit();
+  initMonipo();
+};
 
 // ===== 起動 =====
 init();
