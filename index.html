@@ -1025,37 +1025,45 @@ body {
 /* --- セクション見出し --- */
 .home-section-heading {
   font-family: var(--font-sans);
-  font-size: var(--text-caption);
+  font-size: 0.6875rem;
   font-weight: var(--weight-regular);
-  color: rgba(255, 255, 255, 0.35);
-  letter-spacing: 0.08em;
-  padding: var(--space-5) var(--space-5) var(--space-2);
-  text-transform: uppercase;
+  color: rgba(250, 246, 241, 0.3);
+  letter-spacing: 0.1em;
+  padding: var(--space-6) var(--space-5) var(--space-3);
 }
 .home-section-heading--light {
   color: var(--color-text-tertiary);
 }
+/* 届いた手紙セクション — さらに控えめ */
+.home-section-heading--secondary {
+  padding-top: var(--space-8);
+  color: rgba(250, 246, 241, 0.2);
+}
+.home-section-heading--secondary.home-section-heading--light {
+  color: rgba(26, 21, 32, 0.3);
+}
 
-/* --- 待ってる手紙（高優先度カード） --- */
+/* --- 待ってる手紙（ヒーロー） --- */
 .home-waiting-list {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  padding: 0 var(--space-4);
+  padding: 0 var(--space-5);
 }
 .waiting-card {
   position: relative;
   display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-5) var(--space-5);
+  align-items: stretch;
+  padding: var(--space-6) var(--space-6) var(--space-5);
   background: var(--glass-night-elevated-bg);
-  -webkit-backdrop-filter: blur(var(--glass-night-elevated-blur));
-  backdrop-filter: blur(var(--glass-night-elevated-blur));
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
   border: 1px solid var(--glass-night-elevated-border);
+  border-left: 3px solid var(--color-sunrise);
   border-radius: var(--radius-lg);
   cursor: pointer;
   transition: transform var(--duration-fast) var(--ease-spring);
+  box-shadow: 0 4px 20px rgba(228, 176, 138, 0.06);
 }
 .waiting-card:active {
   transform: scale(0.98);
@@ -1064,42 +1072,49 @@ body {
   background: var(--glass-elevated-bg);
   -webkit-backdrop-filter: blur(var(--glass-elevated-blur));
   backdrop-filter: blur(var(--glass-elevated-blur));
-  border: 1px solid var(--glass-elevated-border);
+  border-color: var(--glass-elevated-border);
+  border-left: 3px solid var(--color-primary);
+  box-shadow: 0 4px 20px rgba(107, 90, 138, 0.06);
 }
-.waiting-card__icon {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-md);
+/* フレンドカード — dawn アクセント */
+.waiting-card--friend {
+  border-left-color: var(--color-dawn);
+}
+.waiting-card--friend.waiting-card--light {
+  border-left-color: var(--color-dawn);
+}
+.waiting-card__friend-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  font-size: var(--text-h3);
-  background: rgba(228, 176, 138, 0.12);
-}
-.waiting-card__icon--friend {
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
   background: rgba(107, 90, 138, 0.15);
+  color: rgba(250, 246, 241, 0.8);
+  margin-right: var(--space-4);
+  align-self: center;
 }
-.waiting-card__icon--light {
-  background: rgba(107, 90, 138, 0.08);
-}
-.waiting-card__icon--friend.waiting-card__icon--light {
+.waiting-card__friend-badge--light {
   background: rgba(107, 90, 138, 0.10);
+  color: var(--color-primary);
 }
 .waiting-card__body {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
 }
 .waiting-card__time {
   font-family: var(--font-sans);
-  font-size: var(--text-h3);
-  font-weight: var(--weight-medium);
-  color: var(--night-text-primary);
-  letter-spacing: -0.01em;
-  line-height: 1.2;
+  font-size: 2.25rem;
+  font-weight: var(--weight-bold);
+  color: rgba(250, 246, 241, 0.95);
+  letter-spacing: -0.03em;
+  line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 .waiting-card__time--light {
@@ -1108,222 +1123,126 @@ body {
 .waiting-card__date {
   font-family: var(--font-sans);
   font-size: var(--text-body-sm);
-  color: var(--night-text-secondary);
+  color: rgba(250, 246, 241, 0.5);
   letter-spacing: var(--tracking-normal);
+  margin-top: 6px;
 }
 .waiting-card__date--light {
   color: var(--color-text-secondary);
 }
 .waiting-card__sub {
-  font-family: var(--font-sans);
+  font-family: var(--font-letter);
   font-size: var(--text-caption);
-  color: var(--night-text-tertiary);
+  color: rgba(250, 246, 241, 0.3);
   letter-spacing: var(--tracking-normal);
+  line-height: var(--leading-normal);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-top: 2px;
+  margin-top: var(--space-3);
 }
 .waiting-card__sub--light {
   color: var(--color-text-tertiary);
 }
-.waiting-card__status {
-  flex-shrink: 0;
-  font-family: var(--font-sans);
-  font-size: var(--text-caption);
-  font-weight: var(--weight-medium);
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-full);
-  background: rgba(228, 176, 138, 0.15);
-  color: var(--color-sunrise);
-}
-.waiting-card__status--light {
-  background: rgba(107, 90, 138, 0.1);
-  color: var(--color-primary);
-}
 .waiting-card__delete {
   position: absolute;
-  top: var(--space-2);
-  right: var(--space-2);
-  width: 32px;
-  height: 32px;
+  top: var(--space-3);
+  right: var(--space-3);
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
   background: none;
-  color: var(--night-text-tertiary);
-  font-size: var(--text-caption);
+  color: rgba(250, 246, 241, 0.25);
   border-radius: var(--radius-full);
   cursor: pointer;
-  opacity: 0.4;
-  transition: opacity var(--duration-fast) var(--ease-out);
-  -webkit-tap-highlight-color: transparent;
-}
-.waiting-card__delete:active {
-  opacity: 1;
-  background: rgba(201, 91, 104, 0.15);
-}
-.waiting-card__delete--light {
-  color: var(--color-text-tertiary);
-}
-.waiting-card__delete--light:active {
-  background: rgba(201, 91, 104, 0.1);
-}
-
-/* --- 受信ボックスリスト（届いた手紙） --- */
-.inbox {
-  display: flex;
-  flex-direction: column;
-}
-.inbox-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-4) var(--space-5);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  cursor: pointer;
-  transition: background-color var(--duration-fast) var(--ease-out);
-  text-align: left;
-}
-.inbox-item:active {
-  background: rgba(255, 255, 255, 0.04);
-}
-.inbox-item--light {
-  border-bottom-color: rgba(0, 0, 0, 0.06);
-}
-.inbox-item--light:active {
-  background: rgba(0, 0, 0, 0.03);
-}
-
-/* アイコン（左側の丸） */
-.inbox-item__icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  font-size: var(--text-h3);
-}
-.inbox-item__icon--self {
-  background: rgba(255, 255, 255, 0.08);
-}
-.inbox-item__icon--friend {
-  background: rgba(107, 63, 160, 0.15);
-}
-.inbox-item__icon--self.inbox-item__icon--light {
-  background: rgba(0, 0, 0, 0.06);
-}
-.inbox-item__icon--friend.inbox-item__icon--light {
-  background: rgba(107, 63, 160, 0.1);
-}
-
-/* テキストエリア（中央） */
-.inbox-item__body {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.inbox-item__title {
-  font-family: var(--font-sans);
-  font-size: var(--text-body);
-  font-weight: var(--weight-medium);
-  color: var(--night-text-primary);
-  letter-spacing: var(--tracking-normal);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.inbox-item__title--light {
-  color: var(--color-text-primary);
-}
-.inbox-item__sub {
-  font-family: var(--font-sans);
-  font-size: var(--text-body-sm);
-  color: var(--night-text-tertiary);
-  letter-spacing: var(--tracking-normal);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.inbox-item__sub--light {
-  color: var(--color-text-tertiary);
-}
-
-/* 右側ステータス（全背景でコントラスト確保） */
-.inbox-item__status {
-  flex-shrink: 0;
-  font-family: var(--font-sans);
-  font-size: var(--text-caption);
-  font-weight: var(--weight-medium);
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-full);
-  background: rgba(232, 168, 124, 0.15);
-  color: var(--color-sunrise);
-}
-.inbox-item__status--light {
-  background: rgba(107, 63, 160, 0.1);
-  color: var(--color-primary);
-}
-
-/* 削除ボタン */
-.inbox-item__delete {
-  flex-shrink: 0;
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: none;
-  color: var(--night-text-tertiary);
-  font-size: var(--text-body);
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  opacity: 0.5;
-  transition: opacity var(--duration-fast) var(--ease-out),
+  transition: color var(--duration-fast) var(--ease-out),
               background-color var(--duration-fast) var(--ease-out);
   -webkit-tap-highlight-color: transparent;
 }
-.inbox-item__delete:active {
-  opacity: 1;
+.waiting-card__delete:active {
+  color: rgba(250, 246, 241, 0.6);
   background: rgba(201, 91, 104, 0.15);
 }
-.inbox-item__delete--light {
+.waiting-card__delete--light {
+  color: rgba(26, 21, 32, 0.2);
+}
+.waiting-card__delete--light:active {
+  color: var(--color-text-secondary);
+  background: rgba(201, 91, 104, 0.1);
+}
+
+/* --- 届いた手紙（セカンダリリスト） --- */
+.inbox {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0 var(--space-5);
+}
+.inbox-item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  text-align: left;
+}
+.inbox-item:last-child {
+  border-bottom: none;
+}
+.inbox-item--light {
+  border-bottom-color: rgba(0, 0, 0, 0.04);
+}
+
+/* 届いた手紙 — 日付ラベル */
+.inbox-item__date {
+  flex-shrink: 0;
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: var(--weight-regular);
+  color: rgba(250, 246, 241, 0.3);
+  letter-spacing: 0.04em;
+  min-width: 4.5em;
+  font-variant-numeric: tabular-nums;
+}
+.inbox-item__date--light {
   color: var(--color-text-tertiary);
 }
-.inbox-item__delete--light:active {
-  background: rgba(201, 91, 104, 0.1);
+/* 届いた手紙 — プレビューテキスト */
+.inbox-item__preview {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-letter);
+  font-size: var(--text-caption);
+  color: rgba(250, 246, 241, 0.4);
+  letter-spacing: var(--tracking-normal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.inbox-item__preview--light {
+  color: var(--color-text-secondary);
 }
 
 /* --- 空状態 --- */
 .inbox-empty {
   display: none;
-  flex: 1;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--space-8);
+  padding: var(--space-12) var(--space-6);
   text-align: center;
 }
 .inbox-empty.active {
   display: flex;
 }
-.inbox-empty__icon {
-  font-size: 2.5rem;
-  margin-bottom: var(--space-4);
-  opacity: 0.3;
-}
 .inbox-empty__text {
   font-family: var(--font-letter);
-  font-size: var(--text-body);
-  color: rgba(255, 255, 255, 0.35);
+  font-size: var(--text-body-sm);
+  color: rgba(255, 255, 255, 0.25);
   line-height: var(--leading-relaxed);
-  max-width: 240px;
 }
 .inbox-empty__text--light {
   color: var(--color-text-tertiary);
@@ -1812,38 +1731,29 @@ body {
     font-size: var(--text-caption);
   }
   .home-section-heading {
-    padding: var(--space-4) var(--space-4) var(--space-1);
-    font-size: 0.6875rem;
+    padding: var(--space-4) var(--space-4) var(--space-2);
+    font-size: 0.625rem;
   }
   .waiting-card {
-    padding: var(--space-4);
-    gap: var(--space-3);
-  }
-  .waiting-card__icon {
-    width: 42px;
-    height: 42px;
+    padding: var(--space-5) var(--space-5) var(--space-4);
   }
   .waiting-card__time {
-    font-size: var(--text-body);
+    font-size: 1.75rem;
+  }
+  .waiting-card__friend-badge {
+    width: 36px;
+    height: 36px;
+    margin-right: var(--space-3);
   }
   .home-waiting-list {
-    padding: 0 var(--space-3);
+    padding: 0 var(--space-4);
     gap: var(--space-2);
   }
+  .inbox {
+    padding: 0 var(--space-4);
+  }
   .inbox-item {
-    padding: var(--space-3) var(--space-4);
-    gap: var(--space-3);
-  }
-  .inbox-item__icon {
-    width: 38px;
-    height: 38px;
-    font-size: var(--text-body);
-  }
-  .inbox-item__title {
-    font-size: var(--text-body-sm);
-  }
-  .inbox-item__sub {
-    font-size: var(--text-caption);
+    padding: var(--space-1) 0;
   }
   .home-fab {
     height: 44px;
@@ -2810,7 +2720,7 @@ body {
       </div>
       <!-- 届いた手紙 -->
       <div id="home-delivered-section" style="display:none;">
-        <div class="home-section-heading" id="home-delivered-heading">届いた手紙</div>
+        <div class="home-section-heading home-section-heading--secondary" id="home-delivered-heading">届いた手紙</div>
         <div class="inbox" id="home-delivered-list"></div>
       </div>
       <!-- 旧ID互換（他のJSから参照） -->
@@ -3658,8 +3568,8 @@ function updateHomeBackground(hour) {
     waitingList.querySelectorAll('.waiting-card').forEach(c => {
       c.classList.toggle('waiting-card--light', lightTime);
     });
-    waitingList.querySelectorAll('.waiting-card__icon').forEach(ic => {
-      ic.classList.toggle('waiting-card__icon--light', lightTime);
+    waitingList.querySelectorAll('.waiting-card__friend-badge').forEach(b => {
+      b.classList.toggle('waiting-card__friend-badge--light', lightTime);
     });
     waitingList.querySelectorAll('.waiting-card__time').forEach(t => {
       t.classList.toggle('waiting-card__time--light', lightTime);
@@ -3669,9 +3579,6 @@ function updateHomeBackground(hour) {
     });
     waitingList.querySelectorAll('.waiting-card__sub').forEach(s => {
       s.classList.toggle('waiting-card__sub--light', lightTime);
-    });
-    waitingList.querySelectorAll('.waiting-card__status').forEach(s => {
-      s.classList.toggle('waiting-card__status--light', lightTime);
     });
     waitingList.querySelectorAll('.waiting-card__delete').forEach(d => {
       d.classList.toggle('waiting-card__delete--light', lightTime);
@@ -3684,20 +3591,11 @@ function updateHomeBackground(hour) {
     deliveredList.querySelectorAll('.inbox-item').forEach(item => {
       item.classList.toggle('inbox-item--light', lightTime);
     });
-    deliveredList.querySelectorAll('.inbox-item__icon--self').forEach(ic => {
-      ic.classList.toggle('inbox-item__icon--light', lightTime);
+    deliveredList.querySelectorAll('.inbox-item__date').forEach(d => {
+      d.classList.toggle('inbox-item__date--light', lightTime);
     });
-    deliveredList.querySelectorAll('.inbox-item__icon--friend').forEach(ic => {
-      ic.classList.toggle('inbox-item__icon--light', lightTime);
-    });
-    deliveredList.querySelectorAll('.inbox-item__title').forEach(t => {
-      t.classList.toggle('inbox-item__title--light', lightTime);
-    });
-    deliveredList.querySelectorAll('.inbox-item__sub').forEach(s => {
-      s.classList.toggle('inbox-item__sub--light', lightTime);
-    });
-    deliveredList.querySelectorAll('.inbox-item__status').forEach(s => {
-      s.classList.toggle('inbox-item__status--light', lightTime);
+    deliveredList.querySelectorAll('.inbox-item__preview').forEach(p => {
+      p.classList.toggle('inbox-item__preview--light', lightTime);
     });
   }
 
@@ -4237,20 +4135,19 @@ function updateHomeLetterArea() {
     const initial = isFriend ? escapeHtml((alarm.friendFromName || '?')[0]) : null;
     const preview = isFriend
       ? `${fromName}からの手紙`
-      : (alarm.letter ? alarm.letter.substring(0, 30) + (alarm.letter.length > 30 ? '…' : '') : '');
-    const iconClass = isFriend ? 'waiting-card__icon--friend' : '';
+      : (alarm.letter ? alarm.letter.substring(0, 24) + (alarm.letter.length > 24 ? '…' : '') : '');
+    const friendClass = isFriend ? ' waiting-card--friend' : '';
 
     waitingHtml += `
-      <div class="waiting-card" ${!isFriend ? `onclick="openWriteSheet(${alarm.id})"` : ''}>
-        <div class="waiting-card__icon ${iconClass}">${isFriend ? initial : getUserIcon()}</div>
+      <div class="waiting-card${friendClass}" ${!isFriend ? `onclick="openWriteSheet(${alarm.id})"` : ''}>
+        ${isFriend ? `<div class="waiting-card__friend-badge">${initial}</div>` : ''}
         <div class="waiting-card__body">
           <div class="waiting-card__time">${h}:${m}</div>
           <div class="waiting-card__date">${dateStr}</div>
           ${preview ? `<div class="waiting-card__sub">${preview}</div>` : ''}
         </div>
-        <span class="waiting-card__status">${isFriend ? '予約中' : '預かり中'}</span>
         <button class="waiting-card__delete" onclick="event.stopPropagation();deleteAlarm(${alarm.id})" aria-label="削除">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
     `;
@@ -4259,24 +4156,20 @@ function updateHomeLetterArea() {
   waitingList.innerHTML = waitingHtml;
   if (waitingSection) waitingSection.style.display = futureAlarms.length > 0 ? '' : 'none';
 
-  // --- 届いた手紙（履歴から直近のもの） ---
+  // --- 届いた手紙（履歴から直近） ---
   const history = JSON.parse(localStorage.getItem('mezame_history') || '[]');
-  const recentDelivered = history.slice(0, 5); // 直近5件
+  const recentDelivered = history.slice(0, 3);
   let deliveredHtml = '';
 
   recentDelivered.forEach(item => {
     const d = new Date(item.replyDate || item.letterDate);
-    const days = ['日', '月', '火', '水', '木', '金', '土'];
-    const dateStr = `${d.getMonth()+1}/${d.getDate()}（${days[d.getDay()]}）`;
-    const preview = item.letter ? item.letter.substring(0, 30) + (item.letter.length > 30 ? '…' : '') : '';
+    const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
+    const preview = item.letter ? item.letter.substring(0, 28) + (item.letter.length > 28 ? '…' : '') : '';
 
     deliveredHtml += `
       <div class="inbox-item">
-        <div class="inbox-item__icon inbox-item__icon--self">${getUserIcon()}</div>
-        <div class="inbox-item__body">
-          <div class="inbox-item__title">${dateStr}</div>
-          <div class="inbox-item__sub">${escapeHtml(preview)}</div>
-        </div>
+        <span class="inbox-item__date">${dateStr}</span>
+        <span class="inbox-item__preview">${escapeHtml(preview)}</span>
       </div>
     `;
   });
@@ -4284,14 +4177,11 @@ function updateHomeLetterArea() {
   deliveredList.innerHTML = deliveredHtml;
   if (deliveredSection) deliveredSection.style.display = recentDelivered.length > 0 ? '' : 'none';
 
-  // 空状態
+  // 空状態（アイコンなし、テキストのみ）
   if (emptyEl) {
     if (futureAlarms.length === 0 && recentDelivered.length === 0) {
       emptyEl.classList.add('active');
-      emptyEl.innerHTML = `
-        <div class="inbox-empty__icon">📮</div>
-        <p class="inbox-empty__text">…まだ手紙がないよ。<br>書いてみない？</p>
-      `;
+      emptyEl.innerHTML = `<p class="inbox-empty__text">…まだ手紙がないよ</p>`;
     } else {
       emptyEl.classList.remove('active');
       emptyEl.innerHTML = '';
@@ -6201,42 +6091,45 @@ async function updateHomeFriendLetters() {
       const deliverDate = d.deliverDate ? d.deliverDate.toDate() : (d.deliverAt ? d.deliverAt.toDate() : null);
       if (!deliverDate || deliverDate > todayEnd) return;
 
-      const initial = escapeHtml((d.fromName || '?')[0]);
       const fromName = escapeHtml(d.fromName || 'ともだち');
       const docId = escapeJsStr(doc.id);
       const escapedName = escapeJsStr(d.fromName || 'ともだち');
       const deliverMs = deliverDate.getTime();
 
       if (d.alarmSet === false) {
-        friendDeliveredHtml += `
-          <div class="inbox-item inbox-item--friend" onclick="setupFriendLetterAlarm('${docId}', '${escapedName}', ${deliverMs})">
-            <div class="inbox-item__icon inbox-item__icon--friend">${initial}</div>
-            <div class="inbox-item__body">
-              <div class="inbox-item__title">${fromName}からの手紙</div>
-              <div class="inbox-item__sub">…何時に開ける？</div>
+        // アラーム未設定 → 待ってる手紙セクションに特別カードとして追加
+        const waitingList = document.getElementById('home-waiting-list');
+        const waitingSection = document.getElementById('home-waiting-section');
+        if (waitingList) {
+          const initial = escapeHtml((d.fromName || '?')[0]);
+          const friendCardHtml = `
+            <div class="waiting-card waiting-card--friend inbox-item--friend" onclick="setupFriendLetterAlarm('${docId}', '${escapedName}', ${deliverMs})">
+              <div class="waiting-card__friend-badge">${initial}</div>
+              <div class="waiting-card__body">
+                <div class="waiting-card__time" style="font-size:var(--text-h3);">${fromName}</div>
+                <div class="waiting-card__date">…何時に開ける？</div>
+              </div>
             </div>
-            <span class="inbox-item__status" style="color:var(--color-primary);">時間をセット</span>
-          </div>
-        `;
+          `;
+          // 重複防止
+          waitingList.querySelectorAll('.inbox-item--friend').forEach(el => el.remove());
+          waitingList.insertAdjacentHTML('beforeend', friendCardHtml);
+          if (waitingSection) waitingSection.style.display = '';
+        }
       } else if (d.alarmSet === true) {
-        // alarmSet済み → 待ってる手紙として既にupdateHomeLetterAreaで表示
         return;
       } else {
-        const preview = d.letter ? escapeHtml(d.letter.substring(0, 30)) + (d.letter.length > 30 ? '…' : '') : '';
+        const dateStr = `${deliverDate.getMonth()+1}/${deliverDate.getDate()}`;
         friendDeliveredHtml += `
           <div class="inbox-item inbox-item--friend">
-            <div class="inbox-item__icon inbox-item__icon--friend">${initial}</div>
-            <div class="inbox-item__body">
-              <div class="inbox-item__title">${fromName}からの手紙</div>
-              <div class="inbox-item__sub">${preview || '…手紙が届いてるよ'}</div>
-            </div>
-            <span class="inbox-item__status">未読</span>
+            <span class="inbox-item__date">${dateStr}</span>
+            <span class="inbox-item__preview">${fromName}からの手紙</span>
           </div>
         `;
       }
     });
 
-    // 既存のフレンド手紙アイテムを削除してから追加（重複防止）
+    // 既存のフレンド届いた手紙を削除してから追加
     deliveredList.querySelectorAll('.inbox-item--friend').forEach(el => el.remove());
     if (friendDeliveredHtml) {
       deliveredList.insertAdjacentHTML('beforeend', friendDeliveredHtml);
